@@ -1,0 +1,6 @@
+cmake-build-*
+venv
+*.xml
+.idea/EnterpriseDiodeTester.iml
+.idea/
+FileTransferApp.zip

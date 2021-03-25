@@ -1,0 +1,27 @@
+// Copyright PA Knowledge Ltd 2021
+// For licence terms see LICENCE.md file
+
+#ifndef ENTERPRISEDIODE_TIMER_HPP
+#define ENTERPRISEDIODE_TIMER_HPP
+
+#include <functional>
+#include <boost/asio.hpp>
+#include <boost/asio/high_resolution_timer.hpp>
+#include "TimerInterface.hpp"
+
+class Timer : public TimerInterface
+{
+public:
+  explicit Timer(std::uint32_t timerPeriod);
+  explicit Timer(boost::posix_time::microseconds timerPeriod);
+  void runTimer(std::function<bool()> callback) override;
+
+private:
+  void tick() override;
+
+  boost::posix_time::microseconds primaryTimerPeriod{boost::posix_time::microseconds(1000000)};
+  boost::asio::io_service io;
+  boost::asio::deadline_timer deadlineTimer;
+};
+
+#endif //ENTERPRISEDIODE_TIMER_HPP

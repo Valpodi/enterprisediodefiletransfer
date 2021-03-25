@@ -1,0 +1,5 @@
+name: "C++ build action"
+description: "Build Enterprise Diode File Transfer app"
+runs:
+  using: 'docker'
+  image: '../../../docker/Dockerfile'

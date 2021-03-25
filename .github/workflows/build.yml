@@ -1,0 +1,17 @@
+name: build Enterprise Diode File Transfer app
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: build Enterprise Diode File Transfer app
+        run: ./scripts/compileAndTestInDocker.sh release
