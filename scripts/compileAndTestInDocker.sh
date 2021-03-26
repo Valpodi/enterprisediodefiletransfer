@@ -15,5 +15,5 @@ docker run -v "$(pwd)":"$(pwd)" \
   /bin/bash -c "pushd $(pwd) && scl enable devtoolset-9 \"HOME=/tmp ./scripts/compile.sh ${BUILDTYPE}\" && ./scripts/runIntegrationTests.sh && chown -R $(id -u):$(id -u) ."
 
 if [[ ${ARCHIVE} == "archive" ]]; then
-  zip FileTransferApp.zip cmake-build-release/Server cmake-build-release/Client cmake-build-release/Tester
+  zip FileTransferApp.zip cmake-build-release/server cmake-build-release/client cmake-build-release/tester
 fi
