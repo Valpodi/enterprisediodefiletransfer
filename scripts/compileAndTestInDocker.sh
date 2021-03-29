@@ -16,6 +16,6 @@ docker run -v "$(pwd)":"$(pwd)" \
 
 if [[ ${ARCHIVE} == "archive" ]]; then
   pushd cmake-build-release
-    zip FileTransferApp.zip server client tester
+    zip ../FileTransferApp.zip server client tester
   popd
 fi
