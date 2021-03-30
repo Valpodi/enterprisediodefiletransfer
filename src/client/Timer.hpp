@@ -1,5 +1,5 @@
 // Copyright PA Knowledge Ltd 2021
-// For licence terms see LICENCE.md file
+// MIT License. For licence terms see LICENCE.md file.
 
 #ifndef ENTERPRISEDIODE_TIMER_HPP
 #define ENTERPRISEDIODE_TIMER_HPP

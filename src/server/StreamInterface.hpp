@@ -1,5 +1,5 @@
 // Copyright PA Knowledge Ltd 2021
-// For licence terms see LICENCE.md file
+// MIT License. For licence terms see LICENCE.md file.
 
 #ifndef ENTERPRISEDIODE_STREAMINTERFACE_HPP
 #define ENTERPRISEDIODE_STREAMINTERFACE_HPP

@@ -1,5 +1,5 @@
 // Copyright PA Knowledge Ltd 2021
-// For licence terms see LICENCE.md file
+// MIT License. For licence terms see LICENCE.md file.
 
 #ifndef ENTERPRISEDIODETESTER_PACKET_HPP
 #define ENTERPRISEDIODETESTER_PACKET_HPP

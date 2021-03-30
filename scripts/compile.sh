@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright PA Knowledge Ltd 2021
-# MIT license, For licence terms see LICENCE.md file.
+# MIT License. For licence terms see LICENCE.md file.
 
 set -eu
 
