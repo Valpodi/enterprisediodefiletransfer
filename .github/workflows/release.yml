@@ -35,3 +35,6 @@ jobs:
           asset_path: FileTransferApp.zip
           asset_name: FileTransferApp
           asset_content_type: application/octet-stream
+
+      - name: Run latest-tag
+        uses: EndBug/latest-tag@latest
