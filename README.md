@@ -1,9 +1,11 @@
-# Enterprise Diode Tester source code
+# Enterprise Diode file transfer source code
 
+This repository contains the source code and scripts necessary to build and run a udp file transfer client and server.
+The "tester" is a loopback application running a server and client simultaneously.
 
-Compile the code for a centos 7 host using docker:
+Compile the code and run the tests using docker:
 
-    ./scripts/compileInDocker.sh release
+    ./scripts/compileAndTestInDocker.sh release
 
 Optionally: Check the binaries are working by running the integration tests:
 
@@ -24,4 +26,16 @@ Client arguments:
 2. ADDRESS: The IP address of the server.
 3. PORT: The port to send from.
 4. MTUSIZE: The size of the mtu in bytes.
-5. DATARATE_MBPS: The desired datarate in megabytes per second. Defaults to 0 - which means
+5. DATARATE_MBPS: The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
+
+Or if running the loopback tester:
+
+    ./tester --filename FILENAME --address ADDRESS --clientPort PORT --serverPort PORT --mtu MTUSIZE --datarate DATARATE_MBPS
+
+Client arguments:
+1. FILENAME: The path to the file to send.
+2. ADDRESS: The IP address of the server.
+3. CLIENT PORT: The port to send from.
+4. SERVER PORT: The port the server will listen on.
+5. MTUSIZE: The size of the mtu in bytes.
+6. DATARATE_MBPS: The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
