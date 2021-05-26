@@ -43,19 +43,22 @@ void Client::send(std::istream& inputStream)
 bool Client::sendFrame(std::istream& inputStream)
 {
   udpClient->send(generateEDPacket(inputStream, maxPayloadSize));
-  return inputStream.rdbuf()->in_avail();
+  return headerBuffer.at(8) != 1;
 }
 
 ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize)
 {
-  const auto payloadLength = inputStream.read((char*) &*(payloadBuffer.begin()), payloadSize).gcount();
-  incrementFrameCount();
-  if (!inputStream.rdbuf()->in_avail())
-  {
-    setEOF();
-  }
-  return {boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
-          boost::asio::buffer(payloadBuffer.data(), (size_t) payloadLength)};
+    if (inputStream.rdbuf()->in_avail())
+    {
+        const auto payloadLength = inputStream.read((char*) &*(payloadBuffer.begin()), payloadSize).gcount();
+        incrementFrameCount();
+        return {boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
+                boost::asio::buffer(payloadBuffer.data(), (size_t) payloadLength)};
+    }
+    else
+    {
+        return addEOFframe();
+    }
 }
 
 void Client::incrementFrameCount()
@@ -66,6 +69,14 @@ void Client::incrementFrameCount()
 void Client::setEOF()
 {
   headerBuffer.at(8) = 1;
+}
+
+ConstSocketBuffers Client::addEOFframe()
+{
+    incrementFrameCount();
+    setEOF();
+    return {boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
+            boost::asio::buffer(payloadBuffer.data(), (size_t) 0)};
 }
 
 void Client::setSessionID()

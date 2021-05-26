@@ -33,6 +33,8 @@ private:
   std::uint32_t maxPayloadSize;
   std::array<char, EnterpriseDiode::HeaderSizeInBytes> headerBuffer;
   std::vector<char> payloadBuffer;
+
+    ConstSocketBuffers addEOFframe();
 };
 
 boost::posix_time::microseconds calculateTimerPeriod(double dataRateMbps, std::uint32_t packetSizeBytes);
