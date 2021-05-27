@@ -20,6 +20,20 @@ TEST_CASE("ReorderPackets. Packets received in order are written to the output")
   REQUIRE(outputStream.str() == "BCDE");
 }
 
+TEST_CASE("ReorderPackets. Handling filename")
+{
+  std::stringstream outputStream;
+  StreamSpy stream(outputStream);
+  auto queueManager = ReorderPackets(4, 1024);
+  SECTION("Handling empty filename")
+  {
+    auto inputStream = std::stringstream("");
+    REQUIRE(queueManager.write(inputStream, &stream, 1, true));
+    REQUIRE(outputStream.str().empty());
+    REQUIRE(stream.storedFilename.empty());
+  }
+}
+
 TEST_CASE("ReorderPackets. Out-of-order packets")
 {
   std::stringstream outputStream;

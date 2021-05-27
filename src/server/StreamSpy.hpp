@@ -46,6 +46,7 @@ public:
   std::stringstream& outputStream;
   bool fileDeletedWasCalled = false;
   bool fileRenameWasCalled = false;
+  std::string storedFilename;
 };
 
 #endif //ENTERPRISEDIODETESTER_STREAMSPY_HPP
