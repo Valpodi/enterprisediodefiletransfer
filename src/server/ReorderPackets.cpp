@@ -37,14 +37,14 @@ bool ReorderPackets::checkQueueAndSend(StreamInterface* streamWrapper)
 {
   while (!queue.empty() && (queue.top().frameCount == nextFrameCount))
   {
-    streamWrapper->write(queue.top().frame);
-    const auto wasLastFrame = queue.top().endOfFile;
-    queue.pop();
-    ++nextFrameCount;
-    if (wasLastFrame)
+    if (queue.top().endOfFile)
     {
+      queue.pop();
       return true;
     }
+    streamWrapper->write(queue.top().frame);
+    queue.pop();
+    ++nextFrameCount;
   }
   return false;
 }

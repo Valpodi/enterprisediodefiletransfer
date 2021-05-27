@@ -20,7 +20,7 @@ void ClientWrapper::sendData(const std::string& filename)
   std::ifstream inputStream(filename, std::ios::binary);
   try
   {
-    edClient.send(inputStream);
+    edClient.send(inputStream, filename);
   }
   catch(const std::exception& exc)
   {

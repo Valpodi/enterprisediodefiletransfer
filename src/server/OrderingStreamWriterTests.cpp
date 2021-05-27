@@ -19,23 +19,33 @@ TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue"
   REQUIRE(outputStream.str() == "AB");
 }
 
-TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been written to the stream")
+TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been received")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream), []() { return 10000; });
+  auto streamWriter = OrderingStreamWriter(1, 5, std::make_unique<StreamSpy>(outputStream), []() { return 10000; });
 
   SECTION("When the EOF packet is not queued")
   {
-    std::stringstream inputStream = createTestPacketStream({'A', 'B'}, 1, 1, true);
+    std::stringstream inputStream = createTestPacketStream({'A', 'B'}, 1, 1, false);
     auto packet = parsePacket(inputStream);
 
-    REQUIRE(streamWriter.write(packet.payload, packet.headerParams));
+    std::stringstream inputStream2 = createTestPacketStream({'r'}, 1, 2, true);
+    auto packet2 = parsePacket(inputStream2);
+
+    REQUIRE_FALSE(streamWriter.write(packet.payload, packet.headerParams));
+    REQUIRE(streamWriter.write(packet2.payload, packet2.headerParams));
     REQUIRE(outputStream.str() == "AB");
   }
 
   SECTION("When the EOF packet is queued")
   {
-    std::stringstream inputStreamA = createTestPacketStream({'C', 'D'}, 1, 2, true);
+    std::stringstream inputStreamC = createTestPacketStream({'r'}, 1, 3, true);
+    auto packetC = parsePacket(inputStreamC);
+
+    REQUIRE_FALSE(streamWriter.write(packetC.payload, packetC.headerParams));
+    REQUIRE(outputStream.str().empty());
+
+    std::stringstream inputStreamA = createTestPacketStream({'C', 'D'}, 1, 2, false);
     auto packetA = parsePacket(inputStreamA);
 
     REQUIRE_FALSE(streamWriter.write(packetA.payload, packetA.headerParams));

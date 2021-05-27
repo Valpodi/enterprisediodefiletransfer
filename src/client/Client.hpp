@@ -18,23 +18,22 @@ public:
     std::shared_ptr<TimerInterface> timer,
     std::uint16_t maxPayloadSize);
 
-  void send(std::istream& inputStream);
+  void send(std::istream& inputStream, const std::string& filename);
 
 private:
 
-  bool sendFrame(std::istream& inputStream);
-  ConstSocketBuffers generateEDPacket(std::istream& inputStream, std::uint32_t maxPayloadSize);
+  bool sendFrame(std::istream& inputStream, const std::string& filename);
+  ConstSocketBuffers generateEDPacket(std::istream& inputStream, std::uint32_t maxPayloadSize, const std::string& filename);
   void incrementFrameCount();
   void setEOF();
   void setSessionID();
+  ConstSocketBuffers addEOFframe(const std::string& filename);
 
   std::shared_ptr<UdpClientInterface> udpClient;
   std::shared_ptr<TimerInterface> edTimer;
   std::uint32_t maxPayloadSize;
   std::array<char, EnterpriseDiode::HeaderSizeInBytes> headerBuffer;
   std::vector<char> payloadBuffer;
-
-    ConstSocketBuffers addEOFframe();
 };
 
 boost::posix_time::microseconds calculateTimerPeriod(double dataRateMbps, std::uint32_t packetSizeBytes);

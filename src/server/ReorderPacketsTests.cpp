@@ -44,9 +44,9 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
 
       SECTION("Frame 4 is EOF and is written to to the output and write returns true")
       {
-        inputStream = std::stringstream("FG");
+        inputStream = std::stringstream("");
         REQUIRE(queueManager.write(inputStream, &stream, 4, true));
-        REQUIRE(outputStream.str() == "ZABCDEFG");
+        REQUIRE(outputStream.str() == "ZABCDE");
       }
 
       SECTION("Frame 4 is EOF and a frame with frameCount above the eofFrame is ignored.")
@@ -54,33 +54,33 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
         inputStream = std::stringstream("YZ");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 99, false));
         REQUIRE(outputStream.str() == "ZABCDE");
-        inputStream = std::stringstream("FG");
+        inputStream = std::stringstream("");
         REQUIRE(queueManager.write(inputStream, &stream, 4, true));
-        REQUIRE(outputStream.str() == "ZABCDEFG");
+        REQUIRE(outputStream.str() == "ZABCDE");
       }
 
       SECTION("Frame 4 is EOF and a frame with frameCount above the eofFrame and eof true is ignored.")
       {
-        inputStream = std::stringstream("YZ");
+        inputStream = std::stringstream("");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 99, true));
         REQUIRE(outputStream.str() == "ZABCDE");
-        inputStream = std::stringstream("FG");
+        inputStream = std::stringstream("");
         REQUIRE(queueManager.write(inputStream, &stream, 4, true));
-        REQUIRE(outputStream.str() == "ZABCDEFG");
+        REQUIRE(outputStream.str() == "ZABCDE");
       }
 
       SECTION("Frame 5 is EOF and must be queued, "
               "a spurious eof packet with a higher frameCount does not reassign the eofFrameNumber.")
       {
-        inputStream = std::stringstream("IJ");
+        inputStream = std::stringstream("");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 5, true));
         REQUIRE(outputStream.str() == "ZABCDE");
-        inputStream = std::stringstream("YZ");
+        inputStream = std::stringstream("");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 99, true));
         REQUIRE(outputStream.str() == "ZABCDE");
         inputStream = std::stringstream("FG");
         REQUIRE(queueManager.write(inputStream, &stream, 4, false));
-        REQUIRE(outputStream.str() == "ZABCDEFGIJ");
+        REQUIRE(outputStream.str() == "ZABCDEFG");
       }
     }
   }
@@ -91,7 +91,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
     REQUIRE_FALSE(queueManager.write(inputStream, &stream, 3, false));
     REQUIRE(outputStream.str().empty());
 
-    inputStream = std::stringstream("DE");
+    inputStream = std::stringstream("");
     REQUIRE_FALSE(queueManager.write(inputStream, &stream, 4, true));
     REQUIRE(outputStream.str().empty());
 
@@ -101,16 +101,16 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
 
     inputStream = std::stringstream("12");
     REQUIRE(queueManager.write(inputStream, &stream, 2, false));
-    REQUIRE(outputStream.str() == "ZA12BCDE");
+    REQUIRE(outputStream.str() == "ZA12BC");
   }
 
   SECTION("ReorderPackets indicates when all packets have been output to stream")
   {
     SECTION("In-order EOF closes stream immediately")
     {
-      auto inputStream = std::stringstream("BC");
+      auto inputStream = std::stringstream("");
       REQUIRE(queueManager.write(inputStream, &stream, 1, true));
-      REQUIRE(outputStream.str() == "BC");
+      REQUIRE(outputStream.str() == "");
     }
 
     SECTION("Out-of-order EOF closes stream after all other packets have been received")
@@ -119,7 +119,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
       REQUIRE_FALSE(queueManager.write(inputStream, &stream, 2, false));
       REQUIRE(outputStream.str().empty());
 
-      inputStream = std::stringstream("FG");
+      inputStream = std::stringstream("");
       REQUIRE_FALSE(queueManager.write(inputStream, &stream, 4, true));
       REQUIRE(outputStream.str().empty());
 
@@ -129,7 +129,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
 
       inputStream = std::stringstream("DE");
       REQUIRE(queueManager.write(inputStream, &stream, 3, false));
-      REQUIRE(outputStream.str() == "ZABCDEFG");
+      REQUIRE(outputStream.str() == "ZABCDE");
     }
   }
 }

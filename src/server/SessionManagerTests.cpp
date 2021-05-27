@@ -37,10 +37,10 @@ TEST_CASE("SessionManager.")
 
     SECTION("SessionManager renames file and closes stream given EOF packet")
     {
-      auto testPacket2 = createTestPacketStream({'D', 'E'}, 1, 2, true);
+      auto testPacket2 = createTestPacketStream({}, 1, 2, true);
       sessionManager.writeToStream(parsePacket(testPacket2));
 
-      REQUIRE(outputStreams.at(0).str() == std::string("BCDE"));
+      REQUIRE(outputStreams.at(0).str() == std::string("BC"));
       REQUIRE(streamSpyPtr->fileRenameWasCalled);
 
       SECTION("After a session is closed, new packets with the same sessionID are written to a new stream")

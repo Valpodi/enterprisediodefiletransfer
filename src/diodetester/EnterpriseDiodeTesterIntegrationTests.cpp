@@ -25,7 +25,7 @@ TEST_CASE("UDP Client. Server. Packets are only written to the output after firs
   Server edServer = createEdServer(std::make_unique<UdpServer>(2002, io_context, 100, 1024*1024), 1024*1024, 100,
                                    capturedSessionId, outputStream);
 
-  std::vector<char> sendPayload{'D', 'E', 'F'};
+  std::vector<char> sendPayload{'r'};
   std::array<char, EnterpriseDiode::HeaderSizeInBytes> sendHeader{};
   sendHeader[EnterpriseDiode::FrameCountIndex] = 2;
   sendHeader[EnterpriseDiode::EOFFlagIndex] = true;
@@ -60,7 +60,7 @@ TEST_CASE("UDP Client. Server. Packets are only written to the output after firs
 
   clientHandle2.wait_for(std::chrono::milliseconds(1000));
   io_context.stop();
-  REQUIRE(outputStream.str() == "ABCDEF");
+  REQUIRE(outputStream.str() == "ABC");
 }
 
 TEST_CASE("Client. Server. Packets are sent by the client, received by the server and placed into the stream", "[integration]")
@@ -79,7 +79,7 @@ TEST_CASE("Client. Server. Packets are sent by the client, received by the serve
     [&io_context, &sendPayload]() {
       while (io_context.stopped()) { usleep(100); }
       Client edClient( std::make_shared<UdpClient>("localhost", 2002), std::make_shared<Timer>(1000000), 1);
-      edClient.send(sendPayload);
+      edClient.send(sendPayload, "received");
     });
 
   auto handle2 = std::async(std::launch::async, [&io_context]() { io_context.run(); });

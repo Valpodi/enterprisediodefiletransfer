@@ -19,7 +19,7 @@ Client::Client(
 {
 }
 
-void Client::send(std::istream& inputStream)
+void Client::send(std::istream& inputStream, const std::string& filename)
 {
   inputStream.exceptions(std::istream::badbit);
   if (!inputStream)
@@ -30,7 +30,7 @@ void Client::send(std::istream& inputStream)
   edTimer->runTimer([&]() {
     try
     {
-      return sendFrame(inputStream);
+      return sendFrame(inputStream, filename);
     }
     catch (const std::exception& exception)
     {
@@ -40,13 +40,13 @@ void Client::send(std::istream& inputStream)
   });
 }
 
-bool Client::sendFrame(std::istream& inputStream)
+bool Client::sendFrame(std::istream& inputStream, const std::string& filename)
 {
-  udpClient->send(generateEDPacket(inputStream, maxPayloadSize));
+  udpClient->send(generateEDPacket(inputStream, maxPayloadSize, filename));
   return headerBuffer.at(8) != 1;
 }
 
-ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize)
+ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize, const std::string& filename)
 {
   if (inputStream.rdbuf()->in_avail())
   {
@@ -58,7 +58,7 @@ ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint
   }
   else
   {
-    return addEOFframe();
+    return addEOFframe(filename);
   }
 }
 
@@ -72,14 +72,14 @@ void Client::setEOF()
   headerBuffer.at(8) = 1;
 }
 
-ConstSocketBuffers Client::addEOFframe()
+ConstSocketBuffers Client::addEOFframe(const std::string& filename)
 {
   incrementFrameCount();
   setEOF();
-  payloadBuffer.at(0) = 'r';
+  payloadBuffer.assign(filename.begin(), filename.end());
   return {
     boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
-    boost::asio::buffer(payloadBuffer.data(), (size_t)1)};
+    boost::asio::buffer(payloadBuffer.data(), filename.length())};
 }
 
 void Client::setSessionID()
