@@ -1,16 +1,16 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file
 
-#include <istream>
-#include <random>
+#include "Client.hpp"
 #include <chrono>
 #include <iostream>
-#include "Client.hpp"
+#include <istream>
+#include <random>
 
 Client::Client(
   std::shared_ptr<UdpClientInterface> udpClient,
   std::shared_ptr<TimerInterface> timer,
-  std::uint16_t maxPayloadSize) :
+  std::uint16_t maxPayloadSize):
     udpClient(udpClient),
     edTimer(timer),
     maxPayloadSize(maxPayloadSize),
@@ -48,17 +48,18 @@ bool Client::sendFrame(std::istream& inputStream)
 
 ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize)
 {
-    if (inputStream.rdbuf()->in_avail())
-    {
-        const auto payloadLength = inputStream.read((char*) &*(payloadBuffer.begin()), payloadSize).gcount();
-        incrementFrameCount();
-        return {boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
-                boost::asio::buffer(payloadBuffer.data(), (size_t) payloadLength)};
-    }
-    else
-    {
-        return addEOFframe();
-    }
+  if (inputStream.rdbuf()->in_avail())
+  {
+    const auto payloadLength = inputStream.read((char*)&*(payloadBuffer.begin()), payloadSize).gcount();
+    incrementFrameCount();
+    return {
+      boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
+      boost::asio::buffer(payloadBuffer.data(), (size_t)payloadLength)};
+  }
+  else
+  {
+    return addEOFframe();
+  }
 }
 
 void Client::incrementFrameCount()
@@ -73,20 +74,22 @@ void Client::setEOF()
 
 ConstSocketBuffers Client::addEOFframe()
 {
-    incrementFrameCount();
-    setEOF();
-    return {boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
-            boost::asio::buffer(payloadBuffer.data(), (size_t) 0)};
+  incrementFrameCount();
+  setEOF();
+  payloadBuffer.at(0) = 'r';
+  return {
+    boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
+    boost::asio::buffer(payloadBuffer.data(), (size_t)1)};
 }
 
 void Client::setSessionID()
 {
   const auto seed = std::chrono::system_clock::now().time_since_epoch().count();
-  *reinterpret_cast<std::uint32_t*>(&headerBuffer.at(0)) = (std::uint32_t) std::default_random_engine(seed)();
+  *reinterpret_cast<std::uint32_t*>(&headerBuffer.at(0)) = (std::uint32_t)std::default_random_engine(seed)();
 }
 
 boost::posix_time::microseconds calculateTimerPeriod(double dataRateMbps, std::uint32_t mtuSize)
 {
   const auto period = std::round((static_cast<double>((mtuSize * 8)) * 1000000) / (dataRateMbps * 1024 * 1024));
-  return boost::posix_time::microseconds{static_cast<std::int64_t>(period)};
+  return boost::posix_time::microseconds {static_cast<std::int64_t>(period)};
 }

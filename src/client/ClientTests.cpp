@@ -29,7 +29,11 @@ TEST_CASE("Client. Stream data is sent using the ED client")
 
   REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::FrameCountIndex) == 2);
   REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::EOFFlagIndex));
-  REQUIRE(udpClientSpy->buffersSent.at(1).size() == EnterpriseDiode::HeaderSizeInBytes);
+
+  SECTION("Filename is set")
+  {
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == 'r');
+  }
 }
 
 TEST_CASE("Client. Stream data is sent using the ED client, where maxPayloadSize is larger than data")
@@ -37,7 +41,7 @@ TEST_CASE("Client. Stream data is sent using the ED client, where maxPayloadSize
   auto udpClientSpy = std::make_shared<UdpClientSpy>();
   Client edClient(udpClientSpy, std::make_shared<Timer>(0), 10);
 
-  std::stringstream ss("B");
+  std::stringstream ss("BA");
   edClient.send(ss);
 
   REQUIRE(udpClientSpy->buffersSent.size() == 2);
@@ -47,7 +51,6 @@ TEST_CASE("Client. Stream data is sent using the ED client, where maxPayloadSize
 
   REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::FrameCountIndex) == 2);
   REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::EOFFlagIndex));
-  REQUIRE(udpClientSpy->buffersSent.at(1).size() == EnterpriseDiode::HeaderSizeInBytes);
 }
 
 TEST_CASE("Client. Two packets are sent using ED client when packet length is 1 and data is length 2")
@@ -70,8 +73,6 @@ TEST_CASE("Client. Two packets are sent using ED client when packet length is 1 
 
   REQUIRE(udpClientSpy->buffersSent.at(2).at(EnterpriseDiode::FrameCountIndex) == 3);
   REQUIRE(udpClientSpy->buffersSent.at(2).at(EnterpriseDiode::EOFFlagIndex));
-  REQUIRE(udpClientSpy->buffersSent.at(2).size() == EnterpriseDiode::HeaderSizeInBytes);
-
 }
 
 TEST_CASE("Client. Empty frame is sent when there is no source data")
@@ -124,7 +125,6 @@ TEST_CASE("Client. For a payload split into two packets, each packet is sent on 
 
   REQUIRE(udpClientSpy->buffersSent.at(2).at(EnterpriseDiode::FrameCountIndex) == 3);
   REQUIRE(udpClientSpy->buffersSent.at(2).at(EnterpriseDiode::EOFFlagIndex));
-  REQUIRE(udpClientSpy->buffersSent.at(2).size() == EnterpriseDiode::HeaderSizeInBytes);
 }
 
 TEST_CASE("Client. For a payload split into two packets, each packet is sent after 1 second", "[integration]")
