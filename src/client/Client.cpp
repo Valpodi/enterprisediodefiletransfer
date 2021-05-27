@@ -27,7 +27,8 @@ void Client::send(std::istream& inputStream, const std::string& filename)
     throw std::runtime_error("file stream not found");
   }
   setSessionID();
-  edTimer->runTimer([&]() {
+  // Must copy filename in the lamda capture to extend the lifetime of the const reference string for the timer
+  edTimer->runTimer([&, filename]() {
     try
     {
       return sendFrame(inputStream, filename);
@@ -46,7 +47,10 @@ bool Client::sendFrame(std::istream& inputStream, const std::string& filename)
   return headerBuffer.at(8) != 1;
 }
 
-ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize, const std::string& filename)
+ConstSocketBuffers Client::generateEDPacket(
+  std::istream& inputStream,
+  std::uint32_t payloadSize,
+  const std::string& filename)
 {
   if (inputStream.rdbuf()->in_avail())
   {
@@ -76,10 +80,9 @@ ConstSocketBuffers Client::addEOFframe(const std::string& filename)
 {
   incrementFrameCount();
   setEOF();
-  payloadBuffer.assign(filename.begin(), filename.end());
   return {
     boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
-    boost::asio::buffer(payloadBuffer.data(), filename.length())};
+    boost::asio::buffer(filename.data(), filename.length())};
 }
 
 void Client::setSessionID()

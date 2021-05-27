@@ -97,7 +97,7 @@ TEST_CASE("Client. Throws exception if given a non-existent stream")
   REQUIRE_THROWS_AS(edClient.send(stream, "received"), std::runtime_error);
 }
 
-/*TEST_CASE("Client. For a payload split into two packets, each packet is sent on a timer tick")
+TEST_CASE("Client. For a payload split into two packets, each packet is sent on a timer tick")
 {
   auto udpClientSpy = std::make_shared<UdpClientSpy>();
   auto timerfake = std::make_shared<ManualTimer>();
@@ -126,7 +126,7 @@ TEST_CASE("Client. Throws exception if given a non-existent stream")
 
   REQUIRE(udpClientSpy->buffersSent.at(2).at(EnterpriseDiode::FrameCountIndex) == 3);
   REQUIRE(udpClientSpy->buffersSent.at(2).at(EnterpriseDiode::EOFFlagIndex));
-}*/
+}
 
 TEST_CASE("Client. For a payload split into two packets, each packet is sent after 1 second", "[integration]")
 {

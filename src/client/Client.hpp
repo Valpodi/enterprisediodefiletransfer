@@ -23,7 +23,8 @@ public:
 private:
 
   bool sendFrame(std::istream& inputStream, const std::string& filename);
-  ConstSocketBuffers generateEDPacket(std::istream& inputStream, std::uint32_t maxPayloadSize, const std::string& filename);
+  ConstSocketBuffers generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize,
+    const std::string& filename);
   void incrementFrameCount();
   void setEOF();
   void setSessionID();
