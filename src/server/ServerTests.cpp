@@ -23,7 +23,12 @@ TEST_CASE("ED server.")
 
   SECTION("A packet received by the server is written to the stream")
   {
-    std::stringstream stream = createTestPacketStream({'B'}, 1, 1, true);
+    std::stringstream stream = createTestPacketStream({'B'}, 1, 1, false);
+    edServer.receivePacket(stream);
+
+    REQUIRE(outputStream.str() == std::string("B"));
+
+    std::stringstream stream2 = createTestPacketStream({}, 1, 2, true);
     edServer.receivePacket(stream);
 
     REQUIRE(outputStream.str() == std::string("B"));
@@ -41,10 +46,10 @@ TEST_CASE("ED server.")
 
     REQUIRE(outputStream.str() == std::string("BCD"));
 
-    std::stringstream stream3 = createTestPacketStream({'E'}, 1, 3, true);
+    std::stringstream stream3 = createTestPacketStream({}, 1, 3, true);
     edServer.receivePacket(stream3);
 
-    REQUIRE(outputStream.str() == std::string("BCDE"));
+    REQUIRE(outputStream.str() == std::string("BCD"));
   }
 
   SECTION("Packets are reordered before being written to stream")
@@ -54,10 +59,15 @@ TEST_CASE("ED server.")
 
     REQUIRE(outputStream.str() == std::string(""));
 
+    std::stringstream stream2 = createTestPacketStream({}, 1, 3, true);
+    edServer.receivePacket(stream2);
+
+    REQUIRE(outputStream.str() == std::string(""));
+
     SECTION("The first frame is received and both are written to the output")
     {
-      std::stringstream stream2 = createTestPacketStream({'B', 'C'}, 1, 1, false);
-      edServer.receivePacket(stream2);
+      std::stringstream stream3 = createTestPacketStream({'B', 'C'}, 1, 1, false);
+      edServer.receivePacket(stream3);
 
       REQUIRE(outputStream.str() == std::string("BCBC"));
     }
