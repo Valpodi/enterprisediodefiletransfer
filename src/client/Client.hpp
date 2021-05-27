@@ -16,25 +16,25 @@ class Client
 public:
   Client(std::shared_ptr<UdpClientInterface> udpClient,
     std::shared_ptr<TimerInterface> timer,
-    std::uint16_t maxPayloadSize);
+    std::uint16_t maxPayloadSize,
+    std::string filename="received");
 
-  void send(std::istream& inputStream, const std::string& filename);
+  void send(std::istream& inputStream);
 
 private:
-
-  bool sendFrame(std::istream& inputStream, const std::string& filename);
-  ConstSocketBuffers generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize,
-    const std::string& filename);
+  bool sendFrame(std::istream& inputStream);
+  ConstSocketBuffers generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize);
   void incrementFrameCount();
   void setEOF();
   void setSessionID();
-  ConstSocketBuffers addEOFframe(const std::string& filename);
+  ConstSocketBuffers addEOFframe();
 
   std::shared_ptr<UdpClientInterface> udpClient;
   std::shared_ptr<TimerInterface> edTimer;
   std::uint32_t maxPayloadSize;
   std::array<char, EnterpriseDiode::HeaderSizeInBytes> headerBuffer;
   std::vector<char> payloadBuffer;
+  const std::string filename;
 };
 
 boost::posix_time::microseconds calculateTimerPeriod(double dataRateMbps, std::uint32_t packetSizeBytes);

@@ -79,7 +79,7 @@ TEST_CASE("Client. Server. Packets are sent by the client, received by the serve
     [&io_context, &sendPayload]() {
       while (io_context.stopped()) { usleep(100); }
       Client edClient( std::make_shared<UdpClient>("localhost", 2002), std::make_shared<Timer>(1000000), 1);
-      edClient.send(sendPayload, "received");
+      edClient.send(sendPayload);
     });
 
   auto handle2 = std::async(std::launch::async, [&io_context]() { io_context.run(); });

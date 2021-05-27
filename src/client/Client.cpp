@@ -10,16 +10,18 @@
 Client::Client(
   std::shared_ptr<UdpClientInterface> udpClient,
   std::shared_ptr<TimerInterface> timer,
-  std::uint16_t maxPayloadSize):
+  std::uint16_t maxPayloadSize,
+  std::string filename):
     udpClient(udpClient),
     edTimer(timer),
     maxPayloadSize(maxPayloadSize),
     headerBuffer({}),
-    payloadBuffer(maxPayloadSize)
+    payloadBuffer(maxPayloadSize),
+    filename(std::move(filename))
 {
 }
 
-void Client::send(std::istream& inputStream, const std::string& filename)
+void Client::send(std::istream& inputStream)
 {
   inputStream.exceptions(std::istream::badbit);
   if (!inputStream)
@@ -27,11 +29,10 @@ void Client::send(std::istream& inputStream, const std::string& filename)
     throw std::runtime_error("file stream not found");
   }
   setSessionID();
-  // Must copy filename in the lamda capture to extend the lifetime of the const reference string for the timer
-  edTimer->runTimer([&, filename]() {
+  edTimer->runTimer([&]() {
     try
     {
-      return sendFrame(inputStream, filename);
+      return sendFrame(inputStream);
     }
     catch (const std::exception& exception)
     {
@@ -41,16 +42,13 @@ void Client::send(std::istream& inputStream, const std::string& filename)
   });
 }
 
-bool Client::sendFrame(std::istream& inputStream, const std::string& filename)
+bool Client::sendFrame(std::istream& inputStream)
 {
-  udpClient->send(generateEDPacket(inputStream, maxPayloadSize, filename));
+  udpClient->send(generateEDPacket(inputStream, maxPayloadSize));
   return headerBuffer.at(8) != 1;
 }
 
-ConstSocketBuffers Client::generateEDPacket(
-  std::istream& inputStream,
-  std::uint32_t payloadSize,
-  const std::string& filename)
+ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize)
 {
   if (inputStream.rdbuf()->in_avail())
   {
@@ -62,7 +60,7 @@ ConstSocketBuffers Client::generateEDPacket(
   }
   else
   {
-    return addEOFframe(filename);
+    return addEOFframe();
   }
 }
 
@@ -76,7 +74,7 @@ void Client::setEOF()
   headerBuffer.at(8) = 1;
 }
 
-ConstSocketBuffers Client::addEOFframe(const std::string& filename)
+ConstSocketBuffers Client::addEOFframe()
 {
   incrementFrameCount();
   setEOF();
