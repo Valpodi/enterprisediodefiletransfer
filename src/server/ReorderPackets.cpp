@@ -21,12 +21,12 @@ bool ReorderPackets::write(
 {
   if (frameCount == nextFrameCount)
   {
-    streamWrapper->write(inputStream);
-    ++nextFrameCount;
     if (eOFFlag)
     {
       return true;
     }
+    streamWrapper->write(inputStream);
+    ++nextFrameCount;
     return checkQueueAndSend(streamWrapper);
   }
   addFrameToQueue(inputStream, frameCount, eOFFlag);
