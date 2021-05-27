@@ -1,0 +1,27 @@
+---
+BasedOnStyle: LLVM
+
+IndentWidth: 2
+UseTab: Never
+ColumnLimit:     120
+ContinuationIndentWidth: 2
+
+BreakBeforeBraces: Allman
+BreakConstructorInitializersBeforeComma: true
+SpaceBeforeCtorInitializerColon: false
+SpaceBeforeInheritanceColon: false
+SpaceBeforeRangeBasedForLoopColon: false
+SpaceBeforeCpp11BracedList: true
+BreakConstructorInitializers: AfterColon
+
+
+AllowShortFunctionsOnASingleLine: Inline
+
+PointerAlignment: Left
+
+AlignAfterOpenBracket: AlwaysBreak
+AllowAllParametersOfDeclarationOnNextLine: false
+BinPackParameters: false
+
+PenaltyReturnTypeOnItsOwnLine: 1000
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
