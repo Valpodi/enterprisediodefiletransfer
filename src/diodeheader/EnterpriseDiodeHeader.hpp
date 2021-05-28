@@ -10,7 +10,9 @@
 
 namespace EnterpriseDiode
 {
-  constexpr std::uint16_t HeaderSizeInBytes = 16;
+  constexpr std::uint16_t HeaderSizeInBytes = 112;
+  constexpr std::uint16_t ControlHeaderSizeInBytes = 16;
+  constexpr std::uint16_t ControlHeaderPaddingSizeInBytes = 7;
   constexpr std::uint32_t SessionIDIndex = 0;
   constexpr std::uint32_t FrameCountIndex = 4;
   constexpr std::uint32_t EOFFlagIndex = 8;

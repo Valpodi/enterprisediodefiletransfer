@@ -13,8 +13,9 @@ EDHeader::EDHeader(std::istream& inputStream) :
 
 void EDHeader::advanceByPaddingSize(std::istream& inputStream)
 {
-  std::array<char, 7> temporaryBuffer{};
-  inputStream.read(temporaryBuffer.data(), 7);
+  constexpr auto totalPaddingSize = (EnterpriseDiode::HeaderSizeInBytes - EnterpriseDiode::ControlHeaderSizeInBytes) + EnterpriseDiode::ControlHeaderPaddingSizeInBytes;
+  std::array<char, totalPaddingSize> temporaryBuffer{};
+  inputStream.read(temporaryBuffer.data(), totalPaddingSize);
 }
 
 HeaderParams EDHeader::readHeaderParams(std::istream& inputStream)
