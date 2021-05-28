@@ -136,7 +136,7 @@ TEST_CASE("ED server. Stream is closed if timeout is exceeded.", "[integration]"
   Server edServer = Server(std::make_unique<UdpServerFake>(0, fake_service, 0, 0), 16, 2,
                            [&outputStream, &capturedSessionId](std::uint32_t sessionId) {
                              capturedSessionId = sessionId;
-                             return std::make_unique<StreamSpy>(outputStream);
+                             return std::make_unique<StreamSpy>(outputStream, sessionId);
                            }, []() { return std::time(nullptr); }, 3);
 
   std::stringstream stream = createTestPacketStream({'A', 'B'}, 1, 1, false);

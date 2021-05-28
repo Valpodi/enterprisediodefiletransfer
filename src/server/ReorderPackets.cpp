@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "ReorderPackets.hpp"
 #include "StreamInterface.hpp"
+#include <regex>
 
 ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength, std::uint32_t maxFilenameLength) :
   maxBufferSize(maxBufferSize),
@@ -41,7 +42,9 @@ std::string ReorderPackets::getFilenameFromStream(std::istream& inputStream)
   std::copy_if(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>(), std::back_inserter(filename),
                [count = maxFilenameLength](auto&&) mutable
                { return count && count--;});
-  return filename;
+  std::regex filter("[a-zA-Z0-9\\.\\-_]+");
+
+  return std::regex_match(filename, filter) ? filename : "rejected?filename";
 }
 
 bool ReorderPackets::checkQueueAndSend(StreamInterface* streamWrapper)

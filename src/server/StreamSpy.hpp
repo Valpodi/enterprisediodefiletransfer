@@ -13,8 +13,9 @@
 class StreamSpy : public StreamInterface
 {
 public:
-  explicit StreamSpy(std::stringstream& outputStream) :
-    outputStream(outputStream)
+  explicit StreamSpy(std::stringstream& outputStream, std::uint32_t sessionId) :
+    outputStream(outputStream),
+    sessionId(sessionId)
   {
   }
 
@@ -30,7 +31,7 @@ public:
 
   void setStoredFilename(std::string filename) override
   {
-    storedFilename = filename;
+    storedFilename = (filename == "rejected?filename") ? "received." + std::to_string(sessionId) : filename;
   }
 
   void write(const std::vector<char>& inputData) override
@@ -54,6 +55,7 @@ public:
   bool fileDeletedWasCalled = false;
   bool fileRenameWasCalled = false;
   std::string storedFilename;
+  const std::uint32_t sessionId;
 };
 
 #endif //ENTERPRISEDIODETESTER_STREAMSPY_HPP

@@ -10,7 +10,7 @@ TEST_CASE("ReorderPackets. Packets received in order are written to the output")
 {
   auto inputStream = std::stringstream("BC");
   std::stringstream outputStream;
-  StreamSpy stream(outputStream);
+  StreamSpy stream(outputStream, 1);
   auto queueManager = ReorderPackets(4, 1024);
   REQUIRE_FALSE(queueManager.write(inputStream, &stream, 1, false));
   REQUIRE(outputStream.str() == "BC");
@@ -23,14 +23,14 @@ TEST_CASE("ReorderPackets. Packets received in order are written to the output")
 TEST_CASE("ReorderPackets. Handling filename")
 {
   std::stringstream outputStream;
-  StreamSpy stream(outputStream);
+  StreamSpy stream(outputStream, 1);
   auto queueManager = ReorderPackets(4, 1024);
   SECTION("Handling empty filename")
   {
     auto inputStream = std::stringstream("");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename.empty());
+    REQUIRE(stream.storedFilename == "received.1");
   }
   SECTION("Handling non-empty filename")
   {
@@ -53,12 +53,27 @@ TEST_CASE("ReorderPackets. Handling filename")
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "testFilenametestFilenametestFilenametestFilenametestFilenametestF");
   }
+  SECTION("Handling filename with allowable special characters")
+  {
+    auto inputStream = std::stringstream("example_file-name_09.txt");
+    REQUIRE(queueManager.write(inputStream, &stream, 1, true));
+    REQUIRE(outputStream.str().empty());
+    REQUIRE(stream.storedFilename == "example_file-name_09.txt");
+  }
+  SECTION("Handling filename with illegal special characters")
+  {
+    auto inputStream = std::stringstream("/file");
+    REQUIRE(queueManager.write(inputStream, &stream, 1, true));
+    REQUIRE(outputStream.str().empty());
+    REQUIRE(stream.storedFilename == "received.1");
+  }
+
 }
 
 TEST_CASE("ReorderPackets. Out-of-order packets")
 {
   std::stringstream outputStream;
-  StreamSpy stream(outputStream);
+  StreamSpy stream(outputStream, 1);
   auto queueManager = ReorderPackets(16, 1024);
 
   SECTION("Frame 2 and 3 are not written to the output if frame 1 missing")

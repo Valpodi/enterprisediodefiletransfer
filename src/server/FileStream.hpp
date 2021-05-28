@@ -32,7 +32,7 @@ public:
 
   void setStoredFilename(std::string filename) override
   {
-    storedFilename = filename;
+    storedFilename = (filename == "rejected?filename") ? "received." + std::to_string(sessionId) : filename;
   }
 
   void write(const std::vector<char>& inputData) override

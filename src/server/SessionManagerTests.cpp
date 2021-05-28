@@ -16,7 +16,7 @@ TEST_CASE("SessionManager.")
   auto streamSpyCreator = [&outputStreams, &capturedSessionId, &streamSpyPtr](std::uint32_t sessionId) {
     capturedSessionId = sessionId;
     outputStreams.emplace_back(std::stringstream());
-    auto streamSpy = std::make_unique<StreamSpy>(outputStreams.back());
+    auto streamSpy = std::make_unique<StreamSpy>(outputStreams.back(), capturedSessionId);
     streamSpyPtr = streamSpy.get();
     return streamSpy;
   };
