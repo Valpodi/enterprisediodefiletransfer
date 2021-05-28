@@ -7,9 +7,10 @@
 #include "ReorderPackets.hpp"
 #include "StreamInterface.hpp"
 
-ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength) :
+ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength, std::uint32_t maxFilenameLength) :
   maxBufferSize(maxBufferSize),
-  maxQueueLength(maxQueueLength)
+  maxQueueLength(maxQueueLength),
+  maxFilenameLength(maxFilenameLength)
 {
 }
 
@@ -38,7 +39,7 @@ std::string ReorderPackets::getFilenameFromStream(std::istream& inputStream)
 {
   std::string filename;
   std::copy_if(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>(), std::back_inserter(filename),
-               [count = 15](auto&&) mutable
+               [count = maxFilenameLength](auto&&) mutable
                { return count && count--;});
   return filename;
 }

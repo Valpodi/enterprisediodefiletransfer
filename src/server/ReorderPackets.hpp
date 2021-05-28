@@ -9,7 +9,7 @@ class ReorderPackets
 {
 
 public:
-  explicit ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength);
+  explicit ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength, std::uint32_t maxFilenameLength = 65);
   bool write(std::istream& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
 
 private:
@@ -32,5 +32,6 @@ private:
   std::uint32_t maxQueueLength;
   std::priority_queue<FrameDetails, std::vector<FrameDetails>, std::greater<>> queue;
 
-  static std::string getFilenameFromStream(std::istream& inputStream);
+  std::string getFilenameFromStream(std::istream& inputStream);
+  std::uint32_t maxFilenameLength;
 };

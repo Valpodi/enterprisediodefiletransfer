@@ -46,6 +46,13 @@ TEST_CASE("ReorderPackets. Handling filename")
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "te");
   }
+  SECTION("Handling filename with length > maxFilenameLength, 65")
+  {
+    auto inputStream = std::stringstream("testFilenametestFilenametestFilenametestFilenametestFilenametestFilename");
+    REQUIRE(queueManager.write(inputStream, &stream, 1, true));
+    REQUIRE(outputStream.str().empty());
+    REQUIRE(stream.storedFilename == "testFilenametestFilenametestFilenametestFilenametestFilenametestF");
+  }
 }
 
 TEST_CASE("ReorderPackets. Out-of-order packets")
