@@ -12,7 +12,7 @@ public:
   virtual ~StreamInterface() = default;
   virtual void deleteFile() = 0;
   virtual void renameFile() = 0;
-  virtual void setStoredFilename(std::istream& inputData) = 0;
+  virtual void setStoredFilename(std::string filename) = 0;
   virtual void write(const std::vector<char>& inputData) = 0;
   virtual void write(std::istream& inputStream) = 0;
 };

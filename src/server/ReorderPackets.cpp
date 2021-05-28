@@ -23,7 +23,7 @@ bool ReorderPackets::write(
   {
     if (eOFFlag)
     {
-      streamWrapper->setStoredFilename(inputStream);
+      streamWrapper->setStoredFilename(getFilenameFromStream(inputStream));
       return true;
     }
     streamWrapper->write(inputStream);
@@ -32,6 +32,15 @@ bool ReorderPackets::write(
   }
   addFrameToQueue(inputStream, frameCount, eOFFlag);
   return false;
+}
+
+std::string ReorderPackets::getFilenameFromStream(std::istream& inputStream)
+{
+  std::string filename;
+  std::copy_if(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>(), std::back_inserter(filename),
+               [count = 15](auto&&) mutable
+               { return count && count--;});
+  return filename;
 }
 
 bool ReorderPackets::checkQueueAndSend(StreamInterface* streamWrapper)

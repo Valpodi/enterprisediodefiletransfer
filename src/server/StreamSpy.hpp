@@ -28,12 +28,8 @@ public:
     fileRenameWasCalled = true;
   }
 
-  void setStoredFilename(std::istream& inputData) override
+  void setStoredFilename(std::string filename) override
   {
-    std::string filename;
-    std::copy_if(std::istreambuf_iterator<char>(inputData), std::istreambuf_iterator<char>(), std::back_inserter(filename),
-                 [count = 15](auto&&) mutable
-                 { return count && count--;});
     storedFilename = filename;
   }
 

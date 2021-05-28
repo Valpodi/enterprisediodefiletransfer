@@ -32,4 +32,5 @@ private:
   std::uint32_t maxQueueLength;
   std::priority_queue<FrameDetails, std::vector<FrameDetails>, std::greater<>> queue;
 
+  static std::string getFilenameFromStream(std::istream& inputStream);
 };

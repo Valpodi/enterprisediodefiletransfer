@@ -30,13 +30,8 @@ public:
     std::filesystem::rename(".received." + std::to_string(sessionId), "received." + std::to_string(sessionId));
   }
 
-  void setStoredFilename(std::istream& inputData) override
+  void setStoredFilename(std::string filename) override
   {
-    std::string filename;
-    std::copy_if(std::istreambuf_iterator<char>(inputData), std::istreambuf_iterator<char>(), std::back_inserter(filename),
-                 [count = 15](auto&&) mutable
-                 { std::cerr << count << std::endl;
-                   return count && count--;});
     storedFilename = filename;
   }
 
