@@ -4,9 +4,11 @@
 #ifndef ENTERPRISEDIODETESTER_STREAMSPY_HPP
 #define ENTERPRISEDIODETESTER_STREAMSPY_HPP
 
-#include <fstream>
-#include <filesystem>
 #include "StreamInterface.hpp"
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 
 class StreamSpy : public StreamInterface
 {
@@ -24,6 +26,15 @@ public:
   void renameFile() override
   {
     fileRenameWasCalled = true;
+  }
+
+  void setStoredFilename(std::istream& inputData) override
+  {
+    std::string filename;
+    std::copy_if(std::istreambuf_iterator<char>(inputData), std::istreambuf_iterator<char>(), std::back_inserter(filename),
+                 [count = 15](auto&&) mutable
+                 { return count && count--;});
+    storedFilename = filename;
   }
 
   void write(const std::vector<char>& inputData) override

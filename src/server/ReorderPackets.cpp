@@ -23,6 +23,7 @@ bool ReorderPackets::write(
   {
     if (eOFFlag)
     {
+      streamWrapper->setStoredFilename(inputStream);
       return true;
     }
     streamWrapper->write(inputStream);

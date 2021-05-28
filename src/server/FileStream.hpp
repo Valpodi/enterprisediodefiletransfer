@@ -1,9 +1,10 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <fstream>
-#include <filesystem>
 #include "StreamInterface.hpp"
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
 
 class FileStream : public StreamInterface
 {
@@ -29,6 +30,16 @@ public:
     std::filesystem::rename(".received." + std::to_string(sessionId), "received." + std::to_string(sessionId));
   }
 
+  void setStoredFilename(std::istream& inputData) override
+  {
+    std::string filename;
+    std::copy_if(std::istreambuf_iterator<char>(inputData), std::istreambuf_iterator<char>(), std::back_inserter(filename),
+                 [count = 15](auto&&) mutable
+                 { std::cerr << count << std::endl;
+                   return count && count--;});
+    storedFilename = filename;
+  }
+
   void write(const std::vector<char>& inputData) override
   {
     std::copy(
@@ -48,4 +59,5 @@ public:
 private:
   const std::uint32_t sessionId;
   std::ofstream outputStream;
+  std::string storedFilename;
 };

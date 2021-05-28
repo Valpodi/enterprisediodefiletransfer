@@ -32,6 +32,20 @@ TEST_CASE("ReorderPackets. Handling filename")
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename.empty());
   }
+  SECTION("Handling non-empty filename")
+  {
+    auto inputStream = std::stringstream("testFilename");
+    REQUIRE(queueManager.write(inputStream, &stream, 1, true));
+    REQUIRE(outputStream.str().empty());
+    REQUIRE(stream.storedFilename == "testFilename");
+  }
+  SECTION("Handling filename with null terminator")
+  {
+    auto inputStream = std::stringstream("te\0stFilename");
+    REQUIRE(queueManager.write(inputStream, &stream, 1, true));
+    REQUIRE(outputStream.str().empty());
+    REQUIRE(stream.storedFilename == "te");
+  }
 }
 
 TEST_CASE("ReorderPackets. Out-of-order packets")
