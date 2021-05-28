@@ -27,12 +27,13 @@ public:
   {
     outputStream.close();
     std::cout << "File complete. Renaming .received. file" << "\n";
-    std::filesystem::rename(".received." + std::to_string(sessionId), "received." + std::to_string(sessionId));
+    std::cout << storedFilename << "\n";
+    std::filesystem::rename(".received." + std::to_string(sessionId), storedFilename + "." + std::to_string(sessionId));
   }
 
   void setStoredFilename(std::string filename) override
   {
-    storedFilename = (filename == "rejected?filename") ? "received." + std::to_string(sessionId) : filename;
+    storedFilename = (filename == "rejected?filename") ? std::to_string(sessionId) : filename;
   }
 
   void write(const std::vector<char>& inputData) override

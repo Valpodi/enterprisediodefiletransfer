@@ -58,7 +58,8 @@ int main(int argc, char **argv)
       params.clientAddress,
       params.clientPort,
       params.mtuSize,
-      params.dataRateMbps
+      params.dataRateMbps,
+      params.filename
     ).sendData(params.filename);
   }
   catch (const std::exception& exception)

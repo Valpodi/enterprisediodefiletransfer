@@ -16,7 +16,8 @@ public:
   ClientWrapper(const std::string& targetAddress,
     std::uint16_t targetPort,
     std::uint16_t mtuSize,
-    double dataRateMbps);
+    double dataRateMbps,
+    std::string filename);
   void sendData(const std::string& filename);
 
 private:

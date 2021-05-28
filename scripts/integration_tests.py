@@ -11,9 +11,8 @@ import glob
 
 class IntegrationTestsEnterpriseDiode(unittest.TestCase):
     def tearDown(self):
-        if os.path.isfile("test_file.bin"):
-            os.remove("test_file.bin")
-        [os.remove(file) for file in glob.glob("received.*") if os.path.isfile(file)]
+        [os.remove(file) for file in glob.glob("test_file.bin*") if os.path.isfile(file)]
+        [os.remove(file) for file in glob.glob("received*") if os.path.isfile(file)]
         [os.remove(file) for file in glob.glob(".received.*") if os.path.isfile(file)]
 
     @staticmethod
@@ -39,8 +38,7 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         files = []
 
         while (not all_data_received) or (len(files) < num_expect_files):
-            files = glob.glob("received.*")
-
+            files = glob.glob("test_file.bin.*")
             all_data_received = True
             for file in files:
                 all_data_received &= (self.read_bytes(file) == client_file_size)

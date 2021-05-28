@@ -2,16 +2,20 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "ClientWrapper.hpp"
+
+#include <utility>
 #include "Timer.hpp"
 
 ClientWrapper::ClientWrapper(
   const std::string& targetAddress,
   std::uint16_t targetPort,
   std::uint16_t mtuSize,
-  double dataRateMbps) :
+  double dataRateMbps,
+  std::string filename) :
     edClient(std::make_shared<UdpClient>(targetAddress, targetPort),
              std::make_shared<Timer>(calculateTimerPeriod(dataRateMbps, mtuSize)),
-             calculatePayloadSize(mtuSize))
+             calculatePayloadSize(mtuSize),
+             std::move(filename))
 {
 }
 
