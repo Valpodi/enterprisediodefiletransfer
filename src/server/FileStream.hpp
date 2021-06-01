@@ -1,6 +1,7 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
+#include <iostream>
 #include "StreamInterface.hpp"
 #include <algorithm>
 #include <filesystem>

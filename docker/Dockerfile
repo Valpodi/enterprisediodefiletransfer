@@ -1,6 +1,6 @@
 FROM centos:7
 
-RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+RUN yum install -y epel-release
 RUN yum install -y centos-release-scl-rh
 RUN yum update -y
 
@@ -10,6 +10,7 @@ RUN yum install -y boost169-devel \
                    cmake3 \
                    lsof \
                    python3 \
-                   python3-pip
+                   python3-pip \
+                   rapidjson-devel
 
 RUN pip3 install nose

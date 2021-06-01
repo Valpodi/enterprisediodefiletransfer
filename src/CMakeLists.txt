@@ -4,6 +4,7 @@
 add_subdirectory(client)
 add_subdirectory(server)
 add_subdirectory(diodeheader)
+add_subdirectory(SislTools)
 
 
 add_executable(tester

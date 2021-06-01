@@ -30,8 +30,7 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-
-find_package(Boost 1.69)
+find_package(Boost)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 message("Boost found at:" ${Boost_LIBRARY_DIRS})
@@ -54,6 +53,7 @@ target_link_libraries(UnitTests
         CLIENT_LIBRARY_TESTS
         SERVER_LIBRARY_TESTS
         HEADER_LIBRARY_TESTS
+        SISL_TOOLS_TEST_LIBRARY
         -Wl,--no-whole-archive
         CLIENT_LIBRARY
         SERVER_LIBRARY
