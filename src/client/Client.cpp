@@ -6,6 +6,8 @@
 #include <iostream>
 #include <istream>
 #include <random>
+#include <filesystem>
+#include <boost/algorithm/string.hpp>
 
 Client::Client(
   std::shared_ptr<UdpClientInterface> udpClient,
@@ -28,6 +30,7 @@ void Client::send(std::istream& inputStream)
   {
     throw std::runtime_error("file stream not found");
   }
+  parseFilename();
   setSessionID();
   edTimer->runTimer([&]() {
     try
@@ -40,6 +43,13 @@ void Client::send(std::istream& inputStream)
       return false;
     }
   });
+}
+
+void Client::parseFilename()
+{
+    std::vector<std::string> segments;
+    boost::split(segments, filename, boost::is_any_of("/"));
+    filename = segments.back();
 }
 
 bool Client::sendFrame(std::istream& inputStream)

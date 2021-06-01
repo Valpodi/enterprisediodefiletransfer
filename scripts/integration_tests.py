@@ -14,6 +14,9 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         [os.remove(file) for file in glob.glob("test_file.bin*") if os.path.isfile(file)]
         [os.remove(file) for file in glob.glob("cmake-build-release/files_to_send/*") if os.path.isfile(file)]
         [os.remove(file) for file in glob.glob("cmake-build-release/files_received/*") if os.path.isfile(file)]
+        [os.remove(file) for file in glob.glob("cmake-build-release/files_to_send/nested/*") if os.path.isfile(file)]
+        if os.path.isdir("cmake-build-release/files_to_send/nested"):
+            os.rmdir("cmake-build-release/files_to_send/nested")
         [os.remove(file) for file in glob.glob(".received.*") if os.path.isfile(file)]
 
     @classmethod
@@ -123,6 +126,15 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         server_handle = self.start_ED_server_thread()
         self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file.bin").wait(timeout=5), 0)
         self.assertTrue(self.wait_for_received_data())
+        server_handle.send_signal(signal.SIGINT)
+        self.assertEqual(server_handle.wait(timeout=5), 0)
+
+    def test_ed_server_receives_nested_file(self):
+        os.mkdir("cmake-build-release/files_to_send/nested")
+        self.write_bytes("nested/test_file.bin")
+        server_handle = self.start_ED_server_thread()
+        self.assertEqual(self.send_file_with_ED_client(file_to_send="nested/test_file.bin").wait(timeout=5), 0)
+        self.assertTrue(self.wait_for_received_data(input_file="nested/test_file.bin"))
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 

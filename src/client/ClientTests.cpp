@@ -37,6 +37,54 @@ TEST_CASE("Client. Stream data is sent using the ED client")
   }
 }
 
+TEST_CASE("Client. Filename can be set dynamically.")
+{
+  auto udpClientSpy = std::make_shared<UdpClientSpy>();
+  Client edClient(udpClientSpy, std::make_shared<Timer>(0), 1, "testFilename");
+
+  std::stringstream ss("B");
+  edClient.send(ss);
+
+  REQUIRE(udpClientSpy->buffersSent.size() == 2);
+  REQUIRE(udpClientSpy->buffersSent.at(0).at(EnterpriseDiode::FrameCountIndex) == 1);
+  REQUIRE(!udpClientSpy->buffersSent.at(0).at(EnterpriseDiode::EOFFlagIndex));
+  REQUIRE(udpClientSpy->buffersSent.at(0).at(EnterpriseDiode::HeaderSizeInBytes) == 'B');
+
+  REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::FrameCountIndex) == 2);
+  REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::EOFFlagIndex));
+
+  SECTION("Filename is set")
+  {
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == 't');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 4) == 'F');
+  }
+}
+
+TEST_CASE("Client. File is sent with appropriate file name if partial file path is provided")
+{
+  auto udpClientSpy = std::make_shared<UdpClientSpy>();
+  Client edClient(udpClientSpy, std::make_shared<Timer>(0), 1, "example/testFilename");
+
+  std::stringstream ss("B");
+  edClient.send(ss);
+
+  REQUIRE(udpClientSpy->buffersSent.size() == 2);
+  REQUIRE(udpClientSpy->buffersSent.at(0).at(EnterpriseDiode::FrameCountIndex) == 1);
+  REQUIRE(!udpClientSpy->buffersSent.at(0).at(EnterpriseDiode::EOFFlagIndex));
+  REQUIRE(udpClientSpy->buffersSent.at(0).at(EnterpriseDiode::HeaderSizeInBytes) == 'B');
+
+  REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::FrameCountIndex) == 2);
+  REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::EOFFlagIndex));
+
+  SECTION("Filename is set")
+  {
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == 't');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 4) == 'F');
+  }
+}
+
+
+
 TEST_CASE("Client. Stream data is sent using the ED client, where maxPayloadSize is larger than data")
 {
   auto udpClientSpy = std::make_shared<UdpClientSpy>();
