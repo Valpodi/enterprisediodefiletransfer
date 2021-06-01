@@ -12,12 +12,22 @@ import glob
 class IntegrationTestsEnterpriseDiode(unittest.TestCase):
     def tearDown(self):
         [os.remove(file) for file in glob.glob("test_file.bin*") if os.path.isfile(file)]
+        [os.remove(file) for file in glob.glob("cmake-build-release/files_to_send/*") if os.path.isfile(file)]
         [os.remove(file) for file in glob.glob("received*") if os.path.isfile(file)]
         [os.remove(file) for file in glob.glob(".received.*") if os.path.isfile(file)]
 
+    @classmethod
+    def tearDownClass(cls):
+        os.rmdir("cmake-build-release/files_to_send")
+
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.isdir("cmake-build-release/files_to_send"):
+            os.mkdir("cmake-build-release/files_to_send")
+
     @staticmethod
     def write_bytes(filepath):
-        with open(filepath, "wb") as file:
+        with open(f"cmake-build-release/files_to_send/{filepath}", "wb") as file:
             return file.write(b"0" * int(110 * 1024))
 
     def send_file_with_ED_loopback(self, file_to_send):
@@ -28,17 +38,20 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
 
     @staticmethod
     def run_ED_program(ed_program, file_to_send, port_args, mtu_size=1000):
-        return subprocess.Popen(
-            f"cmake-build-release/{ed_program} -f {file_to_send} -a localhost {port_args} -m {mtu_size}".split())
+        os.chdir("cmake-build-release/files_to_send")
+        process = subprocess.Popen(
+            f"../{ed_program} -f {file_to_send} -a localhost {port_args} -m {mtu_size}".split())
+        os.chdir("../..")
+        return process
 
-    def wait_for_received_data(self, num_expect_files=1):
+    def wait_for_received_data(self, num_expect_files=1, output_dir="."):
         attempts = 10
         all_data_received = False
-        client_file_size = self.read_bytes("test_file.bin")
+        client_file_size = self.read_bytes("cmake-build-release/files_to_send/test_file.bin")
         files = []
 
         while (not all_data_received) or (len(files) < num_expect_files):
-            files = glob.glob("test_file.bin.*")
+            files = glob.glob(f"{output_dir}/test_file.bin.*")
             all_data_received = True
             for file in files:
                 all_data_received &= (self.read_bytes(file) == client_file_size)
@@ -57,7 +70,7 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
     def test_file_is_sent_and_saved_with_ed_loopback(self):
         self.write_bytes("test_file.bin")
         handle = self.send_file_with_ED_loopback(file_to_send="test_file.bin")
-        self.assertTrue(self.wait_for_received_data())
+        self.assertTrue(self.wait_for_received_data(output_dir="cmake-build-release/files_to_send"))
         handle.send_signal(signal.SIGINT)
         self.assertEqual(handle.wait(timeout=5), 0)
 
