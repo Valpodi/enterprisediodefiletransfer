@@ -88,15 +88,10 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         self.assertEqual(self.send_file_with_ED_loopback(file_to_send="my_file_not_present.bin").wait(timeout=5), 2)
         self.assertEqual(self.send_file_with_ED_client(file_to_send="my_file_not_present.bin").wait(timeout=5), 2)
 
-    def test_file_is_sent_and_renamed_with_illegal_filename(self):
+    def test_file_is_rejected_when_sent_with_illegal_filename(self):
         filename = "test_file?.bin"
         self.write_bytes(filename)
-        server_handle = self.start_ED_server_thread()
-        self.assertEqual(self.send_file_with_ED_client(file_to_send=filename).wait(timeout=5), 0)
-        self.assertTrue(self.wait_for_received_data(input_file=filename))
-        self.assertFalse(os.path.isfile(f"cmake-build-release/files_received/{filename}"))
-        server_handle.send_signal(signal.SIGINT)
-        self.assertEqual(server_handle.wait(timeout=5), 0)
+        self.assertRaises(Exception, self.send_file_with_ED_client(file_to_send=filename))
 
     @staticmethod
     def wait_for_server_start(port, attempts=10):

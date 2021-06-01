@@ -8,6 +8,7 @@
 #include <random>
 #include <filesystem>
 #include <boost/algorithm/string.hpp>
+#include <regex>
 
 Client::Client(
   std::shared_ptr<UdpClientInterface> udpClient,
@@ -50,6 +51,11 @@ void Client::parseFilename()
     std::vector<std::string> segments;
     boost::split(segments, filename, boost::is_any_of("/"));
     filename = segments.back();
+    std::regex filter("[a-zA-Z0-9\\.\\-_]+");
+    if (!std::regex_match(filename, filter))
+    {
+      throw std::runtime_error("Invalid filename provided. Please rename.");
+    }
 }
 
 bool Client::sendFrame(std::istream& inputStream)
