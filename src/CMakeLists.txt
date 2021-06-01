@@ -16,6 +16,7 @@ target_link_libraries(tester
         SERVER_LIBRARY
         HEADER_LIBRARY
         ${Boost_LIBRARIES}
+        SISL_TOOLS_LIBRARY
         pthread
         stdc++fs
         )
@@ -29,6 +30,7 @@ target_link_libraries(client
         CLIENT_LIBRARY
         HEADER_LIBRARY
         ${Boost_LIBRARIES}
+        SISL_TOOLS_LIBRARY
         pthread
         )
 
@@ -40,6 +42,7 @@ target_link_libraries(server
         SERVER_LIBRARY
         HEADER_LIBRARY
         ${Boost_LIBRARIES}
+        SISL_TOOLS_LIBRARY
         pthread
         stdc++fs
         )
