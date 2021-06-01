@@ -13,17 +13,20 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
     def tearDown(self):
         [os.remove(file) for file in glob.glob("test_file.bin*") if os.path.isfile(file)]
         [os.remove(file) for file in glob.glob("cmake-build-release/files_to_send/*") if os.path.isfile(file)]
-        [os.remove(file) for file in glob.glob("received*") if os.path.isfile(file)]
+        [os.remove(file) for file in glob.glob("cmake-build-release/files_received/*") if os.path.isfile(file)]
         [os.remove(file) for file in glob.glob(".received.*") if os.path.isfile(file)]
 
     @classmethod
     def tearDownClass(cls):
         os.rmdir("cmake-build-release/files_to_send")
+        os.rmdir("cmake-build-release/files_received")
 
     @classmethod
     def setUpClass(cls):
         if not os.path.isdir("cmake-build-release/files_to_send"):
             os.mkdir("cmake-build-release/files_to_send")
+        if not os.path.isdir("cmake-build-release/files_received"):
+            os.mkdir("cmake-build-release/files_received")
 
     @staticmethod
     def write_bytes(filepath):
@@ -44,17 +47,17 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         os.chdir("../..")
         return process
 
-    def wait_for_received_data(self, num_expect_files=1, output_dir="."):
+    def wait_for_received_data(self, num_expect_files=1, output_dir="cmake-build-release/files_received", input_file="test_file.bin"):
         attempts = 10
         all_data_received = False
-        client_file_size = self.read_bytes("cmake-build-release/files_to_send/test_file.bin")
+        client_file_size = self.read_bytes(f"cmake-build-release/files_to_send/{input_file}")
         files = []
 
         while (not all_data_received) or (len(files) < num_expect_files):
-            files = glob.glob(f"{output_dir}/test_file.bin.*")
+            files = os.listdir(output_dir)
             all_data_received = True
             for file in files:
-                all_data_received &= (self.read_bytes(file) == client_file_size)
+                all_data_received &= (self.read_bytes(os.path.join(output_dir, file)) == client_file_size)
 
             time.sleep(1)
             attempts -= 1
@@ -82,6 +85,16 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         self.assertEqual(self.send_file_with_ED_loopback(file_to_send="my_file_not_present.bin").wait(timeout=5), 2)
         self.assertEqual(self.send_file_with_ED_client(file_to_send="my_file_not_present.bin").wait(timeout=5), 2)
 
+    def test_file_is_sent_and_renamed_with_illegal_filename(self):
+        filename = "test_file?.bin"
+        self.write_bytes(filename)
+        server_handle = self.start_ED_server_thread()
+        self.assertEqual(self.send_file_with_ED_client(file_to_send=filename).wait(timeout=5), 0)
+        self.assertTrue(self.wait_for_received_data(input_file=filename))
+        self.assertFalse(os.path.isfile(f"cmake-build-release/files_received/{filename}"))
+        server_handle.send_signal(signal.SIGINT)
+        self.assertEqual(server_handle.wait(timeout=5), 0)
+
     @staticmethod
     def wait_for_server_start(port, attempts=10):
         while subprocess.call(f"lsof -i :{port}".split()):
@@ -97,7 +110,10 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
 
     @staticmethod
     def run_ED_server(port):
-        return subprocess.Popen(f"cmake-build-release/server -s {port}".split())
+        os.chdir("cmake-build-release/files_received")
+        server = subprocess.Popen(f"../server -s {port}".split())
+        os.chdir("../..")
+        return server
 
     def test_wait_for_ed_server_start_does_timeout(self):
         self.assertRaises(TimeoutError, self.wait_for_server_start, 5001, attempts=1)
@@ -110,14 +126,15 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 
-    def test_ed_server_receives_multiple_files(self):
+    def test_ed_server_receives_overwrites_files_that_exist(self):
         self.write_bytes("test_file.bin")
         server_handle = self.start_ED_server_thread()
 
-        for i in range(0, 4, 1):
+        for i in range(0, 4):
             self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file.bin").wait(timeout=5), 0)
 
-        self.assertTrue(self.wait_for_received_data(num_expect_files=4))
+        self.assertTrue(self.wait_for_received_data())
+        self.assertTrue(len(os.listdir("cmake-build-release/files_received")) == 1)
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 

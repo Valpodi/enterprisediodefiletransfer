@@ -30,7 +30,7 @@ TEST_CASE("ReorderPackets. Handling filename")
     auto inputStream = std::stringstream("");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "received.1");
+    REQUIRE(stream.storedFilename == "1");
   }
   SECTION("Handling non-empty filename")
   {
@@ -65,7 +65,7 @@ TEST_CASE("ReorderPackets. Handling filename")
     auto inputStream = std::stringstream("/file");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "received.1");
+    REQUIRE(stream.storedFilename == "1");
   }
 
 }

@@ -28,7 +28,7 @@ public:
     outputStream.close();
     std::cout << "File complete. Renaming .received. file" << "\n";
     std::cout << storedFilename << "\n";
-    std::filesystem::rename(".received." + std::to_string(sessionId), storedFilename + "." + std::to_string(sessionId));
+    std::filesystem::rename(".received." + std::to_string(sessionId), storedFilename);
   }
 
   void setStoredFilename(std::string filename) override
