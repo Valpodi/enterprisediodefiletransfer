@@ -9,6 +9,7 @@
 #include <queue>
 #include <rapidjson/document.h>
 #include <regex>
+#include <optional>
 
 ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength, std::uint32_t maxFilenameLength) :
   maxBufferSize(maxBufferSize),
@@ -27,7 +28,7 @@ bool ReorderPackets::write(
   {
     if (eOFFlag)
     {
-      streamWrapper->setStoredFilename(getFilenameFromStream(inputStream));
+      streamWrapper->setStoredFilename(getFilenameFromStream(inputStream).value_or("rejected."));
       return true;
     }
     streamWrapper->write(inputStream);
@@ -38,16 +39,23 @@ bool ReorderPackets::write(
   return false;
 }
 
-std::string ReorderPackets::getFilenameFromStream(std::istream& inputStream)
+std::optional<std::string> ReorderPackets::getFilenameFromStream(std::istream& inputStream)
 {
-  std::string filename;
-  std::copy_if(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>(), std::back_inserter(filename),
+  std::string sislHeader;
+  std::copy_if(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>(), std::back_inserter(sislHeader),
                [count = maxFilenameLength + 13](auto&&) mutable
                { return count && count--;});
-  filename = convertFromSisl(filename);
-  std::regex filter("[a-zA-Z0-9\\.\\-_]+");
+  try
+  {
+    const auto filename = convertFromSisl(sislHeader);
+    std::regex filter("[a-zA-Z0-9\\.\\-_]+");
 
-  return std::regex_match(filename, filter) ? filename : "rejected?filename";
+    return std::regex_match(filename, filter) ? filename : std::optional<std::string>();
+  }
+  catch(std::exception&)
+  {
+    return std::optional<std::string>();
+  }
 }
 
 std::string ReorderPackets::convertFromSisl(std::string sislFilename)
@@ -59,7 +67,7 @@ std::string ReorderPackets::convertFromSisl(std::string sislFilename)
   const auto json = SislTools::toJson(sislFilename);
   rapidjson::Document doc;
   doc.Parse(json.c_str());
-  return doc["name"].GetString();
+  return doc.HasMember("name") ? doc["name"].GetString() : "";
 }
 
 bool ReorderPackets::checkQueueAndSend(StreamInterface* streamWrapper)

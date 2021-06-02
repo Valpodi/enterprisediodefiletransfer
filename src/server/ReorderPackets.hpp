@@ -2,6 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include <queue>
+#include <optional>
 
 class StreamInterface;
 
@@ -15,7 +16,7 @@ public:
 private:
   bool checkQueueAndSend(StreamInterface* streamWrapper);
   void addFrameToQueue(std::istream& inputStream, std::uint32_t frameCount, bool endOfFile);
-  std::string getFilenameFromStream(std::istream& inputStream);
+  std::optional<std::string> getFilenameFromStream(std::istream& inputStream);
   std::string convertFromSisl(std::string sislFilename);
 
   struct FrameDetails {
