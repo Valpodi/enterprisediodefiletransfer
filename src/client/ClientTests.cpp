@@ -32,8 +32,10 @@ TEST_CASE("Client. Stream data is sent using the ED client")
 
   SECTION("Filename is set")
   {
-    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == 'r');
-    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 7) == 'd');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == '{');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 1) == 'n');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 13) == 'r');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 20) == 'd');
   }
 }
 
@@ -55,8 +57,10 @@ TEST_CASE("Client. Filename can be set dynamically.")
 
   SECTION("Filename is set")
   {
-    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == 't');
-    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 4) == 'F');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == '{');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 1) == 'n');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 13) == 't');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 17) == 'F');
   }
 }
 
@@ -78,8 +82,10 @@ TEST_CASE("Client. File is sent with appropriate file name if partial file path 
 
   SECTION("Filename is set")
   {
-    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == 't');
-    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 4) == 'F');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes) == '{');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 1) == 'n');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 13) == 't');
+    REQUIRE(udpClientSpy->buffersSent.at(1).at(EnterpriseDiode::HeaderSizeInBytes + 17) == 'F');
   }
 }
 

@@ -1,11 +1,13 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <queue>
-#include <iostream>
-#include <algorithm>
+#include <SislTools/SislTools.hpp>
 #include "ReorderPackets.hpp"
 #include "StreamInterface.hpp"
+#include <algorithm>
+#include <iostream>
+#include <queue>
+#include <rapidjson/document.h>
 #include <regex>
 
 ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength, std::uint32_t maxFilenameLength) :
@@ -40,11 +42,24 @@ std::string ReorderPackets::getFilenameFromStream(std::istream& inputStream)
 {
   std::string filename;
   std::copy_if(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>(), std::back_inserter(filename),
-               [count = maxFilenameLength](auto&&) mutable
+               [count = maxFilenameLength + 13](auto&&) mutable
                { return count && count--;});
+  filename = convertFromSisl(filename);
   std::regex filter("[a-zA-Z0-9\\.\\-_]+");
 
   return std::regex_match(filename, filter) ? filename : "rejected?filename";
+}
+
+std::string ReorderPackets::convertFromSisl(std::string sislFilename)
+{
+  if (sislFilename.find("\"}") == std::string::npos)
+  {
+    sislFilename = sislFilename + "\"}";
+  }
+  const auto json = SislTools::toJson(sislFilename);
+  rapidjson::Document doc;
+  doc.Parse(json.c_str());
+  return doc["name"].GetString();
 }
 
 bool ReorderPackets::checkQueueAndSend(StreamInterface* streamWrapper)
@@ -81,3 +96,4 @@ void ReorderPackets::addFrameToQueue(std::istream& inputStream, std::uint32_t fr
 
   queue.emplace(FrameDetails{std::move(newFrame), frameCount, endOfFile});
 }
+

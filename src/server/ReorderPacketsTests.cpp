@@ -27,42 +27,42 @@ TEST_CASE("ReorderPackets. Handling filename")
   auto queueManager = ReorderPackets(4, 1024);
   SECTION("Handling empty filename")
   {
-    auto inputStream = std::stringstream("");
+    auto inputStream = std::stringstream("{name: !str \"\"}");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "1");
   }
   SECTION("Handling non-empty filename")
   {
-    auto inputStream = std::stringstream("testFilename");
+    auto inputStream = std::stringstream("{name: !str \"testFilename\"}");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "testFilename");
   }
   SECTION("Handling filename with null terminator")
   {
-    auto inputStream = std::stringstream("te\0stFilename");
+    auto inputStream = std::stringstream("{name: !str \"te\0stFilename\"}");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "te");
   }
   SECTION("Handling filename with length > maxFilenameLength, 65")
   {
-    auto inputStream = std::stringstream("testFilenametestFilenametestFilenametestFilenametestFilenametestFilename");
+    auto inputStream = std::stringstream("{name: !str \"testFilenametestFilenametestFilenametestFilenametestFilenametestFilename\"}");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "testFilenametestFilenametestFilenametestFilenametestFilenametestF");
   }
   SECTION("Handling filename with allowable special characters")
   {
-    auto inputStream = std::stringstream("example_file-name_09.txt");
+    auto inputStream = std::stringstream("{name: !str \"example_file-name_09.txt\"}");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "example_file-name_09.txt");
   }
   SECTION("Handling filename with illegal special characters")
   {
-    auto inputStream = std::stringstream("/file");
+    auto inputStream = std::stringstream("{name: !str \"/file\"}");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "1");
@@ -94,7 +94,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
 
       SECTION("Frame 4 is EOF and is written to to the output and write returns true")
       {
-        inputStream = std::stringstream("");
+        inputStream = std::stringstream("{name: !str \"testFilename\"}");
         REQUIRE(queueManager.write(inputStream, &stream, 4, true));
         REQUIRE(outputStream.str() == "ZABCDE");
       }
@@ -104,7 +104,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
         inputStream = std::stringstream("YZ");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 99, false));
         REQUIRE(outputStream.str() == "ZABCDE");
-        inputStream = std::stringstream("");
+        inputStream = std::stringstream("{name: !str \"testFilename\"}");
         REQUIRE(queueManager.write(inputStream, &stream, 4, true));
         REQUIRE(outputStream.str() == "ZABCDE");
       }
@@ -114,7 +114,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
         inputStream = std::stringstream("");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 99, true));
         REQUIRE(outputStream.str() == "ZABCDE");
-        inputStream = std::stringstream("");
+        inputStream = std::stringstream("{name: !str \"testFilename\"}");
         REQUIRE(queueManager.write(inputStream, &stream, 4, true));
         REQUIRE(outputStream.str() == "ZABCDE");
       }
@@ -122,10 +122,10 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
       SECTION("Frame 5 is EOF and must be queued, "
               "a spurious eof packet with a higher frameCount does not reassign the eofFrameNumber.")
       {
-        inputStream = std::stringstream("");
+        inputStream = std::stringstream("{name: !str \"testFilename\"}");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 5, true));
         REQUIRE(outputStream.str() == "ZABCDE");
-        inputStream = std::stringstream("");
+        inputStream = std::stringstream("{name: !str \"testFilename\"}");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 99, true));
         REQUIRE(outputStream.str() == "ZABCDE");
         inputStream = std::stringstream("FG");
@@ -141,7 +141,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
     REQUIRE_FALSE(queueManager.write(inputStream, &stream, 3, false));
     REQUIRE(outputStream.str().empty());
 
-    inputStream = std::stringstream("");
+    inputStream = std::stringstream("{name: !str \"testFilename\"}");
     REQUIRE_FALSE(queueManager.write(inputStream, &stream, 4, true));
     REQUIRE(outputStream.str().empty());
 
@@ -158,7 +158,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
   {
     SECTION("In-order EOF closes stream immediately")
     {
-      auto inputStream = std::stringstream("");
+      auto inputStream = std::stringstream("{name: !str \"testFilename\"}");
       REQUIRE(queueManager.write(inputStream, &stream, 1, true));
       REQUIRE(outputStream.str() == "");
     }
@@ -169,7 +169,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
       REQUIRE_FALSE(queueManager.write(inputStream, &stream, 2, false));
       REQUIRE(outputStream.str().empty());
 
-      inputStream = std::stringstream("");
+      inputStream = std::stringstream("{name: !str \"testFilename\"}");
       REQUIRE_FALSE(queueManager.write(inputStream, &stream, 4, true));
       REQUIRE(outputStream.str().empty());
 

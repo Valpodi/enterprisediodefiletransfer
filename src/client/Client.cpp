@@ -94,9 +94,10 @@ ConstSocketBuffers Client::addEOFframe()
 {
   incrementFrameCount();
   setEOF();
+  std::string filenameAsSisl = "{name: !str \"" + filename + "\"}";
   return {
     boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
-    boost::asio::buffer(filename.data(), filename.length())};
+    boost::asio::buffer(filenameAsSisl.data(), filenameAsSisl.length())};
 }
 
 void Client::setSessionID()

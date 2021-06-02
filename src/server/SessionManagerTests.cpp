@@ -37,7 +37,9 @@ TEST_CASE("SessionManager.")
 
     SECTION("SessionManager renames file and closes stream given EOF packet")
     {
-      auto testPacket2 = createTestPacketStream({}, 1, 2, true);
+      std::string filename = "{name: !str \"testFilename\"}";
+      std::vector<char> vcFilename(filename.begin(), filename.end());
+      auto testPacket2 = createTestPacketStream(vcFilename, 1, 2, true);
       sessionManager.writeToStream(parsePacket(testPacket2));
 
       REQUIRE(outputStreams.at(0).str() == std::string("BC"));

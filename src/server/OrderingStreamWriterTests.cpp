@@ -29,7 +29,9 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
     std::stringstream inputStream = createTestPacketStream({'A', 'B'}, 1, 1, false);
     auto packet = parsePacket(inputStream);
 
-    std::stringstream inputStream2 = createTestPacketStream({'r'}, 1, 2, true);
+    std::string filename = "{name: !str \"testFilename\"}";
+    std::vector<char> vcFilename(filename.begin(), filename.end());
+    std::stringstream inputStream2 = createTestPacketStream(vcFilename, 1, 2, true);
     auto packet2 = parsePacket(inputStream2);
 
     REQUIRE_FALSE(streamWriter.write(packet.payload, packet.headerParams));
@@ -39,7 +41,9 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
 
   SECTION("When the EOF packet is queued")
   {
-    std::stringstream inputStreamC = createTestPacketStream({'r'}, 1, 3, true);
+    std::string filename = "{name: !str \"testFilename\"}";
+    std::vector<char> vcFilename(filename.begin(), filename.end());
+    std::stringstream inputStreamC = createTestPacketStream(vcFilename, 1, 3, true);
     auto packetC = parsePacket(inputStreamC);
 
     REQUIRE_FALSE(streamWriter.write(packetC.payload, packetC.headerParams));

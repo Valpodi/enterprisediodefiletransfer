@@ -28,7 +28,9 @@ TEST_CASE("ED server.")
 
     REQUIRE(outputStream.str() == std::string("B"));
 
-    std::stringstream stream2 = createTestPacketStream({}, 1, 2, true);
+    std::string filename = "{name: !str \"testFilename\"}";
+    std::vector<char> vcFilename(filename.begin(), filename.end());
+    std::stringstream stream2 = createTestPacketStream(vcFilename, 1, 2, true);
     edServer.receivePacket(stream);
 
     REQUIRE(outputStream.str() == std::string("B"));
@@ -45,8 +47,9 @@ TEST_CASE("ED server.")
     edServer.receivePacket(stream2);
 
     REQUIRE(outputStream.str() == std::string("BCD"));
-
-    std::stringstream stream3 = createTestPacketStream({}, 1, 3, true);
+    std::string filename = "{name: !str \"testFilename\"}";
+    std::vector<char> vcFilename(filename.begin(), filename.end());
+    std::stringstream stream3 = createTestPacketStream(vcFilename, 1, 3, true);
     edServer.receivePacket(stream3);
 
     REQUIRE(outputStream.str() == std::string("BCD"));
@@ -59,7 +62,9 @@ TEST_CASE("ED server.")
 
     REQUIRE(outputStream.str() == std::string(""));
 
-    std::stringstream stream2 = createTestPacketStream({}, 1, 3, true);
+    std::string filename = "{name: !str \"testFilename\"}";
+    std::vector<char> vcFilename(filename.begin(), filename.end());
+    std::stringstream stream2 = createTestPacketStream(vcFilename, 1, 3, true);
     edServer.receivePacket(stream2);
 
     REQUIRE(outputStream.str() == std::string(""));
@@ -118,7 +123,9 @@ TEST_CASE("ED server. Queue length Tests")
     edServer.receivePacket(stream3);
     std::stringstream stream4 = createTestPacketStream({'G', 'H'}, 1, 4, false);
     edServer.receivePacket(stream4);
-    std::stringstream stream5 = createTestPacketStream({'I', 'J'}, 1, 5, true);
+    std::string filename = "{name: !str \"testFilename\"}";
+    std::vector<char> vcFilename(filename.begin(), filename.end());
+    std::stringstream stream5 = createTestPacketStream(vcFilename, 1, 5, true);
     edServer.receivePacket(stream5);
 
     std::stringstream stream2 = createTestPacketStream({'C', 'D'}, 1, 2, false);
@@ -144,7 +151,9 @@ TEST_CASE("ED server. Stream is closed if timeout is exceeded.", "[integration]"
   REQUIRE(outputStream.str() == std::string("AB"));
   sleep(4);
 
-  std::stringstream stream3 = createTestPacketStream({'C', 'D'}, 1, 2, true);
+  std::string filename = "{name: !str \"testFilename\"}";
+  std::vector<char> vcFilename(filename.begin(), filename.end());
+  std::stringstream stream3 = createTestPacketStream(vcFilename, 1, 2, true);
   edServer.receivePacket(stream3);
   REQUIRE(outputStream.str() == std::string("AB"));
 }
