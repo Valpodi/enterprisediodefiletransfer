@@ -43,11 +43,19 @@ std::optional<std::string> ReorderPackets::getFilenameFromStream(std::istream& i
 {
   std::string sislHeader;
   std::copy_if(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>(), std::back_inserter(sislHeader),
-               [count = maxFilenameLength + 13](auto&&) mutable
+               [count = maxSislLength](auto&&) mutable
                { return count && count--;});
   try
   {
+    if(sislHeader.size() > maxSislLength)
+    {
+      return std::optional<std::string>();
+    }
     const auto filename = convertFromSisl(sislHeader);
+    if(filename.size() > maxFilenameLength)
+    {
+      return std::optional<std::string>();
+    }
     std::regex filter("[a-zA-Z0-9\\.\\-_]+");
 
     return std::regex_match(filename, filter) ? filename : std::optional<std::string>();
@@ -62,7 +70,7 @@ std::string ReorderPackets::convertFromSisl(std::string sislFilename)
 {
   if (sislFilename.find("\"}") == std::string::npos)
   {
-    sislFilename = sislFilename + "\"}";
+    sislFilename += "\"}";
   }
   const auto json = SislTools::toJson(sislFilename);
   rapidjson::Document doc;

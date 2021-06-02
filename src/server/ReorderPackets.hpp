@@ -35,4 +35,5 @@ private:
   std::uint32_t maxQueueLength;
   std::priority_queue<FrameDetails, std::vector<FrameDetails>, std::greater<>> queue;
   std::uint32_t maxFilenameLength;
+  std::uint32_t maxSislLength = 1000;
 };

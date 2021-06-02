@@ -53,6 +53,19 @@ TEST_CASE("ReorderPackets. Handling filename")
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "rejected.1");
   }
+  SECTION("Handling sisl that exceeds max sisl size")
+  {
+    std::string sislFilename = "{something: !str \"";
+    for(int i=0; i<1002; i++)
+    {
+      sislFilename += "a";
+    }
+    sislFilename += "\"}";
+    auto inputStream = std::stringstream(sislFilename);
+    REQUIRE(queueManager.write(inputStream, &stream, 1, true));
+    REQUIRE(outputStream.str().empty());
+    REQUIRE(stream.storedFilename == "rejected.1");
+  }
   SECTION("Handling non-empty filename")
   {
     auto inputStream = std::stringstream("{name: !str \"testFilename\"}");
@@ -72,7 +85,7 @@ TEST_CASE("ReorderPackets. Handling filename")
     auto inputStream = std::stringstream("{name: !str \"testFilenametestFilenametestFilenametestFilenametestFilenametestFilename\"}");
     REQUIRE(queueManager.write(inputStream, &stream, 1, true));
     REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "testFilenametestFilenametestFilenametestFilenametestFilenametestF");
+    REQUIRE(stream.storedFilename == "rejected.1");
   }
   SECTION("Handling filename with allowable special characters")
   {
