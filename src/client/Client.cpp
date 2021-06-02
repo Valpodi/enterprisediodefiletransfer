@@ -66,9 +66,9 @@ bool Client::sendFrame(std::istream& inputStream)
 
 ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize)
 {
-  if (inputStream.rdbuf()->in_avail())
+  const auto payloadLength = inputStream.read((char*)&*(payloadBuffer.begin()), payloadSize).gcount();
+  if (payloadLength > 0)
   {
-    const auto payloadLength = inputStream.read((char*)&*(payloadBuffer.begin()), payloadSize).gcount();
     incrementFrameCount();
     return {
       boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
