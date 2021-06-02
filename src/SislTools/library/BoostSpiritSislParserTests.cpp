@@ -9,6 +9,11 @@ TEST_CASE("SISL parsing. Can parse strings")
   REQUIRE(SislToolsInternal::parseSislToJson("{ field: !str \"h\"}") == "{\"field\":\"h\"}");
 }
 
+TEST_CASE("SISL parsing throws when first character is not {")
+{
+  REQUIRE_THROWS_AS(SislToolsInternal::parseSislToJson(" field: !str \"h\"}"), std::runtime_error);
+}
+
 TEST_CASE("SISL parsing. Can parse doubles")
 {
   REQUIRE(

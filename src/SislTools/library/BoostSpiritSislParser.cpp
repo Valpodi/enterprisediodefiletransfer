@@ -5,8 +5,9 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#include <map>
 #include <functional>
+#include <iostream>
+#include <map>
 
 #include "BoostSpiritSislParser.hpp"
 
@@ -111,8 +112,12 @@ namespace parser
 
 std::string SislToolsInternal::parseSislToJson(std::string input)
 {
+  if(input[0] != 0x7B)
+  {
+    std::cout << "Invalid sisl, first character is not {" << std::endl;
+    throw std::runtime_error("Invalid sisl, first character is not {");
+  }
   Storage storage;
-
   auto parser = boost::spirit::x3::with<actions::state_tag>(std::ref(storage))[parser::sisl] >> boost::spirit::x3::eoi;
 
   using boost::spirit::x3::ascii::space;
