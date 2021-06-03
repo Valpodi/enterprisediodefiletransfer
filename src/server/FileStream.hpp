@@ -23,7 +23,7 @@ public:
   {
     outputStream.close();
     std::cerr << "Removing .received. file" << "\n";
-    std::filesystem::remove(".received." + std::to_string(sessionId));
+    std::filesystem::remove(".received." + std::to_string(tempFilename));
   }
 
   void renameFile() override
@@ -31,12 +31,12 @@ public:
     outputStream.close();
     std::cout << "File complete. Renaming .received. file" << "\n";
     std::cout << storedFilename << "\n";
-    std::filesystem::rename(".received." + std::to_string(sessionId), storedFilename);
+    std::filesystem::rename(".received." + std::to_string(tempFilename), storedFilename);
   }
 
   void setStoredFilename(std::string filename) override
   {
-    storedFilename = (filename == "rejected.") ? filename+std::to_string(sessionId) : filename;
+    storedFilename = (filename == "rejected.") ? filename+std::to_string(tempFilename) : filename;
   }
 
   void write(const std::vector<char>& inputData) override
