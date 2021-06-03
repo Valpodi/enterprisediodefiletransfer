@@ -29,14 +29,14 @@ private:
   void setSessionID();
   ConstSocketBuffers addEOFframe();
   void parseFilename();
+  std::string getFilenameFromPath() const;
 
   std::shared_ptr<UdpClientInterface> udpClient;
   std::shared_ptr<TimerInterface> edTimer;
   std::uint32_t maxPayloadSize;
   std::array<char, EnterpriseDiode::HeaderSizeInBytes> headerBuffer;
   std::vector<char> payloadBuffer;
-  std::string filename;
-
+  const std::string filename;
 };
 
 boost::posix_time::microseconds calculateTimerPeriod(double dataRateMbps, std::uint32_t packetSizeBytes);

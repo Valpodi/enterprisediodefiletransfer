@@ -48,16 +48,20 @@ void Client::send(std::istream& inputStream)
 
 void Client::parseFilename()
 {
-    filename = std::filesystem::path(filename).filename();
+    const auto filenameFromPath = getFilenameFromPath();
     std::regex filter("[a-zA-Z0-9\\.\\-_]+");
-    if (!std::regex_match(filename, filter))
+    if (!std::regex_match(filenameFromPath, filter))
     {
       throw std::runtime_error("Invalid filename provided. Please rename. The filename can only contain alphanumeric characters, dashes(-) and dots(.)");
     }
-    if (filename.length() > 65)
+    if (filenameFromPath.length() > 65)
     {
-      throw std::runtime_error("Invalid filename provided. The maximum length of the filename is 65 characters.\n" + filename + " is " + std::to_string(filename.length()) + " characters.");
+      throw std::runtime_error("Invalid filename provided. The maximum length of the filename is 65 characters.\n" + filenameFromPath + " is " + std::to_string(filenameFromPath.length()) + " characters.");
     }
+}
+std::string Client::getFilenameFromPath() const
+{
+  return std::filesystem::path(filename).filename();
 }
 
 bool Client::sendFrame(std::istream& inputStream)
@@ -96,7 +100,7 @@ ConstSocketBuffers Client::addEOFframe()
 {
   incrementFrameCount();
   setEOF();
-  std::string filenameAsSisl = "{name: !str \"" + filename + "\"}";
+  const auto filenameAsSisl = "{name: !str \"" + getFilenameFromPath() + "\"}";
   return {
     boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
     boost::asio::buffer(filenameAsSisl.data(), filenameAsSisl.length())};
