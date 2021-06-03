@@ -1,17 +1,19 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <iostream>
 #include "StreamInterface.hpp"
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <random>
 
 class FileStream : public StreamInterface
 {
 public:
   explicit FileStream(std::uint32_t sessionId) :
-    sessionId(sessionId)
+    sessionId(sessionId),
+    tempFilename(setTempFilename())
   {
     outputStream.open(".received." + std::to_string(sessionId));
     outputStream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
@@ -53,8 +55,16 @@ public:
       std::ostreambuf_iterator(outputStream));
   }
 
+
 private:
+  static uint32_t setTempFilename()
+  {
+    const auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+    return (std::uint32_t)std::default_random_engine(seed)();
+  }
+
   const std::uint32_t sessionId;
   std::ofstream outputStream;
   std::string storedFilename;
+  const std::uint32_t tempFilename;
 };
