@@ -15,7 +15,7 @@ public:
     sessionId(sessionId),
     tempFilename(setTempFilename())
   {
-    outputStream.open(".received." + std::to_string(sessionId));
+    outputStream.open(".received." + std::to_string(tempFilename));
     outputStream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
   }
 
