@@ -23,6 +23,8 @@ Server arguments:
 
 Client arguments:
 1. FILENAME: The path to the file to send.
+   
+   Note that the maximum length of the filename (not the path) is 65 characters, and the filename can only contain alphanumeric characters, dashes(-) and dots(.).
 2. ADDRESS: The IP address of the server.
 3. PORT: The port to send from.
 4. MTUSIZE: The size of the mtu in bytes.
@@ -34,8 +36,12 @@ Or if running the loopback tester:
 
 Client arguments:
 1. FILENAME: The path to the file to send.
+
+   Note that the maximum length of the filename (not the path) is 65 characters, and the filename can only contain alphanumeric characters, dashes(-) and dots(.).
 2. ADDRESS: The IP address of the server.
 3. CLIENT PORT: The port to send from.
 4. SERVER PORT: The port the server will listen on.
 5. MTUSIZE: The size of the mtu in bytes.
 6. DATARATE_MBPS: The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
+
+

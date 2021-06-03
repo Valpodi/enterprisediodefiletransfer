@@ -48,13 +48,15 @@ void Client::send(std::istream& inputStream)
 
 void Client::parseFilename()
 {
-    std::vector<std::string> segments;
-    boost::split(segments, filename, boost::is_any_of("/"));
-    filename = segments.back();
+    filename = std::filesystem::path(filename).filename();
     std::regex filter("[a-zA-Z0-9\\.\\-_]+");
     if (!std::regex_match(filename, filter))
     {
-      throw std::runtime_error("Invalid filename provided. Please rename.");
+      throw std::runtime_error("Invalid filename provided. Please rename. The filename can only contain alphanumeric characters, dashes(-) and dots(.)");
+    }
+    if (filename.length() > 65)
+    {
+      throw std::runtime_error("Invalid filename provided. The maximum length of the filename is 65 characters.\n" + filename + " is " + std::to_string(filename.length()) + " characters.");
     }
 }
 

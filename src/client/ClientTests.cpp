@@ -98,6 +98,15 @@ TEST_CASE("Client. Client throws if file is sent with an illegal file name")
   REQUIRE_THROWS_AS(edClient.send(ss), std::runtime_error);
 }
 
+TEST_CASE("Client. Client throws if file is sent with a file name that exceeds the 65 character limit.")
+{
+  auto udpClientSpy = std::make_shared<UdpClientSpy>();
+  Client edClient(udpClientSpy, std::make_shared<Timer>(0), 1, "testFilenametestFilenametestFilenametestFilenametestFilenametestFilename");
+
+  std::stringstream ss("B");
+  REQUIRE_THROWS_AS(edClient.send(ss), std::runtime_error);
+}
+
 
 TEST_CASE("Client. Stream data is sent using the ED client, where maxPayloadSize is larger than data")
 {
