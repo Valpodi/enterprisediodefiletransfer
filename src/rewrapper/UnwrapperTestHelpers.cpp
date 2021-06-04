@@ -42,11 +42,6 @@ BytesBuffer createTestWrappedBytesBuffer(const std::string& payload, const Bytes
   return MessageParsingHelpers::StringToBytes(createTestWrappedString(payload, mask).str());
 }
 
-BytesBuffer getMask(const BytesBuffer& data)
-{
-  return BytesBuffer(data.begin() + 20, data.begin() + 28);
-}
-
 BytesBuffer dummyWrappedBuffer()
 {
   return BytesBuffer{0xd1};

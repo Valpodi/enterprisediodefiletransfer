@@ -6,15 +6,12 @@
 
 #include <filesystem>
 #include <BytesBuffer.hpp>
-#include "Unwrapper.hpp"
 #include <sstream>
 #include "StreamingFileInfo.hpp"
 
-struct DataPackage;
 
 std::stringstream createTestWrappedString(const std::string& payload, const BytesBuffer& mask={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
 BytesBuffer createTestWrappedBytesBuffer(const std::string& payload, const BytesBuffer& mask={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
-BytesBuffer getMask(const BytesBuffer& data);
 BytesBuffer dummyWrappedBuffer();
 
 inline bool operator==(const ResumeInfo& a, const ResumeInfo& b)

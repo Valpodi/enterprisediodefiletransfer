@@ -1,7 +1,6 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <algorithm>
 #include "StreamingRewrapper.hpp"
 #include "CloakedDagger.hpp"
 #include "StreamingFileInfo.hpp"

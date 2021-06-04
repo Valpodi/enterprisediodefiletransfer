@@ -1,7 +1,5 @@
 
 add_library (UNWRAPPER_LIBRARY
-        Unwrapper.hpp
-        Unwrapper.cpp
         WrapperInterface.hpp
         CloakedDagger.cpp
         CloakedDagger.hpp
