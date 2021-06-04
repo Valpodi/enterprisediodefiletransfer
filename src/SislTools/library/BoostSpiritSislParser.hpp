@@ -10,4 +10,4 @@ namespace SislToolsInternal
 {
 std::string parseSislToJson(std::string input);
 }
-#endif //GATEWAY_BOOSTSPIRIT_HPP
+#endif //ED_BOOSTSPIRIT_HPP

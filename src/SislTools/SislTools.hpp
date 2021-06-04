@@ -27,4 +27,4 @@ namespace SislTools
   std::string toJson(const std::string& sisl);
 }
 
-#endif //GATEWAY_RAPIDJSONSISLCONVERTERINTERFACE_HPP
+#endif //ED_SISLTOOLS_HPP

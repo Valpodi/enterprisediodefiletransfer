@@ -10,4 +10,4 @@ namespace SislToolsInternal
 {
 std::string parseJsonToSisl(std::string json);
 }
-#endif //GATEWAY_RAPIDJSONSISLCONVERTER_HPP
+#endif //ED_RAPIDJSONSISLCONVERTER_HPP

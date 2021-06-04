@@ -5,6 +5,7 @@ add_subdirectory(client)
 add_subdirectory(server)
 add_subdirectory(diodeheader)
 add_subdirectory(SislTools)
+add_subdirectory(rewrapper)
 
 
 add_executable(tester
@@ -32,6 +33,7 @@ target_link_libraries(client
         ${Boost_LIBRARIES}
         SISL_TOOLS_LIBRARY
         pthread
+        stdc++fs
         )
 
 
