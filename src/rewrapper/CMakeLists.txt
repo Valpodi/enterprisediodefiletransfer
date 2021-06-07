@@ -3,7 +3,6 @@ add_library (UNWRAPPER_LIBRARY
         WrapperInterface.hpp
         CloakedDagger.cpp
         CloakedDagger.hpp
-        DataPackage.hpp
         StreamingRewrapper.cpp
         StreamingRewrapper.hpp
         )
