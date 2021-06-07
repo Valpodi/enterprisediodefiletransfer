@@ -73,6 +73,10 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         with open(filepath, "rb") as file:
             return file.read()
 
+    @staticmethod
+    def is_files_received_dir_is_empty(self):
+        return not os.listdir("cmake-build-release/files_received/")
+
     def test_file_is_sent_and_saved_with_ed_loopback(self):
         self.write_bytes("test_file.bin")
         handle = self.send_file_with_ED_loopback(file_to_send="test_file.bin")
@@ -101,15 +105,15 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
             if attempts == 0:
                 raise TimeoutError("Server failed to start")
 
-    def start_ED_server_thread(self):
-        process_handle = self.run_ED_server(5000)
+    def start_ED_server_thread(self, set_drop_packets_flag=False):
+        process_handle = self.run_ED_server(5000, set_drop_packets_flag)
         self.wait_for_server_start(port=5000)
         return process_handle
 
     @staticmethod
-    def run_ED_server(port):
+    def run_ED_server(port, set_drop_packets_flag=False):
         os.chdir("cmake-build-release/files_received")
-        server = subprocess.Popen(f"../server -s {port}".split())
+        server = subprocess.Popen(f"../server -s {port} {'-d' * set_drop_packets_flag}".split())
         os.chdir("../..")
         return server
 
@@ -145,6 +149,13 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 
+    def test_ed_server_does_not_write_files_to_disk_if_correct_flag_is_set(self):
+        self.write_bytes("test_file.bin")
+        server_handle = self.start_ED_server_thread(set_drop_packets_flag=True)
+        self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file.bin").wait(timeout=5), 0)
+        self.assertTrue(self.is_files_received_dir_is_empty())
+        server_handle.send_signal(signal.SIGINT)
+        self.assertEqual(server_handle.wait(timeout=5), 0)
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(IntegrationTestsEnterpriseDiode)
