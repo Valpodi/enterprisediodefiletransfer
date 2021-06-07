@@ -16,7 +16,6 @@ public:
 
 private:
   size_t count {0};
-  bool fileStart {false};
   BytesBuffer mask;
 
   BytesBuffer rewrap(const BytesBuffer& input);

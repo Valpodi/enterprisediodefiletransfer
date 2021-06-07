@@ -11,18 +11,7 @@ BytesBuffer StreamingRewrapper::unwrap(const BytesBuffer& data)
   {
     return data;
   }
-
-  if (fileStart)
-  {
-    mask = getMaskFromHeader(data);
-    fileStart = false;
-    count = data.size() - CloakedDagger::headerSize();
-    return data;
-  }
-  else
-  {
-    return rewrap(data);
-  }
+  return rewrap(data);
 }
 
 BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input)
