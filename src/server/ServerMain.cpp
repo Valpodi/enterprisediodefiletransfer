@@ -15,6 +15,7 @@ struct Params
   std::uint16_t serverPort;
   std::uint16_t mtuSize;
   std::uint16_t maxQueueLength;
+  bool dropPackets;
 };
 
 inline Params parseArgs(int argc, char **argv)
@@ -23,11 +24,14 @@ inline Params parseArgs(int argc, char **argv)
   std::uint16_t serverPort;
   std::uint16_t mtuSize;
   std::uint16_t maxQueueLength = 1024;
+  bool dropPackets = false;
   const auto cli = clara::Help(showHelp) |
                    clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on") |
                    clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface") |
                    clara::Opt(maxQueueLength, "Queue Length")["-q"]["--queueLength"](
-                     "Max length of queue for reordering packets");
+                     "Max length of queue for reordering packets") |
+                   clara::Opt(dropPackets)["-d"]["--dropPackets"](
+                     "Server will write packets to disk if this flag is false, else will drop them and only count missing packets");
 
   const auto result = cli.parse(clara::Args(argc, argv));
   if (!result)
@@ -42,7 +46,7 @@ inline Params parseArgs(int argc, char **argv)
     exit(1);
   }
 
-  return {serverPort, mtuSize, maxQueueLength};
+  return {serverPort, mtuSize, maxQueueLength, dropPackets};
 }
 
 namespace ServerApplication

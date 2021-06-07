@@ -22,6 +22,7 @@ struct Params
   double dataRateMbps;
   std::uint16_t mtuSize;
   std::uint16_t maxQueueLength;
+  bool dropPackets;
 };
 
 inline Params parseArgs(int argc, char **argv)
@@ -34,15 +35,18 @@ inline Params parseArgs(int argc, char **argv)
   double dataRateMbps;
   std::uint16_t mtuSize;
   std::uint16_t maxQueueLength = 1024;
+  bool dropPackets = false;
   const auto cli = clara::Help(showHelp) |
                    clara::Opt(clientAddress, "client address")["-a"]["--address"]("address send packets to") |
                    clara::Opt(clientPort, "client port")["-c"]["--clientPort"]("port to send packets to") |
                    clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on") |
                    clara::Opt(filename, "filename")["-f"]["--filename"]("name of a file you want to send") |
-                   clara::Opt(dataRateMbps, "date rate in Megabits per second")["-r"]["--datarate"](
-                     "data rate of transfer") |
+                   clara::Opt(dataRateMbps, "date rate in Megabits per second")["-r"]["--datarate"]("data rate of transfer") |
                    clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface") |
-                   clara::Opt(maxQueueLength, "Queue Length")["-q"]["--queueLength"]("Max length of queue for reordering packets");
+                   clara::Opt(maxQueueLength, "Queue Length")["-q"]["--queueLength"](
+                     "Max length of queue for reordering packets") |
+                   clara::Opt(dropPackets)["-d"]["--dropPackets"](
+                     "Server will write packets to disk if this flag is false, else will drop them and only count missing packets");
 
   const auto result = cli.parse(clara::Args(argc, argv));
   if (!result)
@@ -57,7 +61,7 @@ inline Params parseArgs(int argc, char **argv)
     exit(1);
   }
 
-  return {clientAddress, clientPort, serverPort, filename, dataRateMbps, mtuSize, maxQueueLength};
+  return {clientAddress, clientPort, serverPort, filename, dataRateMbps, mtuSize, maxQueueLength, dropPackets};
 }
 
 namespace EDTesterApplication
