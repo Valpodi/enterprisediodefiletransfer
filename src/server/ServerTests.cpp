@@ -57,7 +57,7 @@ TEST_CASE("ED server.")
 
   SECTION("Packets are reordered before being written to stream")
   {
-    std::stringstream stream = createTestPacketStream({'B', 'C'}, 1, 2, false);
+    std::stringstream stream = createTestPacketStream({'C', 'D'}, 1, 2, false);
     edServer.receivePacket(stream);
 
     REQUIRE(outputStream.str() == std::string(""));
@@ -71,10 +71,10 @@ TEST_CASE("ED server.")
 
     SECTION("The first frame is received and both are written to the output")
     {
-      std::stringstream stream3 = createTestPacketStream({'B', 'C'}, 1, 1, false);
+      std::stringstream stream3 = createTestPacketStream({'A', 'B'}, 1, 1, false);
       edServer.receivePacket(stream3);
 
-      REQUIRE(outputStream.str() == std::string("BCBC"));
+      REQUIRE(outputStream.str() == std::string("ABCD"));
     }
   }
 
@@ -123,10 +123,12 @@ TEST_CASE("ED server. Queue length Tests")
     edServer.receivePacket(stream3);
     std::stringstream stream4 = createTestPacketStream({'G', 'H'}, 1, 4, false);
     edServer.receivePacket(stream4);
+    std::stringstream stream5 = createTestPacketStream({'I', 'J'}, 1, 5, false);
+    edServer.receivePacket(stream5);
     std::string filename = "{name: !str \"testFilename\"}";
     std::vector<char> vcFilename(filename.begin(), filename.end());
-    std::stringstream stream5 = createTestPacketStream(vcFilename, 1, 5, true);
-    edServer.receivePacket(stream5);
+    std::stringstream stream6 = createTestPacketStream(vcFilename, 1, 6, true);
+    edServer.receivePacket(stream6);
 
     std::stringstream stream2 = createTestPacketStream({'C', 'D'}, 1, 2, false);
     edServer.receivePacket(stream2);
