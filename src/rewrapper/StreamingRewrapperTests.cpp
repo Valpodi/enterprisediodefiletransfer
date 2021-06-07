@@ -2,8 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include <src/test/catch.hpp>
-#include "DataPackage.hpp"
-#include "StreamingFileInfo.hpp"
+#include "BytesBuffer.hpp"
 #include "UnwrapperTestHelpers.hpp"
 #include "StreamingRewrapper.hpp"
 #include "CloakedDagger.hpp"
@@ -11,38 +10,7 @@
 TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
 {
   StreamingRewrapper streamingRewrapper;
-  const auto rewrappedInfo = streamingRewrapper.startFile(StreamingFileInfo{"filename", 8, ResumeInfo{{0, 7, 19}, "session1"}, std::string("london")}, dummyWrappedBuffer());
 
-  SECTION("Check file length is increased for first segment")
-  {
-    REQUIRE(rewrappedInfo == StreamingFileInfo{"filename", 8 + CloakedDagger::headerSize(),
-          ResumeInfo{{0, 7 + CloakedDagger::headerSize(), 19 + CloakedDagger::headerSize()}, "session1"}, std::string("london")});
-
-    SECTION("Can't call start file twice without a chunk")
-    {
-      REQUIRE_THROWS_AS(
-        streamingRewrapper.startFile(StreamingFileInfo{"filename", 11, ResumeInfo{{8, 18, 19}, "session1"}, std::string("london")}, dummyWrappedBuffer()),
-        std::logic_error);
-    }
-
-    SECTION("Check file offset is increased for subsequent segment")
-    {
-      streamingRewrapper.unwrap(createTestWrappedBytesBuffer("TESTDATA"));
-
-      const auto rewrappedInfo2 = streamingRewrapper.startFile(StreamingFileInfo{"filename", 11, ResumeInfo{{8, 18, 19}, "session1"}, std::string("london")}, dummyWrappedBuffer());
-
-      REQUIRE(rewrappedInfo2 == StreamingFileInfo{"filename", 11,
-            ResumeInfo{{8 + CloakedDagger::headerSize(), 18 + CloakedDagger::headerSize(), 19 + CloakedDagger::headerSize()}, "session1"}, std::string("london")});
-    }
-  }
-
-  SECTION("Throws exception if startFile called with non-zero content-range start")
-  {
-    REQUIRE_THROWS_AS(
-      streamingRewrapper.startFile(StreamingFileInfo{"filename", 10, ResumeInfo{{1, 5, 10}, "session2"}, std::string("london")},
-                                   dummyWrappedBuffer()),
-      std::runtime_error);
-  }
 
   SECTION("For file that looks wrapped throw if not enough data for header")
   {

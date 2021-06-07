@@ -7,26 +7,10 @@
 #include <filesystem>
 #include <BytesBuffer.hpp>
 #include <sstream>
-#include "StreamingFileInfo.hpp"
 
 
 std::stringstream createTestWrappedString(const std::string& payload, const BytesBuffer& mask={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
 BytesBuffer createTestWrappedBytesBuffer(const std::string& payload, const BytesBuffer& mask={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
-BytesBuffer dummyWrappedBuffer();
-
-inline bool operator==(const ResumeInfo& a, const ResumeInfo& b)
-{
-  return a.contentRange == b.contentRange &&
-         a.sessionID == b.sessionID;
-}
-
-inline bool operator==(const StreamingFileInfo& a, const StreamingFileInfo& b)
-{
-  return a.filename == b.filename &&
-         a.contentLength == b.contentLength &&
-         a.resumeInfo == b.resumeInfo &&
-         a.destinationSpecifier == b.destinationSpecifier;
-}
 
 
 #endif //REWRAPPER_UNWRAPPERTESTHELPERS_HPP

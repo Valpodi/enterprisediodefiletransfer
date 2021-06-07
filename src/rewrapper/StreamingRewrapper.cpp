@@ -3,8 +3,7 @@
 
 #include "StreamingRewrapper.hpp"
 #include "CloakedDagger.hpp"
-#include "StreamingFileInfo.hpp"
-#include "DataPackage.hpp"
+#include "BytesBuffer.hpp"
 
 BytesBuffer StreamingRewrapper::unwrap(const BytesBuffer& data)
 {
@@ -64,83 +63,4 @@ BytesBuffer StreamingRewrapper::getMaskFromHeader(const BytesBuffer& input)
   const auto header = CloakedDagger::createFromBuffer(input);
 
   return BytesBuffer(header.key.begin(), header.key.end());
-}
-
-StreamingFileInfo StreamingRewrapper::startFile(const StreamingFileInfo& info, const BytesBuffer& firstData)
-{
-  if (info.resumeInfo)
-  {
-    resumableFileStart(info);
-  }
-  else
-  {
-    // Start of only segment of non-resumable file
-    fileStart = true;
-    currentSessionID = boost::none;
-  }
-
-  return updateFileInfo(info, firstData);
-}
-
-void StreamingRewrapper::resumableFileStart(const StreamingFileInfo& info)
-{
-  if (info.resumeInfo->contentRange.start == 0)
-  {
-    // Start of first segment of resumable file
-    fileStart = true;
-    currentSessionID = info.resumeInfo->sessionID;
-  }
-  else
-  {
-    if (info.resumeInfo->sessionID != currentSessionID)
-    {
-      throw std::runtime_error("starting re-wrapper with content-range not equal to zero");
-    }
-
-    if (fileStart)
-    {
-      throw std::logic_error("StreamingRewrapper::startFile called twice with no chunk");
-    }
-
-    count = info.resumeInfo->contentRange.start;
-  }
-}
-
-StreamingFileInfo StreamingRewrapper::updateFileInfo(const StreamingFileInfo& info, const BytesBuffer& firstData) const
-{
-  StreamingFileInfo newInfo = info;
-
-  if (firstData.at(0) != CloakedDagger::cloakedDaggerIdentifierByte)
-  {
-    return newInfo;
-  }
-
-  if (fileStart)
-  {
-    // First chunk of file, or first chunk of first segment of resumable file
-    if (info.contentLength)
-    {
-      newInfo.contentLength = *newInfo.contentLength + CloakedDagger::headerSize();
-    }
-
-    if (info.resumeInfo)
-    {
-      newInfo.resumeInfo->contentRange = ContentRange{
-        info.resumeInfo->contentRange.start,
-        info.resumeInfo->contentRange.end + CloakedDagger::headerSize(),
-        info.resumeInfo->contentRange.total + CloakedDagger::headerSize()};
-    }
-  }
-  else
-  {
-    if (info.resumeInfo)
-    {
-      newInfo.resumeInfo->contentRange = ContentRange{
-        info.resumeInfo->contentRange.start + CloakedDagger::headerSize(),
-        info.resumeInfo->contentRange.end + CloakedDagger::headerSize(),
-        info.resumeInfo->contentRange.total + CloakedDagger::headerSize()};
-    }
-  }
-
-  return newInfo;
 }
