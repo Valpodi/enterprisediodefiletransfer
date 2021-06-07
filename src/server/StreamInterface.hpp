@@ -5,6 +5,7 @@
 #define ENTERPRISEDIODE_STREAMINTERFACE_HPP
 
 #include <vector>
+#include <BytesBuffer.hpp>
 
 class StreamInterface
 {
@@ -13,7 +14,7 @@ public:
   virtual void deleteFile() = 0;
   virtual void renameFile() = 0;
   virtual void setStoredFilename(std::string filename) = 0;
-  virtual void write(const std::vector<char>& inputData) = 0;
+  virtual void write(const BytesBuffer& inputData) = 0;
   virtual void write(std::istream& inputStream) = 0;
 };
 

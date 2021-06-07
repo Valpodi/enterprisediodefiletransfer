@@ -102,7 +102,7 @@ void ReorderPackets::addFrameToQueue(std::istream& inputStream, std::uint32_t fr
     return;
   }
 
-  std::vector<char> newFrame;
+  BytesBuffer newFrame;
   newFrame.reserve(maxBufferSize);
 
   std::copy(

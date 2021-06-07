@@ -1,8 +1,9 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <queue>
+#include <BytesBuffer.hpp>
 #include <optional>
+#include <queue>
 
 class StreamInterface;
 
@@ -20,7 +21,7 @@ private:
   std::string convertFromSisl(std::string sislFilename);
 
   struct FrameDetails {
-    std::vector<char> frame;
+    BytesBuffer frame;
     std::uint32_t frameCount;
     bool endOfFile;
 

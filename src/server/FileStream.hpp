@@ -39,7 +39,7 @@ public:
     storedFilename = (filename == "rejected.") ? filename+std::to_string(tempFilename) : filename;
   }
 
-  void write(const std::vector<char>& inputData) override
+  void write(const BytesBuffer& inputData) override
   {
     std::copy(
       inputData.begin(),
