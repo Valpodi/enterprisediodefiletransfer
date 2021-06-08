@@ -28,16 +28,18 @@ bool ReorderPackets::write(
 
 std::optional<std::string> ReorderPackets::getFilenameFromStream(BytesBuffer eofFrame)
 {
-  std::string sislHeader = std::string(eofFrame.begin(), eofFrame.end());
+  const auto sislHeader = std::string(eofFrame.begin(), eofFrame.end());
   try
   {
     if(sislHeader.size() > maxSislLength)
     {
+      std::cerr << "SISL too long" << "\n";
       return std::optional<std::string>();
     }
     const auto filename = convertFromSisl(sislHeader);
     if(filename.size() > maxFilenameLength)
     {
+      std::cerr << "Filename too long" << "\n";
       return std::optional<std::string>();
     }
     std::regex filter("[a-zA-Z0-9\\.\\-_]+");
@@ -46,6 +48,7 @@ std::optional<std::string> ReorderPackets::getFilenameFromStream(BytesBuffer eof
   }
   catch(UnableToParseSislException&)
   {
+    std::cerr << "Unable to parse SISL filename. possible regex problem" << "\n";
     return std::optional<std::string>();
   }
 }
