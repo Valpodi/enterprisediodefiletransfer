@@ -132,7 +132,7 @@ TEST_CASE("ED server. Queue length Tests")
 
     std::stringstream stream2 = createTestPacketStream({'C', 'D'}, 1, 2, false);
     edServer.receivePacket(stream2);
-    REQUIRE(outputStream.str() == std::string("ABCDEFGH"));
+    REQUIRE(outputStream.str() == std::string("AB"));
   }
 }
 

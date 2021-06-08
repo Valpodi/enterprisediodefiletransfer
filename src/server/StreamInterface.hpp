@@ -15,7 +15,6 @@ public:
   virtual void renameFile() = 0;
   virtual void setStoredFilename(std::string filename) = 0;
   virtual void write(const BytesBuffer& inputData) = 0;
-  virtual void write(std::istream& inputStream) = 0;
 };
 
 #endif //ENTERPRISEDIODE_STREAMINTERFACE_HPP

@@ -6,7 +6,6 @@
 #include "StreamInterface.hpp"
 #include <algorithm>
 #include <iostream>
-#include <queue>
 #include <rapidjson/document.h>
 #include <regex>
 #include <optional>
@@ -24,19 +23,13 @@ bool ReorderPackets::write(
   std::uint32_t frameCount,
   bool eOFFlag)
 {
-  if (frameCount == nextFrameCount)
+  if (frameCount == nextFrameCount && eOFFlag)
   {
-    if (eOFFlag)
-    {
-      streamWrapper->setStoredFilename(getFilenameFromStream(inputStream).value_or("rejected."));
-      return true;
-    }
-    streamWrapper->write(inputStream);
-    ++nextFrameCount;
-    return checkQueueAndSend(streamWrapper);
+    streamWrapper->setStoredFilename(getFilenameFromStream(inputStream).value_or("rejected."));
+    return true;
   }
   addFrameToQueue(inputStream, frameCount, eOFFlag);
-  return false;
+  return checkQueueAndSend(streamWrapper);
 }
 
 std::optional<std::string> ReorderPackets::getFilenameFromStream(std::istream& inputStream)

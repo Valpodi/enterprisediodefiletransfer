@@ -47,14 +47,6 @@ public:
       std::ostreambuf_iterator(outputStream));
   }
 
-  void write(std::istream& inputStream) override
-  {
-    std::copy(
-      std::istreambuf_iterator<char>(inputStream),
-      std::istreambuf_iterator<char>(),
-      std::ostreambuf_iterator(outputStream));
-  }
-
 
 private:
   static uint32_t setTempFilename()

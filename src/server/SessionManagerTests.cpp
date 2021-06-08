@@ -122,7 +122,6 @@ TEST_CASE("SessionManager.")
     auto testPacket5 = createTestPacketStream({'D', 'E'}, 1, 2, false);
     sessionManager.writeToStream(parsePacket(testPacket5));
 
-    REQUIRE(outputStreams.at(0).str() == std::string("BCDEFGHI"));
     REQUIRE_FALSE(streamSpyPtr->fileRenameWasCalled);
   }
 }

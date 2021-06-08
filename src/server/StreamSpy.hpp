@@ -43,14 +43,6 @@ public:
       std::ostreambuf_iterator(outputStream));
   }
 
-  void write(std::istream& inputStream) override
-  {
-    std::copy(
-      std::istreambuf_iterator<char>(inputStream),
-      std::istreambuf_iterator<char>(),
-      std::ostreambuf_iterator(outputStream));
-  }
-
 public:
   std::stringstream& outputStream;
   bool fileDeletedWasCalled = false;
