@@ -15,9 +15,9 @@ public:
   bool write(std::istream& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
 
 private:
-  bool checkQueueAndSend(StreamInterface* streamWrapper);
+  bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(std::istream& inputStream, std::uint32_t frameCount, bool endOfFile);
-  std::optional<std::string> getFilenameFromStream(std::istream& inputStream);
+  std::optional<std::string> getFilenameFromStream(BytesBuffer eofFrame);
   std::string convertFromSisl(std::string sislFilename);
 
   struct FrameDetails {

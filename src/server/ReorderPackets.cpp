@@ -4,7 +4,6 @@
 #include <SislTools/SislTools.hpp>
 #include "ReorderPackets.hpp"
 #include "StreamInterface.hpp"
-#include <algorithm>
 #include <iostream>
 #include <rapidjson/document.h>
 #include <regex>
@@ -23,21 +22,13 @@ bool ReorderPackets::write(
   std::uint32_t frameCount,
   bool eOFFlag)
 {
-  if (frameCount == nextFrameCount && eOFFlag)
-  {
-    streamWrapper->setStoredFilename(getFilenameFromStream(inputStream).value_or("rejected."));
-    return true;
-  }
   addFrameToQueue(inputStream, frameCount, eOFFlag);
-  return checkQueueAndSend(streamWrapper);
+  return checkQueueAndWrite(streamWrapper);
 }
 
-std::optional<std::string> ReorderPackets::getFilenameFromStream(std::istream& inputStream)
+std::optional<std::string> ReorderPackets::getFilenameFromStream(BytesBuffer eofFrame)
 {
-  std::string sislHeader;
-  std::copy_if(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>(), std::back_inserter(sislHeader),
-               [count = maxSislLength](auto&&) mutable
-               { return count && count--;});
+  std::string sislHeader = std::string(eofFrame.begin(), eofFrame.end());
   try
   {
     if(sislHeader.size() > maxSislLength)
@@ -53,7 +44,7 @@ std::optional<std::string> ReorderPackets::getFilenameFromStream(std::istream& i
 
     return std::regex_match(filename, filter) ? filename : std::optional<std::string>();
   }
-  catch(std::exception&)
+  catch(UnableToParseSislException&)
   {
     return std::optional<std::string>();
   }
@@ -71,12 +62,13 @@ std::string ReorderPackets::convertFromSisl(std::string sislFilename)
   return doc.HasMember("name") ? doc["name"].GetString() : "";
 }
 
-bool ReorderPackets::checkQueueAndSend(StreamInterface* streamWrapper)
+bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
 {
   while (!queue.empty() && (queue.top().frameCount == nextFrameCount))
   {
     if (queue.top().endOfFile)
     {
+      streamWrapper->setStoredFilename(getFilenameFromStream(queue.top().frame).value_or("rejected."));
       queue.pop();
       return true;
     }

@@ -159,12 +159,14 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
         inputStream = std::stringstream("{name: !str \"testFilename\"}");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 5, true));
         REQUIRE(outputStream.str() == "ZABCDE");
-        inputStream = std::stringstream("{name: !str \"testFilename\"}");
+        inputStream = std::stringstream("{name: !str \"wrongFilename\"}");
         REQUIRE_FALSE(queueManager.write(inputStream, &stream, 99, true));
         REQUIRE(outputStream.str() == "ZABCDE");
         inputStream = std::stringstream("FG");
         REQUIRE(queueManager.write(inputStream, &stream, 4, false));
         REQUIRE(outputStream.str() == "ZABCDEFG");
+
+        REQUIRE(stream.storedFilename == "testFilename");
       }
     }
   }
