@@ -6,12 +6,21 @@
 class DropStream: public StreamInterface
 {
 public:
-  explicit DropStream(std::uint32_t) {}
-  void deleteFile() override {}
+  explicit DropStream(std::uint32_t sessionId)
+  {
+    std::cout << "Session: " << sessionId << "started\n";
+  }
+  void deleteFile() override
+  {
+    std::cerr << "File incomplete. Dropping stream" << "\n";
+  }
   void renameFile() override
   {
     std::cout << "Transfer complete" << "\n";
   }
-  void setStoredFilename(std::string) override { }
+  void setStoredFilename(std::string filename) override
+  {
+    std::cout << "File: " << filename << " received" << "\n";
+  }
   void write(const BytesBuffer&) override { }
 };
