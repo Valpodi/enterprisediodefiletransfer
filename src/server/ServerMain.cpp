@@ -62,6 +62,16 @@ namespace ServerApplication
   }
 }
 
+inline std::function<std::unique_ptr<StreamInterface>(uint32_t)> selectWriteStreamFunction(bool dropPackets)
+{
+  if (dropPackets)
+  {
+    return [](uint32_t sessionId) { return std::make_unique<DropStream>(sessionId); };
+  }
+  return [](uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); };
+}
+
+
 int main(int argc, char **argv)
 {
   std::cout << "Starting Enterprise Diode Server application!" << std::endl;
@@ -70,16 +80,6 @@ int main(int argc, char **argv)
   const auto params = parseArgs(argc, argv);
 
   const auto maxBufferSize = EnterpriseDiode::calculateMaxBufferSize(params.mtuSize);
-
-  std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator;
-  if (params.dropPackets)
-  {
-    streamCreator = [](std::uint32_t sessionId) { return std::make_unique<DropStream>(sessionId); };
-  }
-  else
-  {
-    streamCreator = [](std::uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); };
-  }
 
   try
   {
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
         EnterpriseDiode::UDPSocketSizeInBytes),
       maxBufferSize,
       params.maxQueueLength,
-      streamCreator,
+      selectWriteStreamFunction(params.dropPackets),
       []() { return std::time(nullptr); }, 15);
     ServerApplication::io_context.run();
   }
