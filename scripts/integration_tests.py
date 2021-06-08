@@ -74,7 +74,7 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
             return file.read()
 
     @staticmethod
-    def is_files_received_dir_is_empty(self):
+    def is_files_received_dir_is_empty():
         return not os.listdir("cmake-build-release/files_received/")
 
     def test_file_is_sent_and_saved_with_ed_loopback(self):
