@@ -68,11 +68,11 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
   {
     if (queue.top().endOfFile)
     {
-      streamWrapper->setStoredFilename(getFilenameFromStream(queue.top().frame).value_or("rejected."));
+      streamWrapper->setStoredFilename(getFilenameFromStream(queue.top().getFrame()).value_or("rejected."));
       queue.pop();
       return true;
     }
-    streamWrapper->write(queue.top().frame);
+    streamWrapper->write(queue.top().getFrame());
     queue.pop();
     ++nextFrameCount;
   }
@@ -95,6 +95,6 @@ void ReorderPackets::addFrameToQueue(std::istream& inputStream, std::uint32_t fr
     std::istreambuf_iterator<char>(),
     std::back_inserter(newFrame));
 
-  queue.emplace(FrameDetails{std::move(newFrame), frameCount, endOfFile});
+  queue.emplace(FrameDetails{frameCount, endOfFile, std::move(newFrame)});
 }
 

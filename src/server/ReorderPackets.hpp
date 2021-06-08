@@ -21,14 +21,27 @@ private:
   std::string convertFromSisl(std::string sislFilename);
 
   struct FrameDetails {
-    BytesBuffer frame;
     std::uint32_t frameCount;
     bool endOfFile;
+
+    FrameDetails(std::uint32_t frameCount, bool endOfFile, BytesBuffer frame):
+      frameCount(frameCount),
+      endOfFile(endOfFile),
+      frame(std::move(frame))
+    {}
 
     bool operator>(const FrameDetails& rhs) const
     {
       return (frameCount > rhs.frameCount);
     }
+
+    BytesBuffer getFrame() const
+    {
+      return frame;
+    }
+
+  private:
+    BytesBuffer frame;
   };
 
   std::uint32_t nextFrameCount = 1;
