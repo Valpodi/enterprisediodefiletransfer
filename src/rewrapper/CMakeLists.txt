@@ -1,5 +1,5 @@
 
-add_library (UNWRAPPER_LIBRARY
+add_library (REWRAPPER_LIBRARY
         WrapperInterface.hpp
         CloakedDagger.cpp
         CloakedDagger.hpp
@@ -7,7 +7,7 @@ add_library (UNWRAPPER_LIBRARY
         StreamingRewrapper.hpp
         )
 
-add_library(UNWRAPPER_LIBRARY_TESTS
+add_library(REWRAPPER_LIBRARY_TESTS
         StreamingRewrapperTests.cpp
         UnwrapperTestHelpers.cpp
         UnwrapperTestHelpers.hpp

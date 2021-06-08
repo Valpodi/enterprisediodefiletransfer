@@ -4,14 +4,22 @@
 #include <BytesBuffer.hpp>
 #include <optional>
 #include <queue>
+#include <rewrapper/StreamingRewrapper.hpp>
 
 class StreamInterface;
+
+enum class diodeType
+{
+  import,
+  basic
+};
 
 class ReorderPackets
 {
 
 public:
-  explicit ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength, std::uint32_t maxFilenameLength = 65);
+  explicit ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength,
+    std::uint32_t maxFilenameLength = 65, diodeType diode = diodeType::basic);
   bool write(std::istream& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
 
 private:
@@ -50,4 +58,6 @@ private:
   std::priority_queue<FrameDetails, std::vector<FrameDetails>, std::greater<>> queue;
   std::uint32_t maxFilenameLength;
   std::uint32_t maxSislLength = 1000;
+  diodeType diode;
+  StreamingRewrapper streamingRewrapper;
 };

@@ -53,13 +53,13 @@ target_link_libraries(UnitTests
         CLIENT_LIBRARY_TESTS
         SERVER_LIBRARY_TESTS
         HEADER_LIBRARY_TESTS
-        UNWRAPPER_LIBRARY_TESTS
+        REWRAPPER_LIBRARY_TESTS
         SISL_TOOLS_TEST_LIBRARY
         -Wl,--no-whole-archive
         CLIENT_LIBRARY
         SERVER_LIBRARY
         HEADER_LIBRARY
-        UNWRAPPER_LIBRARY
+        REWRAPPER_LIBRARY
         pthread
         stdc++fs
         )

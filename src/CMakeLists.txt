@@ -16,6 +16,7 @@ target_link_libraries(tester
         CLIENT_LIBRARY
         SERVER_LIBRARY
         HEADER_LIBRARY
+        REWRAPPER_LIBRARY
         ${Boost_LIBRARIES}
         SISL_TOOLS_LIBRARY
         pthread
@@ -43,6 +44,7 @@ add_executable(server
 target_link_libraries(server
         SERVER_LIBRARY
         HEADER_LIBRARY
+        REWRAPPER_LIBRARY
         ${Boost_LIBRARIES}
         SISL_TOOLS_LIBRARY
         pthread

@@ -1,7 +1,6 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <sstream>
 #include "catch.hpp"
 #include "ReorderPackets.hpp"
 #include "StreamSpy.hpp"
@@ -217,5 +216,23 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
       REQUIRE(queueManager.write(inputStream, &stream, 3, false));
       REQUIRE(outputStream.str() == "ZABCDE");
     }
+  }
+}
+
+TEST_CASE("ReorderPackets. Import diode.")
+{
+  std::stringstream outputStream;
+  StreamSpy stream(outputStream, 1);
+  auto queueManager = ReorderPackets(4, 1024, 65, diodeType::import);
+
+  SECTION("Data which is not wrapped remains unchanged")
+  {
+    auto inputStream = std::stringstream("BC");
+    REQUIRE_FALSE(queueManager.write(inputStream, &stream, 1, false));
+    REQUIRE(outputStream.str() == "BC");
+
+    inputStream = std::stringstream("DE");
+    REQUIRE_FALSE(queueManager.write(inputStream, &stream, 2, false));
+    REQUIRE(outputStream.str() == "BCDE");
   }
 }

@@ -9,10 +9,12 @@
 #include <regex>
 #include <optional>
 
-ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength, std::uint32_t maxFilenameLength) :
+ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength,
+  std::uint32_t maxFilenameLength, diodeType diode) :
   maxBufferSize(maxBufferSize),
   maxQueueLength(maxQueueLength),
-  maxFilenameLength(maxFilenameLength)
+  maxFilenameLength(maxFilenameLength),
+  diode(diode)
 {
 }
 
@@ -31,13 +33,13 @@ std::optional<std::string> ReorderPackets::getFilenameFromStream(BytesBuffer eof
   const auto sislHeader = std::string(eofFrame.begin(), eofFrame.end());
   try
   {
-    if(sislHeader.size() > maxSislLength)
+    if (sislHeader.size() > maxSislLength)
     {
       std::cerr << "SISL too long" << "\n";
       return std::optional<std::string>();
     }
     const auto filename = convertFromSisl(sislHeader);
-    if(filename.size() > maxFilenameLength)
+    if (filename.size() > maxFilenameLength)
     {
       std::cerr << "Filename too long" << "\n";
       return std::optional<std::string>();
@@ -46,7 +48,7 @@ std::optional<std::string> ReorderPackets::getFilenameFromStream(BytesBuffer eof
 
     return std::regex_match(filename, filter) ? filename : std::optional<std::string>();
   }
-  catch(UnableToParseSislException&)
+  catch (UnableToParseSislException&)
   {
     std::cerr << "Unable to parse SISL filename. possible regex problem" << "\n";
     return std::optional<std::string>();
@@ -74,6 +76,10 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
       streamWrapper->setStoredFilename(getFilenameFromStream(queue.top().getFrame()).value_or("rejected."));
       queue.pop();
       return true;
+    }
+    if (diode == diodeType::import)
+    {
+      streamingRewrapper.unwrap(queue.top().getFrame());
     }
     streamWrapper->write(queue.top().getFrame());
     queue.pop();
