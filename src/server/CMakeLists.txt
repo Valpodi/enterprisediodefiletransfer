@@ -10,8 +10,7 @@ add_library(SERVER_LIBRARY
         SessionManager.cpp
         FileStream.hpp
         StreamInterface.hpp
-        Packet.cpp
-        DropStream.hpp)
+        Packet.cpp)
 
 add_library(SERVER_LIBRARY_TESTS
         ../test/EnterpriseDiodeTestHelpers.cpp

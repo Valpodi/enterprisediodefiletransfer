@@ -9,7 +9,6 @@
 #include "Server.hpp"
 #include "UdpServer.hpp"
 #include "FileStream.hpp"
-#include "DropStream.hpp"
 
 struct Params
 {
@@ -32,7 +31,7 @@ inline Params parseArgs(int argc, char **argv)
                    clara::Opt(maxQueueLength, "Queue Length")["-q"]["--queueLength"](
                      "Max length of queue for reordering packets") |
                    clara::Opt(dropPackets)["-d"]["--dropPackets"](
-                     "Diagnostic tool: Server will not write packets to disk if this flag set (will only count missing frames), else will write them to a file as normal");
+                     "Server will write packets to disk if this flag is false, else will drop them and only count missing packets");
 
   const auto result = cli.parse(clara::Args(argc, argv));
   if (!result)
@@ -71,16 +70,6 @@ int main(int argc, char **argv)
 
   const auto maxBufferSize = EnterpriseDiode::calculateMaxBufferSize(params.mtuSize);
 
-  std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator;
-  if (params.dropPackets)
-  {
-    streamCreator = [](std::uint32_t sessionId) { return std::make_unique<DropStream>(sessionId); };
-  }
-  else
-  {
-    streamCreator = [](std::uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); };
-  }
-
   try
   {
     Server edServer(
@@ -91,7 +80,7 @@ int main(int argc, char **argv)
         EnterpriseDiode::UDPSocketSizeInBytes),
       maxBufferSize,
       params.maxQueueLength,
-      streamCreator,
+      [](std::uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); },
       []() { return std::time(nullptr); }, 15);
     ServerApplication::io_context.run();
   }
