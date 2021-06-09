@@ -9,31 +9,33 @@ import signal
 import glob
 
 
-class IntegrationTestsEnterpriseDiode(unittest.TestCase):
+class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
+    build_folder = os.environ.get("BUILD_FOLDER")
+
     def tearDown(self):
         [os.remove(file) for file in glob.glob("test_file.bin*") if os.path.isfile(file)]
-        [os.remove(file) for file in glob.glob("cmake-build-release/files_to_send/*") if os.path.isfile(file)]
-        [os.remove(file) for file in glob.glob("cmake-build-release/files_received/*") if os.path.isfile(file)]
-        [os.remove(file) for file in glob.glob("cmake-build-release/files_to_send/nested/*") if os.path.isfile(file)]
-        if os.path.isdir("cmake-build-release/files_to_send/nested"):
-            os.rmdir("cmake-build-release/files_to_send/nested")
+        [os.remove(file) for file in glob.glob(f"{self.build_folder}/files_to_send/*") if os.path.isfile(file)]
+        [os.remove(file) for file in glob.glob(f"{self.build_folder}/files_received/*") if os.path.isfile(file)]
+        [os.remove(file) for file in glob.glob(f"{self.build_folder}/files_to_send/nested/*") if os.path.isfile(file)]
+        if os.path.isdir(f"{self.build_folder}/files_to_send/nested"):
+            os.rmdir(f"{self.build_folder}/files_to_send/nested")
         [os.remove(file) for file in glob.glob(".received.*") if os.path.isfile(file)]
 
     @classmethod
     def tearDownClass(cls):
-        os.rmdir("cmake-build-release/files_to_send")
-        os.rmdir("cmake-build-release/files_received")
+        os.rmdir(f"{cls.build_folder}/files_to_send")
+        os.rmdir(f"{cls.build_folder}/files_received")
 
     @classmethod
     def setUpClass(cls):
-        if not os.path.isdir("cmake-build-release/files_to_send"):
-            os.mkdir("cmake-build-release/files_to_send")
-        if not os.path.isdir("cmake-build-release/files_received"):
-            os.mkdir("cmake-build-release/files_received")
+        if not os.path.isdir(f"{cls.build_folder}/files_to_send"):
+            os.mkdir(f"{cls.build_folder}/files_to_send")
+        if not os.path.isdir(f"{cls.build_folder}/files_received"):
+            os.mkdir(f"{cls.build_folder}/files_received")
 
-    @staticmethod
-    def write_bytes(filepath):
-        with open(f"cmake-build-release/files_to_send/{filepath}", "wb") as file:
+    @classmethod
+    def write_bytes(cls, filepath):
+        with open(f"{cls.build_folder}/files_to_send/{filepath}", "wb") as file:
             return file.write(b"0" * int(110 * 1024))
 
     def send_file_with_ED_loopback(self, file_to_send):
@@ -42,18 +44,18 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
     def send_file_with_ED_client(self, file_to_send):
         return self.run_ED_program("client", file_to_send, "-c 5000", 1000)
 
-    @staticmethod
-    def run_ED_program(ed_program, file_to_send, port_args, mtu_size=1000):
-        os.chdir("cmake-build-release/files_to_send")
+    @classmethod
+    def run_ED_program(cls, ed_program, file_to_send, port_args, mtu_size=1000):
+        os.chdir(f"{cls.build_folder}/files_to_send")
         process = subprocess.Popen(
             f"../{ed_program} -f {file_to_send} -a localhost {port_args} -m {mtu_size}".split())
         os.chdir("../..")
         return process
 
-    def wait_for_received_data(self, num_expect_files=1, output_dir="cmake-build-release/files_received", input_file="test_file.bin"):
+    def wait_for_received_data(self, output_dir, input_file="test_file.bin", num_expect_files=1):
         attempts = 10
         all_data_received = False
-        client_file_size = self.read_bytes(f"cmake-build-release/files_to_send/{input_file}")
+        client_file_size = self.read_bytes(f"{self.build_folder}/files_to_send/{input_file}")
         files = []
 
         while (not all_data_received) or (len(files) < num_expect_files):
@@ -73,14 +75,14 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         with open(filepath, "rb") as file:
             return file.read()
 
-    @staticmethod
-    def is_files_received_dir_is_empty():
-        return not os.listdir("cmake-build-release/files_received/")
+    @classmethod
+    def is_files_received_dir_is_empty(cls):
+        return not os.listdir(f"{cls.build_folder}/files_received/")
 
     def test_file_is_sent_and_saved_with_ed_loopback(self):
         self.write_bytes("test_file.bin")
         handle = self.send_file_with_ED_loopback(file_to_send="test_file.bin")
-        self.assertTrue(self.wait_for_received_data(output_dir="cmake-build-release/files_to_send"))
+        self.assertTrue(self.wait_for_received_data(output_dir=f"{self.build_folder}/files_to_send"))
         handle.send_signal(signal.SIGINT)
         self.assertEqual(handle.wait(timeout=5), 0)
 
@@ -110,9 +112,9 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         self.wait_for_server_start(port=5000)
         return process_handle
 
-    @staticmethod
-    def run_ED_server(port, set_drop_packets_flag=False):
-        os.chdir("cmake-build-release/files_received")
+    @classmethod
+    def run_ED_server(cls, port, set_drop_packets_flag=False):
+        os.chdir(f"{cls.build_folder}/files_received")
         server = subprocess.Popen(f"../server -s {port} {'-d' * set_drop_packets_flag}".split())
         os.chdir("../..")
         return server
@@ -124,16 +126,16 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         self.write_bytes("test_file.bin")
         server_handle = self.start_ED_server_thread()
         self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file.bin").wait(timeout=5), 0)
-        self.assertTrue(self.wait_for_received_data())
+        self.assertTrue(self.wait_for_received_data(output_dir=f"{self.build_folder}/files_received"))
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 
     def test_ed_server_receives_nested_file(self):
-        os.mkdir("cmake-build-release/files_to_send/nested")
+        os.mkdir(f"{self.build_folder}/files_to_send/nested")
         self.write_bytes("nested/test_file.bin")
         server_handle = self.start_ED_server_thread()
         self.assertEqual(self.send_file_with_ED_client(file_to_send="nested/test_file.bin").wait(timeout=5), 0)
-        self.assertTrue(self.wait_for_received_data(input_file="nested/test_file.bin"))
+        self.assertTrue(self.wait_for_received_data(input_file="nested/test_file.bin", output_dir=f"{self.build_folder}/files_received"))
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 
@@ -144,8 +146,8 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         for i in range(0, 4):
             self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file.bin").wait(timeout=5), 0)
 
-        self.assertTrue(self.wait_for_received_data())
-        self.assertTrue(len(os.listdir("cmake-build-release/files_received")) == 1)
+        self.assertTrue(self.wait_for_received_data(output_dir=f"{self.build_folder}/files_received"))
+        self.assertTrue(len(os.listdir(f"{self.build_folder}/files_received")) == 1)
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 
@@ -157,6 +159,7 @@ class IntegrationTestsEnterpriseDiode(unittest.TestCase):
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 
+
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(IntegrationTestsEnterpriseDiode)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(IntegrationTestsEnterpriseDiodeFileTransfer)
     unittest.TextTestRunner(verbosity=5).run(SUITE)

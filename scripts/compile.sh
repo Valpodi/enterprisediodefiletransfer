@@ -6,10 +6,11 @@ set -eu
 
 BUILD_TYPE=${1}
 BUILD_TYPE_LOWERCASE="${BUILD_TYPE,,}"
-BUILD_FOLDER=cmake-build-"${BUILD_TYPE_LOWERCASE}"
+BUILD_TARGET=${2:-"docker"}
+BUILD_FOLDER=cmake-build-"$BUILD_TARGET"-"$BUILD_TYPE_LOWERCASE"
 
-mkdir -p "${BUILD_FOLDER}"
-pushd "${BUILD_FOLDER}"
+mkdir -p "$BUILD_FOLDER"
+pushd "$BUILD_FOLDER"
 
 cmake3 -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
 make -j 8
