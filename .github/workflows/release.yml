@@ -33,7 +33,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: FileTransferApp.zip
-          asset_name: FileTransferApp
+          asset_name: FileTransferApp.zip
           asset_content_type: application/octet-stream
 
       - name: Run latest-tag
