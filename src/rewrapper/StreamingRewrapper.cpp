@@ -5,17 +5,13 @@
 #include "CloakedDagger.hpp"
 #include "BytesBuffer.hpp"
 
-BytesBuffer StreamingRewrapper::unwrap(const BytesBuffer& data)
-{
-  if (data.at(0) != CloakedDagger::cloakedDaggerIdentifierByte)
-  {
-    return data;
-  }
-  return rewrap(data);
-}
 
 BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input)
 {
+  if (input.at(0) != CloakedDagger::cloakedDaggerIdentifierByte)
+  {
+    return input;
+  }
   const auto inputChunkMask = getMaskFromHeader(input);
 
   const BytesBuffer newMask = constructXORedMask(inputChunkMask);

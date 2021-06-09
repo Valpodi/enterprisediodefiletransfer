@@ -79,7 +79,7 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
     }
     if (diode == diodeType::import)
     {
-      streamingRewrapper.unwrap(queue.top().getFrame());
+      streamingRewrapper.rewrap(queue.top().getFrame());
     }
     streamWrapper->write(queue.top().getFrame());
     queue.pop();

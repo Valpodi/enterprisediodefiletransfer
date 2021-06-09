@@ -6,20 +6,18 @@
 #define REWRAPPER_STREAMINGREWRAPPER_HPP
 
 #include <boost/optional.hpp>
-#include "WrapperInterface.hpp"
 #include "CloakedDagger.hpp"
 
-class StreamingRewrapper: public WrapperInterface
+class StreamingRewrapper
 {
 public:
   StreamingRewrapper() = default;
-  BytesBuffer unwrap(const BytesBuffer& data) override;
+  BytesBuffer rewrap(const BytesBuffer& input);
 
 private:
   size_t count {0};
   BytesBuffer mask = BytesBuffer(CloakedDagger::maskLength);
 
-  BytesBuffer rewrap(const BytesBuffer& input);
   static BytesBuffer getMaskFromHeader(const BytesBuffer& input);
   BytesBuffer constructXORedMask(const BytesBuffer& inputChunkMask) const;
   BytesBuffer rewrapData(const BytesBuffer& input, const BytesBuffer& newMask);

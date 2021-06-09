@@ -1,6 +1,5 @@
 
 add_library (REWRAPPER_LIBRARY
-        WrapperInterface.hpp
         CloakedDagger.cpp
         CloakedDagger.hpp
         StreamingRewrapper.cpp
