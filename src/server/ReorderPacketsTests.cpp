@@ -1,6 +1,7 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
+#include <rewrapper/UnwrapperTestHelpers.hpp>
 #include "catch.hpp"
 #include "ReorderPackets.hpp"
 #include "StreamSpy.hpp"
@@ -234,5 +235,12 @@ TEST_CASE("ReorderPackets. Import diode.")
     inputStream = std::stringstream("DE");
     REQUIRE_FALSE(queueManager.write(inputStream, &stream, 2, false));
     REQUIRE(outputStream.str() == "BCDE");
+  }
+
+  SECTION("The first frame of wrapped data remains unchanged")
+  {
+    auto wrappedInputStream = createTestWrappedString("abcdefgh");
+    queueManager.write(wrappedInputStream, &stream, 1, false);
+    REQUIRE(outputStream.str() == wrappedInputStream.str());
   }
 }

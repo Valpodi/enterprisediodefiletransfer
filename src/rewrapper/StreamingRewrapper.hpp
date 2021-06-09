@@ -7,6 +7,7 @@
 
 #include <boost/optional.hpp>
 #include "WrapperInterface.hpp"
+#include "CloakedDagger.hpp"
 
 class StreamingRewrapper: public WrapperInterface
 {
@@ -16,7 +17,7 @@ public:
 
 private:
   size_t count {0};
-  BytesBuffer mask;
+  BytesBuffer mask = BytesBuffer(CloakedDagger::maskLength);
 
   BytesBuffer rewrap(const BytesBuffer& input);
   static BytesBuffer getMaskFromHeader(const BytesBuffer& input);
