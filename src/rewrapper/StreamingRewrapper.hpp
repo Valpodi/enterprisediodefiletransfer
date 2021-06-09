@@ -12,7 +12,7 @@ class StreamingRewrapper
 {
 public:
   StreamingRewrapper() = default;
-  BytesBuffer rewrap(const BytesBuffer& input);
+  BytesBuffer rewrap(const BytesBuffer& input, std::uint32_t frameCount);
 
 private:
   size_t count {0};

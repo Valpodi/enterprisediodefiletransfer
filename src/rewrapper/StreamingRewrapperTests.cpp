@@ -15,7 +15,7 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
   SECTION("For file that looks wrapped throw if not enough data for header")
   {
     const BytesBuffer input{0xd1};
-    REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input), std::runtime_error);
+    REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input, 1), std::runtime_error);
   }
 
   SECTION("For file that looks wrapped throw if header not valid")
@@ -23,19 +23,19 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
     auto input = createTestWrappedBytesBuffer("AAA");
     input[1] = 0xA;
 
-    REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input), std::runtime_error);
+    REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input, 1), std::runtime_error);
   }
 
   SECTION("For single chunk rYaml files, ensure we don't 'rewrap'")
   {
     const auto data = BytesBuffer{'{'};
-    REQUIRE(streamingRewrapper.rewrap(data) == data);
+    REQUIRE(streamingRewrapper.rewrap(data, 1) == data);
   }
 
   SECTION("For single chunk BMP files, ensure we don't 'rewrap'")
   {
     const auto data = BytesBuffer{'B'};
-    REQUIRE(streamingRewrapper.rewrap(data) == data);
+    REQUIRE(streamingRewrapper.rewrap(data, 1) == data);
   }
 
 }

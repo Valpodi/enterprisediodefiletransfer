@@ -6,7 +6,7 @@
 #include "BytesBuffer.hpp"
 
 
-BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input)
+BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, std::uint32_t frameCount)
 {
   if (input.at(0) != CloakedDagger::cloakedDaggerIdentifierByte)
   {
@@ -15,7 +15,11 @@ BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input)
   const auto inputChunkMask = getMaskFromHeader(input);
 
   const BytesBuffer newMask = constructXORedMask(inputChunkMask);
-
+  if (frameCount == 1)
+  {
+    mask = inputChunkMask;
+    return input;
+  }
   return rewrapData(input, newMask);
 }
 

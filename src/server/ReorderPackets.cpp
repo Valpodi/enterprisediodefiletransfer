@@ -71,17 +71,18 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
 {
   while (!queue.empty() && (queue.top().frameCount == nextFrameCount))
   {
+    auto data = queue.top().getFrame();
     if (queue.top().endOfFile)
     {
-      streamWrapper->setStoredFilename(getFilenameFromStream(queue.top().getFrame()).value_or("rejected."));
+      streamWrapper->setStoredFilename(getFilenameFromStream(data).value_or("rejected."));
       queue.pop();
       return true;
     }
     if (diode == diodeType::import)
     {
-      streamingRewrapper.rewrap(queue.top().getFrame());
+      data = streamingRewrapper.rewrap(data, nextFrameCount);
     }
-    streamWrapper->write(queue.top().getFrame());
+    streamWrapper->write(data);
     queue.pop();
     ++nextFrameCount;
   }

@@ -3,6 +3,7 @@
 
 #include "MessageParsingHelpers.hpp"
 #include "UnwrapperTestHelpers.hpp"
+#include "CloakedDagger.hpp"
 
 
 std::stringstream createTestWrappedString(const std::string& payload, const BytesBuffer& mask)
@@ -40,4 +41,35 @@ std::stringstream createTestWrappedString(const std::string& payload, const Byte
 BytesBuffer createTestWrappedBytesBuffer(const std::string& payload, const BytesBuffer& mask)
 {
   return MessageParsingHelpers::StringToBytes(createTestWrappedString(payload, mask).str());
+}
+
+bool isCloakDaggerEncoded(std::istream& inputStream)
+{
+  return inputStream.peek() == CloakedDagger::cloakedDaggerIdentifierByte;
+}
+
+void cloakDaggerUnwrap(std::istream& inputStream, std::ostream& outputStream)
+{
+  const CloakedDagger wrappedHeader(inputStream);
+
+  char readByte;
+  uint64_t count = 0;
+
+  while (!inputStream.get(readByte).eof())
+  {
+    outputStream.put(readByte ^ static_cast<char>(wrappedHeader.key[count % CloakedDagger::maskLength]));
+    count++;
+  }
+}
+
+void unwrapFromStream(std::istream& inputStream, std::ostream& outputStream)
+{
+  if (isCloakDaggerEncoded(inputStream))
+  {
+    cloakDaggerUnwrap(inputStream, outputStream);
+  }
+  else
+  {
+    outputStream << inputStream.rdbuf();
+  }
 }
