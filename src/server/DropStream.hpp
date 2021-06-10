@@ -8,7 +8,7 @@ class DropStream: public StreamInterface
 public:
   explicit DropStream(std::uint32_t sessionId)
   {
-    std::cout << "Session: " << sessionId << "started\n";
+    std::cout << "Session: " << sessionId << " started\n";
   }
   void deleteFile() override
   {
