@@ -11,7 +11,8 @@ add_library(SERVER_LIBRARY
         FileStream.hpp
         StreamInterface.hpp
         Packet.cpp
-        DropStream.hpp)
+        DropStream.hpp
+        PacketQueueInterface.hpp)
 
 add_library(SERVER_LIBRARY_TESTS
         ../test/EnterpriseDiodeTestHelpers.cpp

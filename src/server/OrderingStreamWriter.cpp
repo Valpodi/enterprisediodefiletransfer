@@ -9,7 +9,7 @@ OrderingStreamWriter::OrderingStreamWriter(
   std::unique_ptr<StreamInterface> streamWrapper,
   std::function<std::time_t()> getTime,
   DiodeType diodeType) :
-    packetQueue(maxBufferSize, maxQueueLength, diodeType),
+    packetQueue(std::make_unique<ReorderPackets>(maxBufferSize, maxQueueLength, diodeType)),
     streamWrapper(std::move(streamWrapper)),
     getTime(std::move(getTime)),
     timeLastUpdated(this->getTime())
@@ -19,7 +19,7 @@ OrderingStreamWriter::OrderingStreamWriter(
 bool OrderingStreamWriter::write(std::istream& data, const HeaderParams& headerParams)
 {
   timeLastUpdated = getTime();
-  return packetQueue.write(data, streamWrapper.get(), headerParams.frameCount, headerParams.eOFFlag);
+  return packetQueue->write(data, streamWrapper.get(), headerParams.frameCount, headerParams.eOFFlag);
 }
 
 void OrderingStreamWriter::deleteFile()

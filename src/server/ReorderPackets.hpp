@@ -5,6 +5,7 @@
 #include <optional>
 #include <queue>
 #include <rewrapper/StreamingRewrapper.hpp>
+#include <PacketQueueInterface.hpp>
 
 class StreamInterface;
 
@@ -14,13 +15,13 @@ enum class DiodeType
   basic
 };
 
-class ReorderPackets
+class ReorderPackets : public PacketQueueInterface
 {
 
 public:
   explicit ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength,
                           DiodeType diodeType, std::uint32_t maxFilenameLength = 65);
-  bool write(std::istream& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
+  bool write(std::istream& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag) override;
 
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
