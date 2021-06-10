@@ -1,6 +1,9 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
+#ifndef FILESTREAM_HPP
+#define FILESTREAM_HPP
+
 #include "StreamInterface.hpp"
 #include <algorithm>
 #include <filesystem>
@@ -60,3 +63,5 @@ private:
   std::string storedFilename;
   const std::uint32_t tempFilename;
 };
+
+#endif //FILESTREAM_HPP

@@ -8,9 +8,6 @@
 #include "clara/clara.hpp"
 #include "Server.hpp"
 #include "UdpServer.hpp"
-#include "FileStream.hpp"
-#include "DropStream.hpp"
-
 struct Params
 {
   std::uint16_t serverPort;
@@ -74,16 +71,6 @@ namespace ServerApplication
     std::cout << "SIGINT Received, stopping Server" << std::endl;
   }
 }
-
-inline std::function<std::unique_ptr<StreamInterface>(uint32_t)> selectWriteStreamFunction(bool dropPackets)
-{
-  if (dropPackets)
-  {
-    return [](uint32_t sessionId) { return std::make_unique<DropStream>(sessionId); };
-  }
-  return [](uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); };
-}
-
 
 int main(int argc, char **argv)
 {
