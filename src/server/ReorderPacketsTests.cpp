@@ -246,13 +246,14 @@ TEST_CASE("ReorderPackets. Import diode.")
 
   SECTION("A two frame wrapped file is rewrapped with the key from the first frame.")
   {
-    auto wrappedInputStream = createTestWrappedString("abcdefgh", {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
+    auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
     queueManager.write(wrappedInputStream, &stream, 1, false);
     REQUIRE(outputStream.str() == wrappedInputStream.str());
-    auto wrappedInputStream2 = createTestWrappedString("abcdefgh", {0xf0, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x12});
+    auto wrappedInputStream2 = createTestWrappedString("def", {0xf0, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x12});
     queueManager.write(wrappedInputStream2, &stream, 2, false);
+
     std::stringstream unwrappedStream;
     unwrapFromStream(outputStream, unwrappedStream);
-    REQUIRE(unwrappedStream.str() == "abcdefghabcdefgh");
+    REQUIRE(unwrappedStream.str() == "abcdef");
   }
 }

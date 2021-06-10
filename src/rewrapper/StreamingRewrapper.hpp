@@ -15,7 +15,7 @@ public:
   BytesBuffer rewrap(const BytesBuffer& input, std::uint32_t frameCount);
 
 private:
-  size_t count {0};
+  size_t mask_index {0};
   BytesBuffer mask = BytesBuffer(CloakedDagger::maskLength);
 
   static BytesBuffer getMaskFromHeader(const BytesBuffer& input);
