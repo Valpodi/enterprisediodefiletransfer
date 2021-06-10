@@ -93,7 +93,11 @@ void ReorderPackets::addFrameToQueue(std::istream& inputStream, std::uint32_t fr
 {
   if (queue.size() >= maxQueueLength)
   {
-    std::cerr << "ReorderPackets: maxQueueLength exceeded." << std::endl;
+    if (!queueAlreadyExceeded)
+    {
+      std::cerr << "ReorderPackets: maxQueueLength exceeded." << std::endl;
+      queueAlreadyExceeded = true;
+    }
     return;
   }
 

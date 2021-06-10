@@ -52,6 +52,7 @@ private:
     BytesBuffer frame;
   };
 
+  bool queueAlreadyExceeded = false;
   std::uint32_t nextFrameCount = 1;
   std::uint32_t maxBufferSize;
   std::uint32_t maxQueueLength;
