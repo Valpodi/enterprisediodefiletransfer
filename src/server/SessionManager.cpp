@@ -12,12 +12,14 @@ SessionManager::SessionManager(
   std::uint32_t maxQueueLength,
   std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
   std::function<time_t()> getTime,
-  std::uint32_t timeoutPeriod) :
+  std::uint32_t timeoutPeriod,
+  bool importDiode) :
     maxBufferSize(maxBufferSize),
     maxQueueLength(maxQueueLength),
     streamCreator(std::move(streamCreator)),
     getTime(std::move(getTime)),
-    timeoutPeriod(timeoutPeriod)
+    timeoutPeriod(timeoutPeriod),
+    importDiode(importDiode)
 {
 }
 
@@ -48,7 +50,7 @@ void SessionManager::createNewSession(std::uint32_t sessionId)
 {
   streams.emplace(std::make_pair(
     sessionId,
-    OrderingStreamWriter(maxBufferSize, maxQueueLength, streamCreator(sessionId), getTime)));
+    OrderingStreamWriter(maxBufferSize, maxQueueLength, streamCreator(sessionId), getTime, importDiode)));
 }
 
 bool SessionManager::isStreamExpired(std::uint32_t sessionId)

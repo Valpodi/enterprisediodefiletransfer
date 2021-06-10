@@ -26,11 +26,12 @@ Server createEdServer(
   std::uint32_t maxBufferSize,
   std::uint32_t maxQueueLength,
   std::uint32_t& capturedSessionId,
-  std::stringstream& outputStream)
+  std::stringstream& outputStream,
+  bool importDiode)
 {
   return Server(std::move(udpServer), maxBufferSize, maxQueueLength,
                 [&outputStream, &capturedSessionId](std::uint32_t sessionId) {
                   capturedSessionId = sessionId;
                   return std::make_unique<StreamSpy>(outputStream, sessionId);
-                }, []() { return 10000; }, 5);
+                }, []() { return 10000; }, 5, importDiode);
 }

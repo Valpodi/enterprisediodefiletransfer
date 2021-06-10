@@ -18,7 +18,8 @@ Server createEdServer(std::unique_ptr<UdpServerInterface> udpServer,
   std::uint32_t maxBufferSize,
   std::uint32_t maxQueueLength,
   std::uint32_t& capturedSessionId,
-  std::stringstream& outputStream);
+  std::stringstream& outputStream,
+  bool importDiode);
 
 class UdpServerFake : public UdpServerInterface
 {

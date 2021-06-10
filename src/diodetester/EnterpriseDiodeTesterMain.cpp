@@ -23,6 +23,7 @@ struct Params
   std::uint16_t mtuSize;
   std::uint16_t maxQueueLength;
   bool dropPackets;
+  bool importDiode;
 };
 
 inline Params parseArgs(int argc, char **argv)
@@ -36,6 +37,7 @@ inline Params parseArgs(int argc, char **argv)
   std::uint16_t mtuSize;
   std::uint16_t maxQueueLength = 1024;
   bool dropPackets = false;
+  bool importDiode;
   const auto cli = clara::Help(showHelp) |
                    clara::Opt(clientAddress, "client address")["-a"]["--address"]("address send packets to") |
                    clara::Opt(clientPort, "client port")["-c"]["--clientPort"]("port to send packets to") |
@@ -46,7 +48,8 @@ inline Params parseArgs(int argc, char **argv)
                    clara::Opt(maxQueueLength, "Queue Length")["-q"]["--queueLength"](
                      "Max length of queue for reordering packets") |
                    clara::Opt(dropPackets)["-d"]["--dropPackets"](
-                     "Server will write packets to disk if this flag is false, else will drop them and only count missing packets");
+                     "Server will write packets to disk if this flag is false, else will drop them and only count missing packets") |
+                   clara::Opt(importDiode, "import diode")["-i"]["--importDiode"]("import diode flag for rewrapper");;
 
   const auto result = cli.parse(clara::Args(argc, argv));
   if (!result)
@@ -61,7 +64,7 @@ inline Params parseArgs(int argc, char **argv)
     exit(1);
   }
 
-  return {clientAddress, clientPort, serverPort, filename, dataRateMbps, mtuSize, maxQueueLength, dropPackets};
+  return {clientAddress, clientPort, serverPort, filename, dataRateMbps, mtuSize, maxQueueLength, dropPackets, importDiode};
 }
 
 namespace EDTesterApplication
@@ -96,7 +99,7 @@ int main(int argc, char **argv)
     [](std::uint32_t sessionId)
     { return std::make_unique<FileStream>(sessionId); },
     []()
-    { return std::time(nullptr); }, 15);
+    { return std::time(nullptr); }, 15, params.importDiode);
 
   auto handleToSendingProcess = std::async(
     std::launch::async, []() {

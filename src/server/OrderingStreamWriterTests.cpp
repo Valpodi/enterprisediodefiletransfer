@@ -10,7 +10,7 @@
 TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; });
+  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, false);
 
   std::stringstream inputStream = createTestPacketStream({'A', 'B'}, 1, 1, false);
   auto packet = parsePacket(inputStream);
@@ -22,7 +22,7 @@ TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue"
 TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been received")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 5, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; });
+  auto streamWriter = OrderingStreamWriter(1, 5, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, false);
 
   SECTION("When the EOF packet is not queued")
   {
@@ -70,7 +70,7 @@ TEST_CASE("OrderingStreamWriter. OrderingStreamWriter constructor sets timeLastU
   OrderingStreamWriter orderingStreamWriter(1,
                                             1,
                                             std::make_unique<StreamSpy>(outputStream, 1),
-                                            [&initialTime]() mutable { return initialTime; });
+                                            [&initialTime]() mutable { return initialTime; }, false);
 
   REQUIRE(orderingStreamWriter.timeLastUpdated == 500);
 

@@ -19,7 +19,8 @@ public:
     std::uint32_t maxBufferSize,
     std::uint32_t maxQueueLength,
     std::unique_ptr<StreamInterface> stream,
-    std::function<std::time_t()> getTime);
+    std::function<std::time_t()> getTime,
+    bool importDiode);
 
   bool write(std::istream& data, const HeaderParams& edHeader);
   void deleteFile();
@@ -32,6 +33,9 @@ private:
 
 public:
   std::time_t timeLastUpdated;
+
+private:
+  bool importDiode;
 };
 
 #endif //ENTERPRISEDIODE_ORDERINGSTREAMWRITER_HPP

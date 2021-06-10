@@ -18,7 +18,7 @@ TEST_CASE("ED server.")
   boost::asio::io_service fake_service;
 
   Server edServer = createEdServer(std::make_unique<UdpServerFake>(0, fake_service, 0, 0), 16, 100,
-                                   capturedSessionId, outputStream);
+                                   capturedSessionId, outputStream, false);
 
 
   SECTION("A packet received by the server is written to the stream")
@@ -112,7 +112,7 @@ TEST_CASE("ED server. Queue length Tests")
   boost::asio::io_service fake_service;
 
   Server edServer = createEdServer(std::make_unique<UdpServerFake>(0, fake_service, 0, 0), 16, 2,
-                                   capturedSessionId, outputStream);
+                                   capturedSessionId, outputStream, false);
 
   SECTION("Packets are not queued if the size of the queue is at least maxQueueLength.")
   {
@@ -146,7 +146,7 @@ TEST_CASE("ED server. Stream is closed if timeout is exceeded.", "[integration]"
                            [&outputStream, &capturedSessionId](std::uint32_t sessionId) {
                              capturedSessionId = sessionId;
                              return std::make_unique<StreamSpy>(outputStream, sessionId);
-                           }, []() { return std::time(nullptr); }, 3);
+                           }, []() { return std::time(nullptr); }, 3, false);
 
   std::stringstream stream = createTestPacketStream({'A', 'B'}, 1, 1, false);
   edServer.receivePacket(stream);

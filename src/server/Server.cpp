@@ -11,9 +11,10 @@ Server::Server(
   std::uint32_t maxQueueLength,
   std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
   std::function<std::time_t()> getTime,
-  std::uint32_t timeoutPeriod) :
+  std::uint32_t timeoutPeriod,
+  bool importDiode) :
     udpServerInterface(std::move(udpServerInterface)),
-    sessionManager(maxBufferSize, maxQueueLength, std::move(streamCreator), std::move(getTime), timeoutPeriod)
+    sessionManager(maxBufferSize, maxQueueLength, std::move(streamCreator), std::move(getTime), timeoutPeriod, importDiode)
 {
   this->udpServerInterface->setCallback([this](std::istream& payload) { receivePacket(payload); });
 }

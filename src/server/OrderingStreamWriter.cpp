@@ -7,11 +7,13 @@ OrderingStreamWriter::OrderingStreamWriter(
   std::uint32_t maxBufferSize,
   std::uint32_t maxQueueLength,
   std::unique_ptr<StreamInterface> streamWrapper,
-  std::function<std::time_t()> getTime) :
+  std::function<std::time_t()> getTime,
+  bool importDiode) :
     packetQueue(maxBufferSize, maxQueueLength),
     streamWrapper(std::move(streamWrapper)),
     getTime(std::move(getTime)),
-    timeLastUpdated(this->getTime())
+    timeLastUpdated(this->getTime()),
+    importDiode(importDiode)
 {
 }
 
