@@ -100,16 +100,10 @@ int main(int argc, char **argv)
 
   Server edServer(
     std::make_unique<UdpServer>(
-      params.serverPort,
-      EDTesterApplication::io_context,
-      maxBufferSize,
-      EnterpriseDiode::UDPSocketSizeInBytes),
-    maxBufferSize,
-    params.maxQueueLength,
-    [](std::uint32_t sessionId)
-    { return std::make_unique<FileStream>(sessionId); },
-    []()
-    { return std::time(nullptr); }, 15, params.diodeType);
+      params.serverPort, EDTesterApplication::io_context, maxBufferSize, EnterpriseDiode::UDPSocketSizeInBytes),
+    maxBufferSize, params.maxQueueLength, false,
+    [](std::uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); },
+    []() { return std::time(nullptr); }, 15, params.diodeType);
 
   auto handleToSendingProcess = std::async(
     std::launch::async, []() {

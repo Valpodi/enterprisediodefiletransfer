@@ -104,6 +104,7 @@ int main(int argc, char **argv)
         EnterpriseDiode::UDPSocketSizeInBytes),
       maxBufferSize,
       params.maxQueueLength,
+      params.dropPackets,
       selectWriteStreamFunction(params.dropPackets),
       []() { return std::time(nullptr); }, 15, params.diodeType);
 
