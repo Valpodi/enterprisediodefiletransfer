@@ -42,6 +42,10 @@ BytesBuffer StreamingRewrapper::rewrapData(const BytesBuffer& input, const Bytes
 
 BytesBuffer StreamingRewrapper::constructXORedMask(const BytesBuffer& inputChunkMask) const
 {
+  if (mask == BytesBuffer(CloakedDagger::maskLength))
+  {
+    throw std::runtime_error("Tried to rewrap a frame before mask set.");
+  }
   BytesBuffer newMask(CloakedDagger::maskLength);
 
   for (std::uint8_t rotatingInputIndex=0; rotatingInputIndex < CloakedDagger::maskLength; rotatingInputIndex++)

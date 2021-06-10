@@ -38,4 +38,19 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
     REQUIRE(streamingRewrapper.rewrap(data, 1) == data);
   }
 
+  SECTION("Rewrap is called with framecount 1, returns the input - including the header")
+  {
+    auto input = createTestWrappedBytesBuffer("AAA");
+    auto output = streamingRewrapper.rewrap(input, 1);
+    REQUIRE(output == input);
+    REQUIRE(output.at(0) == CloakedDagger::cloakedDaggerIdentifierByte);
+    REQUIRE(output.size() == CloakedDagger::headerSize() + 3);
+  }
+
+  SECTION("If the first frame that rewrapper is given has frameCount != 1, the mask will not be set.")
+  {
+    auto input = createTestWrappedBytesBuffer("AAA");
+    REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input, 2), std::runtime_error);
+  }
+
 }
