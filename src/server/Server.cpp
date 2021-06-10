@@ -7,18 +7,14 @@
 
 Server::Server(
   std::unique_ptr<UdpServerInterface> udpServerInterface,
-  std::uint32_t maxBufferSize,
-  std::uint32_t maxQueueLength,
-  bool dropPackets,
+  PacketQueueSettings queueSettings,
   std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
   std::function<std::time_t()> getTime,
   std::uint32_t timeoutPeriod,
   DiodeType diodeType) :
     udpServerInterface(std::move(udpServerInterface)),
     sessionManager(
-      maxBufferSize,
-      maxQueueLength,
-      dropPackets,
+      queueSettings,
       std::move(streamCreator),
       std::move(getTime),
       timeoutPeriod,

@@ -5,9 +5,7 @@
 #include "DropPackets.hpp"
 
 OrderingStreamWriter::OrderingStreamWriter(
-  std::uint32_t maxBufferSize,
-  std::uint32_t maxQueueLength,
-  bool dropPackets,
+  PacketQueueSettings queueSettings,
   std::unique_ptr<StreamInterface> stream,
   std::function<std::time_t()> getTime,
   DiodeType diodeType) :
@@ -15,9 +13,9 @@ OrderingStreamWriter::OrderingStreamWriter(
     getTime(std::move(getTime)),
     timeLastUpdated(this->getTime())
 {
-  if (!dropPackets)
+  if (!queueSettings.dropPackets)
   {
-    packetQueue = std::make_unique<ReorderPackets>(maxBufferSize, maxQueueLength, diodeType);
+    packetQueue = std::make_unique<ReorderPackets>(queueSettings.maxBufferSize, queueSettings.maxQueueLength, diodeType);
   }
   else
   {
