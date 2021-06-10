@@ -256,4 +256,33 @@ TEST_CASE("ReorderPackets. Import diode.")
     unwrapFromStream(outputStream, unwrappedStream);
     REQUIRE(unwrappedStream.str() == "abcdef");
   }
+
+  SECTION("Two wrapped frames out of order are rewrapped with the key from frame with frameCount 1.")
+  {
+    auto wrappedInputStream = createTestWrappedString("def", {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
+    queueManager.write(wrappedInputStream, &stream, 2, false);
+    auto wrappedInputStream2 = createTestWrappedString("abc", {0xf0, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x12});
+    queueManager.write(wrappedInputStream2, &stream, 1, false);
+
+    std::stringstream unwrappedStream;
+    unwrapFromStream(outputStream, unwrappedStream);
+    REQUIRE(unwrappedStream.str() == "abcdef");
+  }
+
+  SECTION("A three frame wrapped file is rewrapped with the key from the first frame.")
+  {
+    auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
+    queueManager.write(wrappedInputStream, &stream, 1, false);
+    auto wrappedInputStream2 = createTestWrappedString("def", {0xf0, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x12});
+    queueManager.write(wrappedInputStream2, &stream, 2, false);
+    auto wrappedInputStream3 = createTestWrappedString("ghi", {0xf5, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x34});
+    queueManager.write(wrappedInputStream3, &stream, 3, false);
+    std::stringstream inputStream = std::stringstream("{name: !str \"testFilename\"}");
+    REQUIRE(queueManager.write(inputStream, &stream, 4, true));
+
+    std::stringstream unwrappedStream;
+    unwrapFromStream(outputStream, unwrappedStream);
+    REQUIRE(unwrappedStream.str() == "abcdefghi");
+    REQUIRE(stream.storedFilename == "testFilename");
+  }
 }
