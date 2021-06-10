@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_EDHEADER_HPP
-#define ENTERPRISEDIODE_EDHEADER_HPP
+#ifndef EDHEADER_HPP
+#define EDHEADER_HPP
 
 #include <fstream>
 #include <boost/asio/buffer.hpp>
@@ -60,4 +60,4 @@ private:
   const std::array<std::uint8_t, 7> padding;
 };
 
-#endif //ENTERPRISEDIODE_EDHEADER_HPP
+#endif //EDHEADER_HPP

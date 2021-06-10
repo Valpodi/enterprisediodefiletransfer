@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_EDCLIENT_HPP
-#define ENTERPRISEDIODE_EDCLIENT_HPP
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
 
 #include <istream>
 #include <boost/asio/time_traits.hpp>
@@ -41,4 +41,4 @@ private:
 
 boost::posix_time::microseconds calculateTimerPeriod(double dataRateMbps, std::uint32_t packetSizeBytes);
 
-#endif //ENTERPRISEDIODE_EDCLIENT_HPP
+#endif //CLIENT_HPP

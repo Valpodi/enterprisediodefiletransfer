@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_ORDERINGSTREAMWRITER_HPP
-#define ENTERPRISEDIODE_ORDERINGSTREAMWRITER_HPP
+#ifndef ORDERINGSTREAMWRITER_HPP
+#define ORDERINGSTREAMWRITER_HPP
 
 #include <memory>
 #include <fstream>
@@ -37,4 +37,4 @@ private:
   DiodeType diodeType;
 };
 
-#endif //ENTERPRISEDIODE_ORDERINGSTREAMWRITER_HPP
+#endif //ORDERINGSTREAMWRITER_HPP

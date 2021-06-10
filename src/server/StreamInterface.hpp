@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_STREAMINTERFACE_HPP
-#define ENTERPRISEDIODE_STREAMINTERFACE_HPP
+#ifndef STREAMINTERFACE_HPP
+#define STREAMINTERFACE_HPP
 
 #include <vector>
 #include <BytesBuffer.hpp>
@@ -17,4 +17,4 @@ public:
   virtual void write(const BytesBuffer& inputData) = 0;
 };
 
-#endif //ENTERPRISEDIODE_STREAMINTERFACE_HPP
+#endif //STREAMINTERFACE_HPP

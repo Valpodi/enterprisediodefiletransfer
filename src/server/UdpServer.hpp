@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_UDPSERVER_HPP
-#define ENTERPRISEDIODE_UDPSERVER_HPP
+#ifndef UDPSERVER_HPP
+#define UDPSERVER_HPP
 
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/io_service.hpp>
@@ -31,4 +31,4 @@ private:
   std::istream outputPacketStream;
 };
 
-#endif //ENTERPRISEDIODE_UDPSERVER_HPP
+#endif //UDPSERVER_HPP

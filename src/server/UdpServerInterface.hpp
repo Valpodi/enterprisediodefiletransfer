@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_UDPSERVERINTERFACE_HPP
-#define ENTERPRISEDIODE_UDPSERVERINTERFACE_HPP
+#ifndef UDPSERVERINTERFACE_HPP
+#define UDPSERVERINTERFACE_HPP
 
 #include <functional>
 #include <boost/asio/buffer.hpp>
@@ -23,4 +23,4 @@ protected:
   std::function<void(std::istream&)> callback;
 };
 
-#endif //ENTERPRISEDIODE_UDPSERVERINTERFACE_HPP
+#endif //UDPSERVERINTERFACE_HPP

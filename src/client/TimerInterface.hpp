@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_TIMERINTERFACE_HPP
-#define ENTERPRISEDIODE_TIMERINTERFACE_HPP
+#ifndef TIMERINTERFACE_HPP
+#define TIMERINTERFACE_HPP
 
 #include <functional>
 
@@ -22,4 +22,4 @@ protected:
 };
 
 
-#endif //ENTERPRISEDIODE_TIMERINTERFACE_HPP
+#endif //TIMERINTERFACE_HPP

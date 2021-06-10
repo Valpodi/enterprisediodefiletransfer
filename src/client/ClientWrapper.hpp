@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_EDCLIENTWRAPPER_HPP
-#define ENTERPRISEDIODE_EDCLIENTWRAPPER_HPP
+#ifndef CLIENTWRAPPER_HPP
+#define CLIENTWRAPPER_HPP
 
 #include <iostream>
 #include <fstream>
@@ -27,4 +27,4 @@ private:
 
 std::uint16_t calculatePayloadSize(std::uint16_t mtuSize);
 
-#endif //ENTERPRISEDIODE_EDCLIENTWRAPPER_HPP
+#endif //CLIENTWRAPPER_HPP

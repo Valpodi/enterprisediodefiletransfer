@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_TIMER_HPP
-#define ENTERPRISEDIODE_TIMER_HPP
+#ifndef TIMER_HPP
+#define TIMER_HPP
 
 #include <functional>
 #include <boost/asio.hpp>
@@ -24,4 +24,4 @@ private:
   boost::asio::deadline_timer deadlineTimer;
 };
 
-#endif //ENTERPRISEDIODE_TIMER_HPP
+#endif //TIMER_HPP

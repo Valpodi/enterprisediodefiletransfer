@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_EDSERVER_HPP
-#define ENTERPRISEDIODE_EDSERVER_HPP
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
 #include <memory>
 #include <boost/asio/io_service.hpp>
@@ -42,4 +42,4 @@ inline std::function<std::unique_ptr<StreamInterface>(uint32_t)> selectWriteStre
   return [](uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); };
 }
 
-#endif //ENTERPRISEDIODE_EDSERVER_HPP
+#endif //SERVER_HPP

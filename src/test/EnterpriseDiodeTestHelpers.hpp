@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_TESTHELPERS_HPP
-#define ENTERPRISEDIODE_TESTHELPERS_HPP
+#ifndef TESTHELPERS_HPP
+#define TESTHELPERS_HPP
 
 #include <sstream>
 #include <boost/asio/io_service.hpp>
@@ -63,4 +63,4 @@ public:
   }
 };
 
-#endif //ENTERPRISEDIODE_TESTHELPERS_HPP
+#endif //TESTHELPERS_HPP

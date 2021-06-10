@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_SESSIONMANAGER_HPP
-#define ENTERPRISEDIODE_SESSIONMANAGER_HPP
+#ifndef SESSIONMANAGER_HPP
+#define SESSIONMANAGER_HPP
 
 #include <map>
 #include <set>
@@ -36,4 +36,4 @@ private:
   void writeFileAndSaveIfComplete(Packet packet);
 };
 
-#endif //ENTERPRISEDIODE_SESSIONMANAGER_HPP
+#endif //SESSIONMANAGER_HPP

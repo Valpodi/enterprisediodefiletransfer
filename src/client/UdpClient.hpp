@@ -1,8 +1,8 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODE_UDPCLIENT_HPP
-#define ENTERPRISEDIODE_UDPCLIENT_HPP
+#ifndef UDPCLIENT_HPP
+#define UDPCLIENT_HPP
 
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/io_service.hpp>
@@ -24,4 +24,4 @@ private:
   boost::asio::ip::udp::endpoint findEndpoints(const std::string& address, std::uint16_t port);
 };
 
-#endif //ENTERPRISEDIODE_UDPCLIENT_HPP
+#endif //UDPCLIENT_HPP
