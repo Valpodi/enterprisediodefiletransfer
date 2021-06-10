@@ -5,6 +5,7 @@
 #include "catch.hpp"
 #include "ReorderPackets.hpp"
 #include "StreamSpy.hpp"
+#include "DropPackets.hpp"
 
 TEST_CASE("ReorderPackets. Packets received in order are written to the output")
 {
@@ -285,4 +286,17 @@ TEST_CASE("ReorderPackets. Import diode.")
     REQUIRE(unwrappedStream.str() == "abcdefghi");
     REQUIRE(stream.storedFilename == "testFilename");
   }
+}
+
+TEST_CASE("DropPackets. Packets received in any order are not written to the output")
+{
+  auto inputStream = std::stringstream("BC");
+  std::stringstream outputStream;
+  StreamSpy stream(outputStream, 1);
+  auto queueManager = DropPackets();
+  REQUIRE_FALSE(queueManager.write(inputStream, &stream, 1, false));
+
+  inputStream = std::stringstream("DE");
+  REQUIRE(queueManager.write(inputStream, &stream, 2, true));
+  REQUIRE(outputStream.str().empty());
 }
