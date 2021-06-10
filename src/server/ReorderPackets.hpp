@@ -62,4 +62,5 @@ private:
   std::uint32_t maxSislLength = 1000;
   DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
+  void writeFrame(StreamInterface *streamWrapper);
 };

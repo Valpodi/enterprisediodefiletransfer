@@ -25,7 +25,6 @@ inline Params parseArgs(int argc, char **argv)
   std::uint16_t maxQueueLength = 1024;
   bool dropPackets = false;
   bool importDiode = false;
-  DiodeType diodeType;
   const auto cli = clara::Help(showHelp) |
                    clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on") |
                    clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface") |
@@ -33,7 +32,8 @@ inline Params parseArgs(int argc, char **argv)
                      "Max length of queue for reordering packets") |
                    clara::Opt(dropPackets)["-d"]["--dropPackets"](
                      "Diagnostic tool: Server will not write packets to disk if this flag set (will only count missing frames), else will write them to a file as normal") |
-                   clara::Opt(importDiode, "import diode")["-i"]["--importDiode"]("import diode flag for rewrapper");
+                   clara::Opt(importDiode)["-i"]["--importDiode"](
+                     "Set flag if using an import diode so that the server rewraps data before writing to file.");
 
   const auto result = cli.parse(clara::Args(argc, argv));
   if (!result)
@@ -48,13 +48,10 @@ inline Params parseArgs(int argc, char **argv)
     exit(1);
   }
 
+  auto diodeType = DiodeType::basic;
   if (importDiode)
   {
     diodeType = DiodeType::import;
-  }
-  else
-  {
-    diodeType = DiodeType::basic;
   }
 
   return {serverPort, mtuSize, maxQueueLength, dropPackets, diodeType};

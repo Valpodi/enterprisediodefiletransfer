@@ -77,18 +77,23 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
       queue.pop();
       return true;
     }
-    if (diodeType == DiodeType::import)
-    {
-      streamWrapper->write(streamingRewrapper.rewrap(queue.top().getFrame(), nextFrameCount));
-    }
-    else
-    {
-      streamWrapper->write(queue.top().getFrame());
-    }
+    writeFrame(streamWrapper);
     queue.pop();
     ++nextFrameCount;
   }
   return false;
+}
+
+void ReorderPackets::writeFrame(StreamInterface *streamWrapper)
+{
+  if (diodeType == DiodeType::import)
+  {
+    streamWrapper->write(streamingRewrapper.rewrap(queue.top().getFrame(), nextFrameCount));
+  }
+  else
+  {
+    streamWrapper->write(queue.top().getFrame());
+  }
 }
 
 void ReorderPackets::addFrameToQueue(std::istream& inputStream, std::uint32_t frameCount, bool endOfFile)

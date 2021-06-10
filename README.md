@@ -13,13 +13,14 @@ Optionally: Check the binaries are working by running the integration tests:
 
 On the pitcher and catcher run the client and server manually:
 
-    ./server --serverPort PORT --mtu MTUSIZE --queueLength QUEUELENGTH
+    ./server --serverPort PORT --mtu MTUSIZE --queueLength QUEUELENGTH --importDiode IMPORTDIODE
     ./client --filename FILENAME --address ADDRESS --clientPort PORT --mtu MTUSIZE --datarate DATARATE_MBPS
 
 Server arguments:
 1. PORT: The port the server will listen on.
 2. MTUSIZE: The size of the mtu in bytes.
 3. QUEUELENGTH: The number of packets to queue in the case of missing / out of order packets.
+3. IMPORTDIODE: default=false, set to true when using an import diode, so that the data gets re-wrapped.
 
 Client arguments:
 1. FILENAME: The path to the file to send.
@@ -32,7 +33,7 @@ Client arguments:
 
 Or if running the loopback tester:
 
-    ./tester --filename FILENAME --address ADDRESS --clientPort PORT --serverPort PORT --mtu MTUSIZE --datarate DATARATE_MBPS
+    ./tester --filename FILENAME --address ADDRESS --clientPort PORT --serverPort PORT --mtu MTUSIZE --datarate DATARATE_MBPS --importDiode IMPORTDIODE
 
 Client arguments:
 1. FILENAME: The path to the file to send.
@@ -43,5 +44,3 @@ Client arguments:
 4. SERVER PORT: The port the server will listen on.
 5. MTUSIZE: The size of the mtu in bytes.
 6. DATARATE_MBPS: The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
-
-

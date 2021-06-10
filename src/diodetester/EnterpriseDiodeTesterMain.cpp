@@ -38,19 +38,20 @@ inline Params parseArgs(int argc, char **argv)
   std::uint16_t maxQueueLength = 1024;
   bool dropPackets = false;
   bool importDiode = false;
-  DiodeType diodeType;
   const auto cli = clara::Help(showHelp) |
                    clara::Opt(clientAddress, "client address")["-a"]["--address"]("address send packets to") |
                    clara::Opt(clientPort, "client port")["-c"]["--clientPort"]("port to send packets to") |
                    clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on") |
                    clara::Opt(filename, "filename")["-f"]["--filename"]("name of a file you want to send") |
-                   clara::Opt(dataRateMbps, "date rate in Megabits per second")["-r"]["--datarate"]("data rate of transfer") |
+                   clara::Opt(dataRateMbps, "date rate in Megabits per second")["-r"]["--datarate"](
+                     "data rate of transfer") |
                    clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface") |
                    clara::Opt(maxQueueLength, "Queue Length")["-q"]["--queueLength"](
                      "Max length of queue for reordering packets") |
                    clara::Opt(dropPackets)["-d"]["--dropPackets"](
                      "Server will write packets to disk if this flag is false, else will drop them and only count missing packets") |
-                   clara::Opt(importDiode, "import diode")["-i"]["--importDiode"]("import diode flag for rewrapper");
+                   clara::Opt(importDiode, "import diode")["-i"]["--importDiode"](
+                     "Set flag if using an import diode so that the server rewraps data before writing to file.");
 
   const auto result = cli.parse(clara::Args(argc, argv));
   if (!result)
@@ -65,16 +66,14 @@ inline Params parseArgs(int argc, char **argv)
     exit(1);
   }
 
+  auto diodeType = DiodeType::basic;
   if (importDiode)
   {
     diodeType = DiodeType::import;
   }
-  else
-  {
-    diodeType = DiodeType::basic;
-  }
 
-  return {clientAddress, clientPort, serverPort, filename, dataRateMbps, mtuSize, maxQueueLength, dropPackets, diodeType};
+  return {clientAddress, clientPort, serverPort, filename, dataRateMbps, mtuSize, maxQueueLength, dropPackets,
+          diodeType};
 }
 
 namespace EDTesterApplication

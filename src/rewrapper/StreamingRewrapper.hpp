@@ -21,6 +21,7 @@ private:
   static BytesBuffer getMaskFromHeader(const BytesBuffer& input);
   BytesBuffer constructXORedMask(const BytesBuffer& inputChunkMask) const;
   BytesBuffer rewrapData(const BytesBuffer& input, const BytesBuffer& newMask);
+  BytesBuffer handleFirstFrame(const BytesBuffer& input, const BytesBuffer& inputChunkMask);
 };
 
 

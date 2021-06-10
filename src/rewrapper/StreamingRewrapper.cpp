@@ -16,12 +16,16 @@ BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, std::uint32_t f
 
   if (frameCount == 1)
   {
-    mask = inputChunkMask;
-    mask_index = input.size() - CloakedDagger::headerSize();
-    return input;
+    return handleFirstFrame(input, inputChunkMask);
   }
-  const BytesBuffer newMask = constructXORedMask(inputChunkMask);
-  return rewrapData(input, newMask);
+  return rewrapData(input, constructXORedMask(inputChunkMask));
+}
+
+BytesBuffer StreamingRewrapper::handleFirstFrame(const BytesBuffer& input, const BytesBuffer& inputChunkMask)
+{
+  mask = inputChunkMask;
+  mask_index = input.size() - CloakedDagger::headerSize();
+  return input;
 }
 
 BytesBuffer StreamingRewrapper::rewrapData(const BytesBuffer& input, const BytesBuffer& newMask)
