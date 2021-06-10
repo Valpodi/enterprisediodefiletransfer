@@ -18,7 +18,7 @@ public:
     std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
     std::function<time_t()> getTime,
     std::uint32_t timeoutPeriod,
-    bool importDiode);
+    DiodeType diodeType);
 
   void writeToStream(Packet packet);
 
@@ -32,7 +32,7 @@ private:
   std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator;
   std::function<time_t()> getTime;
   std::uint32_t timeoutPeriod;
-  bool importDiode;
+  DiodeType diodeType;
   void createSessionIfNewId(std::uint32_t sessionId);
   bool isStreamExpired(std::uint32_t sessionId);
   void writeFileAndSaveIfComplete(Packet packet);

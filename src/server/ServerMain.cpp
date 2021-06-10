@@ -17,7 +17,7 @@ struct Params
   std::uint16_t mtuSize;
   std::uint16_t maxQueueLength;
   bool dropPackets;
-  bool importDiode;
+  DiodeType diodeType;
 };
 
 inline Params parseArgs(int argc, char **argv)
@@ -28,6 +28,7 @@ inline Params parseArgs(int argc, char **argv)
   std::uint16_t maxQueueLength = 1024;
   bool dropPackets = false;
   bool importDiode = false;
+  DiodeType diodeType;
   const auto cli = clara::Help(showHelp) |
                    clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on") |
                    clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface") |
@@ -50,7 +51,16 @@ inline Params parseArgs(int argc, char **argv)
     exit(1);
   }
 
-  return {serverPort, mtuSize, maxQueueLength, dropPackets, importDiode};
+  if (importDiode)
+  {
+    diodeType = DiodeType::import;
+  }
+  else
+  {
+    diodeType = DiodeType::basic;
+  }
+
+  return {serverPort, mtuSize, maxQueueLength, dropPackets, diodeType};
 }
 
 namespace ServerApplication
@@ -95,7 +105,7 @@ int main(int argc, char **argv)
       maxBufferSize,
       params.maxQueueLength,
       selectWriteStreamFunction(params.dropPackets),
-      []() { return std::time(nullptr); }, 15, params.importDiode);
+      []() { return std::time(nullptr); }, 15, params.diodeType);
 
     ServerApplication::io_context.run();
   }

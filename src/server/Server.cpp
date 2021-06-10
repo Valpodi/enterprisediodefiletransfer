@@ -12,9 +12,9 @@ Server::Server(
   std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
   std::function<std::time_t()> getTime,
   std::uint32_t timeoutPeriod,
-  bool importDiode) :
+  DiodeType diodeType) :
     udpServerInterface(std::move(udpServerInterface)),
-    sessionManager(maxBufferSize, maxQueueLength, std::move(streamCreator), std::move(getTime), timeoutPeriod, importDiode)
+    sessionManager(maxBufferSize, maxQueueLength, std::move(streamCreator), std::move(getTime), timeoutPeriod, diodeType)
 {
   this->udpServerInterface->setCallback([this](std::istream& payload) { receivePacket(payload); });
 }

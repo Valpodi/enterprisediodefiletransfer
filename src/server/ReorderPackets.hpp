@@ -8,7 +8,7 @@
 
 class StreamInterface;
 
-enum class diodeType
+enum class DiodeType
 {
   import,
   basic
@@ -19,7 +19,7 @@ class ReorderPackets
 
 public:
   explicit ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength,
-    std::uint32_t maxFilenameLength = 65, diodeType diode = diodeType::basic);
+                          DiodeType diodeType, std::uint32_t maxFilenameLength = 65);
   bool write(std::istream& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
 
 private:
@@ -58,6 +58,6 @@ private:
   std::priority_queue<FrameDetails, std::vector<FrameDetails>, std::greater<>> queue;
   std::uint32_t maxFilenameLength;
   std::uint32_t maxSislLength = 1000;
-  diodeType diode;
+  DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
 };

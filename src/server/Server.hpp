@@ -22,7 +22,7 @@ public:
     std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
     std::function<std::time_t()> getTime,
     std::uint32_t timeoutPeriod,
-    bool importDiode);
+   DiodeType diodeType);
 
   void receivePacket(std::istream& inputStream);
 

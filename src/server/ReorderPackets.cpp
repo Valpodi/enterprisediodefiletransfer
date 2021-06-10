@@ -10,11 +10,11 @@
 #include <optional>
 
 ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength,
-  std::uint32_t maxFilenameLength, diodeType diode) :
+                               DiodeType diodeType, std::uint32_t maxFilenameLength) :
   maxBufferSize(maxBufferSize),
   maxQueueLength(maxQueueLength),
   maxFilenameLength(maxFilenameLength),
-  diode(diode)
+  diodeType(diodeType)
 {
 }
 
@@ -78,7 +78,7 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
       queue.pop();
       return true;
     }
-    if (diode == diodeType::import)
+    if (diodeType == DiodeType::import)
     {
       data = streamingRewrapper.rewrap(data, nextFrameCount);
     }

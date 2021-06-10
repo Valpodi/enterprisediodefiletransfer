@@ -23,7 +23,7 @@ TEST_CASE("UDP Client. Server. Packets are only written to the output after firs
   boost::asio::io_service io_context;
 
   Server edServer = createEdServer(std::make_unique<UdpServer>(2002, io_context, EnterpriseDiode::HeaderSizeInBytes*2, 1024*1024), 1024*1024, 100,
-                                   capturedSessionId, outputStream, false);
+                                   capturedSessionId, outputStream, DiodeType::basic);
 
   std::vector<char> sendPayload{'r'};
   std::array<char, EnterpriseDiode::HeaderSizeInBytes> sendHeader{};
@@ -70,7 +70,7 @@ TEST_CASE("Client. Server. Packets are sent by the client, received by the serve
   boost::asio::io_service io_context;
 
   Server edServer = createEdServer(std::make_unique<UdpServer>(2002, io_context, EnterpriseDiode::HeaderSizeInBytes*2, 1024*1024), 1024*1024, 100,
-                                   capturedSessionId, outputStream, false);
+                                   capturedSessionId, outputStream, DiodeType::basic);
 
   std::stringstream sendPayload("ABCDEFGHIJKL");
 
