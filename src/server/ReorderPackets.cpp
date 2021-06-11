@@ -118,15 +118,11 @@ void ReorderPackets::addFrameToQueue(std::istream& inputStream, std::uint32_t fr
     }
     return;
   }
-
-  BytesBuffer newFrame;
-  newFrame.reserve(maxBufferSize);
-
-  std::copy(
-    std::istreambuf_iterator<char>(inputStream),
-    std::istreambuf_iterator<char>(),
-    std::back_inserter(newFrame));
-
-  queue.emplace(FrameDetails{frameCount, endOfFile, std::move(newFrame)});
+  queue.emplace(getDetails(inputStream, frameCount, endOfFile));
 }
 
+ReorderPackets::FrameDetails ReorderPackets::getDetails(std::istream& inputStream, uint32_t frameCount, bool endOfFile)
+{
+  return FrameDetails {
+    frameCount, endOfFile, BytesBuffer(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>())};
+}

@@ -5,6 +5,7 @@
 #include <optional>
 #include <queue>
 #include <rewrapper/StreamingRewrapper.hpp>
+#include <algorithm>
 
 class StreamInterface;
 
@@ -18,8 +19,11 @@ class ReorderPackets
 {
 
 public:
-  explicit ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength,
-                          DiodeType diodeType, std::uint32_t maxFilenameLength = 65);
+  explicit ReorderPackets(
+    std::uint32_t maxBufferSize,
+    std::uint32_t maxQueueLength,
+    DiodeType diodeType,
+    std::uint32_t maxFilenameLength = 65);
   bool write(std::istream& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
 
 private:
@@ -37,6 +41,24 @@ private:
       endOfFile(endOfFile),
       frame(std::move(frame))
     {}
+
+    FrameDetails(const FrameDetails&) = delete;
+    FrameDetails& operator=(FrameDetails&) = delete;
+
+    FrameDetails& operator=(FrameDetails&& rhs)
+    {
+      frameCount = std::move(rhs.frameCount);
+      endOfFile = std::move(rhs.endOfFile);
+      frame = std::move(rhs.frame);
+      return *this;
+    }
+
+    FrameDetails(const FrameDetails&& rhs) :
+     frameCount(rhs.frameCount),
+     endOfFile(rhs.endOfFile),
+     frame(std::move(rhs.frame))
+    {
+    };
 
     bool operator>(const FrameDetails& rhs) const
     {
@@ -64,4 +86,8 @@ private:
   StreamingRewrapper streamingRewrapper;
   void writeFrame(StreamInterface *streamWrapper);
   void logOutOfOrderPackets(uint32_t frameCount);
+  BytesBuffer copyToBuffer(std::istream& inputStream) const;
+  BytesBuffer createBuffer() const;
+  BytesBuffer& copy(std::istream& inputStream, BytesBuffer&& newFrame) const;
+  static FrameDetails getDetails(std::istream& inputStream, uint32_t frameCount, bool endOfFile) ;
 };
