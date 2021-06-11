@@ -25,7 +25,7 @@ public:
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(std::istream& inputStream, std::uint32_t frameCount, bool endOfFile);
-  std::optional<std::string> getFilenameFromStream(BytesBuffer eofFrame);
+  std::optional<std::string> getFilenameFromStream(const BytesBuffer& eofFrame);
   std::string convertFromSisl(std::string sislFilename);
 
   struct FrameDetails {
@@ -54,6 +54,7 @@ private:
 
   bool queueAlreadyExceeded = false;
   std::uint32_t nextFrameCount = 1;
+  std::uint32_t lastFrameReceived = 0;
   std::uint32_t maxBufferSize;
   std::uint32_t maxQueueLength;
   std::priority_queue<FrameDetails, std::vector<FrameDetails>, std::greater<>> queue;
@@ -62,4 +63,5 @@ private:
   DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
   void writeFrame(StreamInterface *streamWrapper);
+  void logOutOfOrderPackets(uint32_t frameCount);
 };

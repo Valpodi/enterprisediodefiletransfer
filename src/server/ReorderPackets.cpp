@@ -1,13 +1,14 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <SislTools/SislTools.hpp>
 #include "ReorderPackets.hpp"
 #include "StreamInterface.hpp"
+#include <SislTools/SislTools.hpp>
+#include <chrono>
 #include <iostream>
+#include <optional>
 #include <rapidjson/document.h>
 #include <regex>
-#include <optional>
 
 ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength,
                                DiodeType diodeType, std::uint32_t maxFilenameLength) :
@@ -24,11 +25,21 @@ bool ReorderPackets::write(
   std::uint32_t frameCount,
   bool eOFFlag)
 {
+  logOutOfOrderPackets(frameCount);
   addFrameToQueue(inputStream, frameCount, eOFFlag);
   return checkQueueAndWrite(streamWrapper);
 }
 
-std::optional<std::string> ReorderPackets::getFilenameFromStream(BytesBuffer eofFrame)
+void ReorderPackets::logOutOfOrderPackets(uint32_t frameCount)
+{
+  if (frameCount != lastFrameReceived + 1)
+  {
+    std::cout << std::chrono::system_clock::now().time_since_epoch().count() << " Out of order frame: " << frameCount << "\n";
+  }
+  lastFrameReceived = frameCount;
+}
+
+std::optional<std::string> ReorderPackets::getFilenameFromStream(const BytesBuffer& eofFrame)
 {
   const auto sislHeader = std::string(eofFrame.begin(), eofFrame.end());
   try
