@@ -27,7 +27,7 @@ public:
   void renameFile();
 
 private:
-  std::unique_ptr<PacketQueueInterface> packetQueue;
+  ReorderPackets packetQueue;
   std::unique_ptr<StreamInterface> streamWrapper;
   std::function<std::time_t()> getTime;
 
