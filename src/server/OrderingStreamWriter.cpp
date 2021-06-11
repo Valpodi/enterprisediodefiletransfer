@@ -2,27 +2,18 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "OrderingStreamWriter.hpp"
-#include "DropPackets.hpp"
 
 OrderingStreamWriter::OrderingStreamWriter(
   std::uint32_t maxBufferSize,
   std::uint32_t maxQueueLength,
-  bool dropPackets,
-  std::unique_ptr<StreamInterface> stream,
+  std::unique_ptr<StreamInterface> streamWrapper,
   std::function<std::time_t()> getTime,
   DiodeType diodeType) :
-    streamWrapper(std::move(stream)),
+    packetQueue(std::make_unique<ReorderPackets>(maxBufferSize, maxQueueLength, diodeType)),
+    streamWrapper(std::move(streamWrapper)),
     getTime(std::move(getTime)),
     timeLastUpdated(this->getTime())
 {
-  if (!dropPackets)
-  {
-    packetQueue = std::make_unique<ReorderPackets>(maxBufferSize, maxQueueLength, diodeType);
-  }
-  else
-  {
-    packetQueue = std::make_unique<DropPackets>();
-  }
 }
 
 bool OrderingStreamWriter::write(std::istream& data, const HeaderParams& headerParams)

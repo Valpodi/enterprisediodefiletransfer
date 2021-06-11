@@ -15,7 +15,6 @@ public:
   explicit SessionManager(
     std::uint32_t maxBufferSize,
     std::uint32_t maxQueueLength,
-    bool dropPackets,
     std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
     std::function<time_t()> getTime,
     std::uint32_t timeoutPeriod,
@@ -29,7 +28,6 @@ private:
 
   std::uint32_t maxBufferSize;
   std::uint32_t maxQueueLength;
-  bool dropPackets;
   std::map<std::uint32_t, OrderingStreamWriter> streams;
   std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator;
   std::function<time_t()> getTime;

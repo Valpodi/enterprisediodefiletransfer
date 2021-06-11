@@ -6,14 +6,13 @@ add_library(SERVER_LIBRARY
         UdpServerInterface.hpp
         OrderingStreamWriter.cpp
         ReorderPackets.cpp
-        DropPackets.hpp
-        PacketQueueInterface.hpp
         Server.cpp
         SessionManager.cpp
         FileStream.hpp
-        DropStream.hpp
         StreamInterface.hpp
-        Packet.cpp)
+        Packet.cpp
+        DropStream.hpp
+        PacketQueueInterface.hpp)
 
 add_library(SERVER_LIBRARY_TESTS
         ../test/EnterpriseDiodeTestHelpers.cpp
