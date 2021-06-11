@@ -7,6 +7,7 @@ import time
 import os
 import signal
 import glob
+import pysisl
 
 
 class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
@@ -19,7 +20,7 @@ class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
         [os.remove(file) for file in glob.glob(f"{self.build_folder}/files_to_send/nested/*") if os.path.isfile(file)]
         if os.path.isdir(f"{self.build_folder}/files_to_send/nested"):
             os.rmdir(f"{self.build_folder}/files_to_send/nested")
-        [os.remove(file) for file in glob.glob(".received.*") if os.path.isfile(file)]
+        [os.remove(file) for file in glob.glob(f"{self.build_folder}/files_received/.received.*") if os.path.isfile(file)]
 
     @classmethod
     def tearDownClass(cls):
@@ -41,8 +42,8 @@ class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
     def send_file_with_ED_loopback(self, file_to_send):
         return self.run_ED_program("tester", file_to_send, "-c 5000 -s 5000", 1000)
 
-    def send_file_with_ED_client(self, file_to_send):
-        return self.run_ED_program("client", file_to_send, "-c 5000", 1000)
+    def send_file_with_ED_client(self, file_to_send, mtu=1000):
+        return self.run_ED_program("client", file_to_send, "-c 5000", mtu)
 
     @classmethod
     def run_ED_program(cls, ed_program, file_to_send, port_args, mtu_size=1000):
@@ -107,15 +108,15 @@ class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
             if attempts == 0:
                 raise TimeoutError("Server failed to start")
 
-    def start_ED_server_thread(self, set_drop_packets_flag=False):
-        process_handle = self.run_ED_server(5000, set_drop_packets_flag)
+    def start_ED_server_thread(self, set_drop_packets_flag=False, import_diode=False):
+        process_handle = self.run_ED_server(5000, set_drop_packets_flag, import_diode)
         self.wait_for_server_start(port=5000)
         return process_handle
 
     @classmethod
-    def run_ED_server(cls, port, set_drop_packets_flag=False):
+    def run_ED_server(cls, port, set_drop_packets_flag=False, import_diode=False):
         os.chdir(f"{cls.build_folder}/files_received")
-        server = subprocess.Popen(f"../server -s {port} {'-d' * set_drop_packets_flag}".split())
+        server = subprocess.Popen(f"../server -s {port} {'-d' * set_drop_packets_flag} {'-i' * import_diode}".split())
         os.chdir("../..")
         return server
 
@@ -130,32 +131,25 @@ class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 
-    def test_ed_server_receives_nested_file(self):
-        os.mkdir(f"{self.build_folder}/files_to_send/nested")
-        self.write_bytes("nested/test_file.bin")
-        server_handle = self.start_ED_server_thread()
-        self.assertEqual(self.send_file_with_ED_client(file_to_send="nested/test_file.bin").wait(timeout=5), 0)
-        self.assertTrue(self.wait_for_received_data(input_file="nested/test_file.bin", output_dir=f"{self.build_folder}/files_received"))
-        server_handle.send_signal(signal.SIGINT)
-        self.assertEqual(server_handle.wait(timeout=5), 0)
+    @classmethod
+    def create_wrapped_file(cls, filename, data):
+        with open(f"{cls.build_folder}/files_to_send/{filename}", 'wb') as file:
+            file.write(pysisl.wraps(data[:5]))
+            file.write(pysisl.wraps(data[5:]))
 
-    def test_ed_server_receives_overwrites_files_that_exist(self):
-        self.write_bytes("test_file.bin")
-        server_handle = self.start_ED_server_thread()
+    @classmethod
+    def unwrap_file(cls, filename):
+        with open(f"{cls.build_folder}/files_received/{filename}", "rb") as file:
+            return pysisl.unwraps(file.read())
 
-        for i in range(0, 4):
-            self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file.bin").wait(timeout=5), 0)
-
-        self.assertTrue(self.wait_for_received_data(output_dir=f"{self.build_folder}/files_received"))
-        self.assertTrue(len(os.listdir(f"{self.build_folder}/files_received")) == 1)
-        server_handle.send_signal(signal.SIGINT)
-        self.assertEqual(server_handle.wait(timeout=5), 0)
-
-    def test_ed_server_does_not_write_files_to_disk_if_correct_flag_is_set(self):
-        self.write_bytes("test_file.bin")
-        server_handle = self.start_ED_server_thread(set_drop_packets_flag=True)
-        self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file.bin").wait(timeout=5), 0)
-        self.assertTrue(self.is_files_received_dir_is_empty())
+    def test_ed_server_import_mode_rewraps_files(self):
+        data = "abcdefghij"
+        # ed_header_size + cloak_dagger_header_size + ip_and_udp_header_size + len(data)/number_of_frames
+        mtu_size = int(112 + 48 + 28 + len(data)/2)
+        self.create_wrapped_file("test_file", data)
+        server_handle = self.start_ED_server_thread(import_diode=True)
+        self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file", mtu=mtu_size).wait(timeout=5), 0)
+        self.assertEqual(data.encode(), self.unwrap_file("test_file"))
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
 
