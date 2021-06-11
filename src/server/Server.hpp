@@ -18,7 +18,9 @@ class Server
 public:
   Server(
     std::unique_ptr<UdpServerInterface> udpServerInterface,
-    PacketQueueSettings queueSettings,
+    std::uint32_t maxBufferSize,
+    std::uint32_t maxQueueLength,
+    bool dropPackets,
     std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
     std::function<std::time_t()> getTime,
     std::uint32_t timeoutPeriod,

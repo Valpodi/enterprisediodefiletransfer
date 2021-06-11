@@ -30,7 +30,7 @@ Server createEdServer(
   DiodeType diodeType)
 {
   return Server(
-    std::move(udpServer), {maxBufferSize, maxQueueLength, false},
+    std::move(udpServer), maxBufferSize, maxQueueLength, false,
     [&outputStream, &capturedSessionId](std::uint32_t sessionId) {
       capturedSessionId = sessionId;
       return std::make_unique<StreamSpy>(outputStream, sessionId);
