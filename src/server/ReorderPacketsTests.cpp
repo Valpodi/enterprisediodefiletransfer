@@ -133,6 +133,18 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
         REQUIRE(outputStream.str() == "ZABCDE");
       }
 
+      SECTION("Frame 5 is eof with filename, but waits for all missing packets before setting filename.")
+      {
+        inputStream = std::stringstream("{name: !str \"testFilename\"}");
+        REQUIRE_FALSE(queueManager.write(inputStream, &stream, 5, true));
+        REQUIRE(outputStream.str() == "ZABCDE");
+        REQUIRE_FALSE(stream.storedFilename == "testFilename");
+        inputStream = std::stringstream("FG");
+        REQUIRE(queueManager.write(inputStream, &stream, 4, false));
+        REQUIRE(outputStream.str() == "ZABCDEFG");
+        REQUIRE(stream.storedFilename == "testFilename");
+      }
+
       SECTION("Frame 4 is EOF and a frame with frameCount above the eofFrame is ignored.")
       {
         inputStream = std::stringstream("YZ");
