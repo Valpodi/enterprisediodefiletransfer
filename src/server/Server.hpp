@@ -10,8 +10,6 @@
 #include "diodeheader/EnterpriseDiodeHeader.hpp"
 #include "SessionManager.hpp"
 #include "Packet.hpp"
-#include "FileStream.hpp"
-#include "DropStream.hpp"
 
 class StreamInterface;
 
@@ -33,13 +31,4 @@ private:
   SessionManager sessionManager;
 };
 
-inline std::function<std::unique_ptr<StreamInterface>(uint32_t)> selectWriteStreamFunction(bool dropPackets)
-{
-  if (dropPackets)
-  {
-    return [](uint32_t sessionId) { return std::make_unique<DropStream>(sessionId); };
-  }
-  return [](uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); };
-}
-
-#endif //SERVER_HPP
+#endif //ENTERPRISEDIODE_EDSERVER_HPP
