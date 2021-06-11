@@ -288,19 +288,15 @@ TEST_CASE("ReorderPackets. Import diode.")
   }
 }
 
-TEST_CASE("DropPackets.")
+TEST_CASE("DropPackets. Packets received in any order are not written to the output")
 {
+  auto inputStream = std::stringstream("BC");
   std::stringstream outputStream;
   StreamSpy stream(outputStream, 1);
   auto queueManager = DropPackets();
+  REQUIRE_FALSE(queueManager.write(inputStream, &stream, 1, false));
 
-  SECTION("Packets received in any order are not written to the output")
-  {
-    auto inputStream = std::stringstream("BC");
-    REQUIRE_FALSE(queueManager.write(inputStream, &stream, 1, false));
-
-    inputStream = std::stringstream("DE");
-    REQUIRE(queueManager.write(inputStream, &stream, 2, true));
-    REQUIRE(outputStream.str().empty());
-  }
+  inputStream = std::stringstream("DE");
+  REQUIRE(queueManager.write(inputStream, &stream, 2, true));
+  REQUIRE(outputStream.str().empty());
 }
