@@ -15,7 +15,7 @@ struct HeaderParams
   std::uint32_t sessionId;
   std::uint32_t frameCount;
   bool eOFFlag;
-  const std::array<char, CloakedDagger::headerSize()> cloakedDaggerHeader;
+  std::array<char, CloakedDagger::headerSize()> cloakedDaggerHeader;
 };
 
 class Packet
