@@ -25,7 +25,8 @@ HeaderParams EDHeader::readHeaderParams(const std::vector<std::uint8_t>& frame)
   return {
     extract<std::uint32_t>(frame, 0),
     extract<std::uint32_t>(frame, 4),
-    extract<bool>(frame, 8)
+    extract<bool>(frame, 8),
+    extract<std::array<char, 48>>(frame, EnterpriseDiode::HeaderSizeInBytes - 48)
   };
 }
 

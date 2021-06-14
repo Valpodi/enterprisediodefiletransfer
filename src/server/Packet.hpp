@@ -8,12 +8,14 @@
 #include <cstdint>
 #include <istream>
 #include <vector>
+#include <array>
 
 struct HeaderParams
 {
   const std::uint32_t sessionId;
   const std::uint32_t frameCount;
   const bool eOFFlag;
+  const std::array<char, 48> cloakedDaggerHeader {};
 };
 
 
