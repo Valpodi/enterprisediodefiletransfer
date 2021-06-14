@@ -41,12 +41,8 @@ public:
 
   void write(const BytesBuffer& inputData) override
   {
-    std::copy(
-      inputData.begin(),
-      inputData.end(),
-      std::ostreambuf_iterator(outputStream));
+    outputStream.write(reinterpret_cast<const char*>(inputData.data()), static_cast<long>(inputData.size()));
   }
-
 
 private:
   static uint32_t setTempFilename()
