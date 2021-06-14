@@ -11,14 +11,14 @@ TEST_CASE("SessionManager.")
 {
   std::vector<std::stringstream> outputStreams;
   std::uint32_t capturedSessionId = 0;
-  StreamSpy* streamSpyPtr;
 
-  auto streamSpyCreator = [&outputStreams, &capturedSessionId, &streamSpyPtr](std::uint32_t sessionId) {
+  bool fileDeletedWasCalled = false;
+  bool fileRenameWasCalled = false;
+
+  auto streamSpyCreator = [&](std::uint32_t sessionId) {
     capturedSessionId = sessionId;
     outputStreams.emplace_back(std::stringstream());
-    auto streamSpy = std::make_unique<StreamSpy>(outputStreams.back(), capturedSessionId);
-    streamSpyPtr = streamSpy.get();
-    return streamSpy;
+    return std::make_unique<StreamSpy>(outputStreams.back(), capturedSessionId, fileDeletedWasCalled, fileRenameWasCalled);
   };
 
   SECTION("SessionManager writes to a new stream given a new sessionId.")
@@ -30,8 +30,8 @@ TEST_CASE("SessionManager.")
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
-    REQUIRE_FALSE(streamSpyPtr->fileDeletedWasCalled);
-    REQUIRE_FALSE(streamSpyPtr->fileRenameWasCalled);
+    REQUIRE_FALSE(fileDeletedWasCalled);
+    REQUIRE_FALSE(fileRenameWasCalled);
 
     SECTION("SessionManager renames file and closes stream given EOF packet")
     {
@@ -39,15 +39,12 @@ TEST_CASE("SessionManager.")
       sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()}));
 
       REQUIRE(outputStreams.at(0).str() == std::string("BC"));
-      REQUIRE(streamSpyPtr->fileRenameWasCalled);
+      REQUIRE(fileRenameWasCalled);
 
       SECTION("After a session is closed, new packets with the same sessionID are written to a new stream")
       {
         sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'F', 'G'}));
-
         REQUIRE(outputStreams.at(1).str() == std::string("FG"));
-        REQUIRE_FALSE(streamSpyPtr->fileDeletedWasCalled);
-        REQUIRE_FALSE(streamSpyPtr->fileRenameWasCalled);
       }
     }
   }
@@ -78,15 +75,15 @@ TEST_CASE("SessionManager.")
 
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
-    REQUIRE_FALSE(streamSpyPtr->fileDeletedWasCalled);
+    REQUIRE_FALSE(fileDeletedWasCalled);
 
     std::uint32_t secondsSinceFirstPacketSent = 20;
     initialTime += secondsSinceFirstPacketSent;
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, false), {'D', 'F'}));
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
-    REQUIRE(streamSpyPtr->fileDeletedWasCalled);
-    REQUIRE_FALSE(streamSpyPtr->fileRenameWasCalled);
+    REQUIRE(fileDeletedWasCalled);
+    REQUIRE_FALSE(fileRenameWasCalled);
   }
 
   SECTION("SessionManager doesn't rename file when queue length is exceeded.")
@@ -104,6 +101,6 @@ TEST_CASE("SessionManager.")
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 5, false), {'J', 'K'}));
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, false), {'D', 'E'}));
 
-    REQUIRE_FALSE(streamSpyPtr->fileRenameWasCalled);
+    REQUIRE_FALSE(fileRenameWasCalled);
   }
 }
