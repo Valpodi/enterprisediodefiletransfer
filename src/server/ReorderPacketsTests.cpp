@@ -11,7 +11,7 @@ TEST_CASE("ReorderPackets. Packets received in order are written to the output")
 {
   std::stringstream outputStream;
   StreamSpy stream(outputStream, 1);
-  auto queueManager = ReorderPackets(4, 1024, DiodeType::basic);
+  auto queueManager = ReorderPackets(4, 1024, false, DiodeType::basic);
   REQUIRE_FALSE(queueManager.write({HeaderParams{0, 1, false}, {'B', 'C'}}, &stream));
   REQUIRE(outputStream.str() == "BC");
 
@@ -24,7 +24,7 @@ TEST_CASE("ReorderPackets. Handling filename")
 {
   std::stringstream outputStream;
   StreamSpy stream(outputStream, 1);
-  auto queueManager = ReorderPackets(4, 1024, DiodeType::basic);
+  auto queueManager = ReorderPackets(4, 1024, false, DiodeType::basic);
   SECTION("Handling empty filename")
   {
     REQUIRE(queueManager.write({HeaderParams{0, 1, true}, {}}, &stream));
@@ -107,7 +107,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
 {
   std::stringstream outputStream;
   StreamSpy stream(outputStream, 1);
-  auto queueManager = ReorderPackets(16, 1024, DiodeType::basic);
+  auto queueManager = ReorderPackets(16, 1024, false, DiodeType::basic);
 
   SECTION("Frame 2 and 3 are not written to the output if frame 1 missing")
   {
@@ -237,7 +237,7 @@ TEST_CASE("ReorderPackets. Import diode.")
 {
   std::stringstream outputStream;
   StreamSpy stream(outputStream, 1);
-  auto queueManager = ReorderPackets(4, 1024, DiodeType::import, 65);
+  auto queueManager = ReorderPackets(4, 1024, false, DiodeType::import, 65);
 
   SECTION("Data which is not wrapped remains unchanged")
   {

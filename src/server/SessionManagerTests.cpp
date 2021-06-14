@@ -24,7 +24,7 @@ TEST_CASE("SessionManager.")
   SECTION("SessionManager writes to a new stream given a new sessionId.")
   {
     auto fakeGetTime = []() { return 10000; };
-    auto sessionManager = SessionManager(10, 10, streamSpyCreator, fakeGetTime, 5, DiodeType::basic);
+    auto sessionManager = SessionManager(10, 10, false, streamSpyCreator, fakeGetTime, 5, DiodeType::basic);
 
     REQUIRE(outputStreams.empty());
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
@@ -55,7 +55,7 @@ TEST_CASE("SessionManager.")
   SECTION("SessionManager writes to 2 streams given 2 different sessionIds.")
   {
     auto fakeGetTime = []() { return 10000; };
-    auto sessionManager = SessionManager(10, 10, streamSpyCreator, fakeGetTime, 5, DiodeType::basic);
+    auto sessionManager = SessionManager(10, 10, false, streamSpyCreator, fakeGetTime, 5, DiodeType::basic);
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
 
@@ -72,7 +72,7 @@ TEST_CASE("SessionManager.")
   {
     std::uint32_t initialTime = 500;
     auto sessionManager = SessionManager(
-      10, 10, streamSpyCreator, [&initialTime]() mutable { return initialTime; }, 15, DiodeType::basic);
+      10, 10, false, streamSpyCreator, [&initialTime]() mutable { return initialTime; }, 15, DiodeType::basic);
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
 
@@ -92,7 +92,7 @@ TEST_CASE("SessionManager.")
   SECTION("SessionManager doesn't rename file when queue length is exceeded.")
   {
     auto fakeGetTime = []() { return 10000; };
-    auto sessionManager = SessionManager(10, 2, streamSpyCreator, fakeGetTime, 15, DiodeType::basic);
+    auto sessionManager = SessionManager(10, 2, false, streamSpyCreator, fakeGetTime, 15, DiodeType::basic);
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
 
