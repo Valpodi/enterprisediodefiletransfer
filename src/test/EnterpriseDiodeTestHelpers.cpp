@@ -7,18 +7,17 @@
 #include "EnterpriseDiodeTestHelpers.hpp"
 #include "diodeheader/EnterpriseDiodeHeader.hpp"
 
-std::stringstream createTestPacketStream(std::vector<char> data, char sessionID, char frameCount, bool eofFlag)
+BytesBuffer createTestPacketStream(std::uint8_t sessionID, std::uint8_t frameCount, std::uint8_t eofFlag)
 {
-  std::vector<char> packet(EnterpriseDiode::HeaderSizeInBytes);
+  BytesBuffer packet(EnterpriseDiode::HeaderSizeInBytes);
   if (eofFlag)
   {
     packet[EnterpriseDiode::EOFFlagIndex] = true;
   }
   packet[EnterpriseDiode::SessionIDIndex] = sessionID;
   packet[EnterpriseDiode::FrameCountIndex] = frameCount;
-  packet.insert(packet.end(), data.begin(), data.end());
 
-  return std::stringstream(std::string(packet.begin(), packet.end()));
+  return packet;
 }
 
 Server createEdServer(

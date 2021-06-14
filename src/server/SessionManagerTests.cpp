@@ -26,10 +26,8 @@ TEST_CASE("SessionManager.")
     auto fakeGetTime = []() { return 10000; };
     auto sessionManager = SessionManager(10, 10, streamSpyCreator, fakeGetTime, 5, DiodeType::basic);
 
-    auto testPacket = createTestPacketStream({'B', 'C'}, 1, 1, false);
-
     REQUIRE(outputStreams.empty());
-    sessionManager.writeToStream(parsePacket(testPacket));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
     REQUIRE_FALSE(streamSpyPtr->fileDeletedWasCalled);
@@ -37,18 +35,15 @@ TEST_CASE("SessionManager.")
 
     SECTION("SessionManager renames file and closes stream given EOF packet")
     {
-      std::string filename = "{name: !str \"testFilename\"}";
-      std::vector<char> vcFilename(filename.begin(), filename.end());
-      auto testPacket2 = createTestPacketStream(vcFilename, 1, 2, true);
-      sessionManager.writeToStream(parsePacket(testPacket2));
+      const std::string filename = "{name: !str \"testFilename\"}";
+      sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()}));
 
       REQUIRE(outputStreams.at(0).str() == std::string("BC"));
       REQUIRE(streamSpyPtr->fileRenameWasCalled);
 
       SECTION("After a session is closed, new packets with the same sessionID are written to a new stream")
       {
-        auto testPacket3 = createTestPacketStream({'F', 'G'}, 1, 1, false);
-        sessionManager.writeToStream(parsePacket(testPacket3));
+        sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'F', 'G'}));
 
         REQUIRE(outputStreams.at(1).str() == std::string("FG"));
         REQUIRE_FALSE(streamSpyPtr->fileDeletedWasCalled);
@@ -62,14 +57,12 @@ TEST_CASE("SessionManager.")
     auto fakeGetTime = []() { return 10000; };
     auto sessionManager = SessionManager(10, 10, streamSpyCreator, fakeGetTime, 5, DiodeType::basic);
 
-    auto testPacket = createTestPacketStream({'B', 'C'}, 1, 1, false);
-    sessionManager.writeToStream(parsePacket(testPacket));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
 
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
 
-    auto testPacket2 = createTestPacketStream({'D', 'E'}, 2, 1, false);
-    sessionManager.writeToStream(parsePacket(testPacket2));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(2, 1, false), {'D', 'E'}));
 
     REQUIRE(outputStreams.at(1).str() == std::string("DE"));
     REQUIRE(capturedSessionId == 2);
@@ -81,8 +74,7 @@ TEST_CASE("SessionManager.")
     auto sessionManager = SessionManager(
       10, 10, streamSpyCreator, [&initialTime]() mutable { return initialTime; }, 15, DiodeType::basic);
 
-    auto testPacket = createTestPacketStream({'B', 'C'}, 1, 1, false);
-    sessionManager.writeToStream(parsePacket(testPacket));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
 
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
@@ -91,9 +83,7 @@ TEST_CASE("SessionManager.")
     std::uint32_t secondsSinceFirstPacketSent = 20;
     initialTime += secondsSinceFirstPacketSent;
 
-    auto testPacket2 = createTestPacketStream({'D', 'F'}, 1, 2, false);
-
-    sessionManager.writeToStream(parsePacket(testPacket2));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, false), {'D', 'F'}));
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(streamSpyPtr->fileDeletedWasCalled);
     REQUIRE_FALSE(streamSpyPtr->fileRenameWasCalled);
@@ -104,23 +94,15 @@ TEST_CASE("SessionManager.")
     auto fakeGetTime = []() { return 10000; };
     auto sessionManager = SessionManager(10, 2, streamSpyCreator, fakeGetTime, 15, DiodeType::basic);
 
-    auto testPacket = createTestPacketStream({'B', 'C'}, 1, 1, false);
-    sessionManager.writeToStream(parsePacket(testPacket));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
 
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
 
-    auto testPacket2 = createTestPacketStream({'F', 'G'}, 1, 3, false);
-    sessionManager.writeToStream(parsePacket(testPacket2));
-
-    auto testPacket3 = createTestPacketStream({'H', 'I'}, 1, 4, false);
-    sessionManager.writeToStream(parsePacket(testPacket3));
-
-    auto testPacket4 = createTestPacketStream({'J', 'K'}, 1, 5, false);
-    sessionManager.writeToStream(parsePacket(testPacket4));
-
-    auto testPacket5 = createTestPacketStream({'D', 'E'}, 1, 2, false);
-    sessionManager.writeToStream(parsePacket(testPacket5));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 3, false), {'F', 'G'}));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 4, false), {'H', 'I'}));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 5, false), {'J', 'K'}));
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, false), {'D', 'E'}));
 
     REQUIRE_FALSE(streamSpyPtr->fileRenameWasCalled);
   }

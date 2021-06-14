@@ -14,9 +14,7 @@ TEST_CASE("ED Header. Header is created from a input stream. readHeaderParams co
                                                                     '\x02', '\x00', '\x00', '\x00',
                                                                     '\x01', '\x00', '\x00', '\x00',
                                                                     '\x00', '\x00', '\x00', '\x00'};
-  std::stringstream ss;
-  ss.write(headerBuffer.begin(), EnterpriseDiode::HeaderSizeInBytes);
-  auto edHeader = EDHeader(ss);
+  auto edHeader = EDHeader({headerBuffer.begin(), headerBuffer.end()});
 
   REQUIRE(edHeader.headerParams.sessionId == 3);
   REQUIRE(edHeader.headerParams.frameCount == 2);
@@ -29,9 +27,7 @@ TEST_CASE("ED Header. Header fields at maximum")
                                                                     '\xFF', '\xFF', '\xFF', '\xFF',
                                                                     '\x01', '\x00', '\x00', '\x00',
                                                                     '\x00', '\x00', '\x00', '\x00'};
-  std::stringstream ss;
-  ss.write(headerBuffer.begin(), EnterpriseDiode::HeaderSizeInBytes);
-  auto edHeader = EDHeader(ss);
+  auto edHeader = EDHeader({headerBuffer.begin(), headerBuffer.end()});
 
   REQUIRE(edHeader.headerParams.sessionId == 0xFFFFFFFF);
   REQUIRE(edHeader.headerParams.frameCount == 0xFFFFFFFF);
@@ -44,9 +40,7 @@ TEST_CASE("ED Header. Header fields near maximum")
                                                                     '\x00', '\xFF', '\xFF', '\xFF',
                                                                     '\x01', '\x00', '\x00', '\x00',
                                                                     '\x00', '\x00', '\x00', '\x00'};
-  std::stringstream ss;
-  ss.write(headerBuffer.begin(), EnterpriseDiode::HeaderSizeInBytes);
-  auto edHeader = EDHeader(ss);
+  auto edHeader = EDHeader({headerBuffer.begin(), headerBuffer.end()});
 
   REQUIRE(edHeader.headerParams.sessionId == 0xFFFFFF00);
   REQUIRE(edHeader.headerParams.frameCount == 0xFFFFFF00);

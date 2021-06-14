@@ -26,26 +26,13 @@ class EDHeader
 {
 public:
 
-  explicit EDHeader(std::istream& inputStream);
   explicit EDHeader(const std::vector<std::uint8_t>& frame);
+  const HeaderParams headerParams;
 
 private:
-  template<typename HeaderFieldType>
-  static HeaderFieldType read(std::istream& inputStream)
-  {
-    std::array<char, sizeof(HeaderFieldType)> temporaryBuffer;
-    inputStream.read(temporaryBuffer.data(), sizeof(HeaderFieldType));
-
-    checkStreamHasSpace(inputStream);
-
-    HeaderFieldType value;
-    std::memcpy(&value, temporaryBuffer.data(), sizeof(HeaderFieldType));
-
-    return value;
-  }
 
   template <typename T>
-  static T extract(const std::vector<std::uint8_t> &v, int pos)
+  static T extract(const std::vector<std::uint8_t> &v, size_t pos)
   {
     T value;
     memcpy(&value, &v[pos], sizeof(T));
@@ -60,13 +47,8 @@ private:
     }
   }
 
-  static void advanceByPaddingSize(std::istream& inputStream);
-  static HeaderParams readHeaderParams(std::istream& inputStream);
   static HeaderParams readHeaderParams(const std::vector<std::uint8_t>& frame);
 
-
-public:
-  const HeaderParams headerParams;
 private:
   const std::array<std::uint8_t, 7> padding;
 };

@@ -23,73 +23,58 @@ TEST_CASE("ED server.")
 
   SECTION("A packet received by the server is written to the stream")
   {
-    std::stringstream stream = createTestPacketStream({'B'}, 1, 1, false);
-    edServer.receivePacket(stream);
+    edServer.receivePacket(createTestPacketStream(1, 1, false), {'B'});
 
     REQUIRE(outputStream.str() == std::string("B"));
 
-    std::string filename = "{name: !str \"testFilename\"}";
-    std::vector<char> vcFilename(filename.begin(), filename.end());
-    std::stringstream stream2 = createTestPacketStream(vcFilename, 1, 2, true);
-    edServer.receivePacket(stream);
+    const std::string filename = "{name: !str \"testFilename\"}";
+    edServer.receivePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()});
 
     REQUIRE(outputStream.str() == std::string("B"));
   }
 
   SECTION("Packets received are inserted into the same stream until the EOF flag is raised")
   {
-    std::stringstream stream = createTestPacketStream({'B', 'C'}, 1, 1, false);
-    edServer.receivePacket(stream);
+    edServer.receivePacket(createTestPacketStream(1, 1, false), {'B', 'C'});
 
     REQUIRE(outputStream.str() == std::string("BC"));
 
-    std::stringstream stream2 = createTestPacketStream({'D'}, 1, 2, false);
-    edServer.receivePacket(stream2);
+    edServer.receivePacket(createTestPacketStream(1, 2, false), {'D'});
 
     REQUIRE(outputStream.str() == std::string("BCD"));
     std::string filename = "{name: !str \"testFilename\"}";
-    std::vector<char> vcFilename(filename.begin(), filename.end());
-    std::stringstream stream3 = createTestPacketStream(vcFilename, 1, 3, true);
-    edServer.receivePacket(stream3);
+    edServer.receivePacket(createTestPacketStream(1, 3, true), {filename.begin(), filename.end()} );
 
     REQUIRE(outputStream.str() == std::string("BCD"));
   }
 
   SECTION("Packets are reordered before being written to stream")
   {
-    std::stringstream stream = createTestPacketStream({'C', 'D'}, 1, 2, false);
-    edServer.receivePacket(stream);
+    edServer.receivePacket(createTestPacketStream(1, 2, false), {'C', 'D'});
 
     REQUIRE(outputStream.str() == std::string(""));
 
-    std::string filename = "{name: !str \"testFilename\"}";
-    std::vector<char> vcFilename(filename.begin(), filename.end());
-    std::stringstream stream2 = createTestPacketStream(vcFilename, 1, 3, true);
-    edServer.receivePacket(stream2);
+    const std::string filename = "{name: !str \"testFilename\"}";
+    edServer.receivePacket(createTestPacketStream(1, 3, true), {filename.begin(), filename.end()});
 
     REQUIRE(outputStream.str() == std::string(""));
 
     SECTION("The first frame is received and both are written to the output")
     {
-      std::stringstream stream3 = createTestPacketStream({'A', 'B'}, 1, 1, false);
-      edServer.receivePacket(stream3);
-
+      edServer.receivePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
       REQUIRE(outputStream.str() == std::string("ABCD"));
     }
   }
 
   SECTION("Packets with invalid headers are not written to the output")
   {
-    std::vector<char> packet(EnterpriseDiode::HeaderSizeInBytes - 1);
-    std::stringstream stream = std::stringstream(std::string(packet.begin(), packet.end()));
-    edServer.receivePacket(stream);
+    edServer.receivePacket(BytesBuffer(EnterpriseDiode::HeaderSizeInBytes - 1), {});
 
     REQUIRE(outputStream.str() == std::string(""));
 
     SECTION("Subsequent packet with valid header is written to the output")
     {
-      std::stringstream stream2 = createTestPacketStream({'X', ' '}, 1, 1, false);
-      edServer.receivePacket(stream2);
+      edServer.receivePacket(createTestPacketStream(1, 1, false),{'X', ' '} );
 
       REQUIRE(outputStream.str() == std::string("X "));
     }
@@ -97,8 +82,7 @@ TEST_CASE("ED server.")
 
   SECTION("Session ID is passed to the stream manager")
   {
-    std::stringstream stream = createTestPacketStream({'B', 'C'}, 2, 1, false);
-    edServer.receivePacket(stream);
+    edServer.receivePacket(createTestPacketStream(2, 1, false), {'B', 'C'});
 
     REQUIRE(capturedSessionId == 2);
     REQUIRE(outputStream.str() == std::string("BC"));
@@ -116,22 +100,13 @@ TEST_CASE("ED server. Queue length Tests")
 
   SECTION("Packets are not queued if the size of the queue is at least maxQueueLength.")
   {
-    std::stringstream stream1 = createTestPacketStream({'A', 'B'}, 1, 1, false);
-    edServer.receivePacket(stream1);
-
-    std::stringstream stream3 = createTestPacketStream({'E', 'F'}, 1, 3, false);
-    edServer.receivePacket(stream3);
-    std::stringstream stream4 = createTestPacketStream({'G', 'H'}, 1, 4, false);
-    edServer.receivePacket(stream4);
-    std::stringstream stream5 = createTestPacketStream({'I', 'J'}, 1, 5, false);
-    edServer.receivePacket(stream5);
+    edServer.receivePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
+    edServer.receivePacket(createTestPacketStream(1, 3, false),{'E', 'F'});
+    edServer.receivePacket(createTestPacketStream(1, 4, false), {'G', 'H'});
+    edServer.receivePacket(createTestPacketStream(1, 5, false), {'I', 'J'});
     std::string filename = "{name: !str \"testFilename\"}";
-    std::vector<char> vcFilename(filename.begin(), filename.end());
-    std::stringstream stream6 = createTestPacketStream(vcFilename, 1, 6, true);
-    edServer.receivePacket(stream6);
-
-    std::stringstream stream2 = createTestPacketStream({'C', 'D'}, 1, 2, false);
-    edServer.receivePacket(stream2);
+    edServer.receivePacket(createTestPacketStream(1, 6, true), {filename.begin(), filename.end()});
+    edServer.receivePacket(createTestPacketStream(1, 2, false), {'C', 'D'});
     REQUIRE(outputStream.str() == std::string("AB"));
   }
 }
@@ -148,14 +123,11 @@ TEST_CASE("ED server. Stream is closed if timeout is exceeded.", "[integration]"
                              return std::make_unique<StreamSpy>(outputStream, sessionId);
                            }, []() { return std::time(nullptr); }, 3, DiodeType::basic);
 
-  std::stringstream stream = createTestPacketStream({'A', 'B'}, 1, 1, false);
-  edServer.receivePacket(stream);
+  edServer.receivePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
   REQUIRE(outputStream.str() == std::string("AB"));
   sleep(4);
 
   std::string filename = "{name: !str \"testFilename\"}";
-  std::vector<char> vcFilename(filename.begin(), filename.end());
-  std::stringstream stream3 = createTestPacketStream(vcFilename, 1, 2, true);
-  edServer.receivePacket(stream3);
+  edServer.receivePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()});
   REQUIRE(outputStream.str() == std::string("AB"));
 }

@@ -12,10 +12,9 @@ TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue"
   std::stringstream outputStream;
   auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic);
 
-  std::stringstream inputStream = createTestPacketStream({'A', 'B'}, 1, 1, false);
-  auto packet = parsePacket(inputStream);
+  auto packet = parsePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
 
-  streamWriter.write(packet.payload, packet.headerParams);
+  streamWriter.write(std::move(packet.payload), packet.headerParams);
   REQUIRE(outputStream.str() == "AB");
 }
 
@@ -26,16 +25,13 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
 
   SECTION("When the EOF packet is not queued")
   {
-    std::stringstream inputStream = createTestPacketStream({'A', 'B'}, 1, 1, false);
-    auto packet = parsePacket(inputStream);
+    auto packet = parsePacket(createTestPacketStream(1, 1, false),{'A', 'B'});
 
-    std::string filename = "{name: !str \"testFilename\"}";
-    std::vector<char> vcFilename(filename.begin(), filename.end());
-    std::stringstream inputStream2 = createTestPacketStream(vcFilename, 1, 2, true);
-    auto packet2 = parsePacket(inputStream2);
+    const std::string filename = "{name: !str \"testFilename\"}";
+    auto packet2 = parsePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()});
 
-    REQUIRE_FALSE(streamWriter.write(packet.payload, packet.headerParams));
-    REQUIRE(streamWriter.write(packet2.payload, packet2.headerParams));
+    REQUIRE_FALSE(streamWriter.write(std::move(packet.payload), packet.headerParams));
+    REQUIRE(streamWriter.write(std::move(packet2.payload), packet2.headerParams));
     REQUIRE(outputStream.str() == "AB");
   }
 
@@ -43,22 +39,19 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
   {
     std::string filename = "{name: !str \"testFilename\"}";
     std::vector<char> vcFilename(filename.begin(), filename.end());
-    std::stringstream inputStreamC = createTestPacketStream(vcFilename, 1, 3, true);
-    auto packetC = parsePacket(inputStreamC);
+    auto packetC = parsePacket(createTestPacketStream(1, 3, true), {filename.begin(), filename.end()});
 
-    REQUIRE_FALSE(streamWriter.write(packetC.payload, packetC.headerParams));
+    REQUIRE_FALSE(streamWriter.write(std::move(packetC.payload), packetC.headerParams));
     REQUIRE(outputStream.str().empty());
 
-    std::stringstream inputStreamA = createTestPacketStream({'C', 'D'}, 1, 2, false);
-    auto packetA = parsePacket(inputStreamA);
+    auto packetA = parsePacket(createTestPacketStream(1, 2, false), {'C', 'D'});
 
-    REQUIRE_FALSE(streamWriter.write(packetA.payload, packetA.headerParams));
+    REQUIRE_FALSE(streamWriter.write(std::move(packetA.payload), packetA.headerParams));
     REQUIRE(outputStream.str().empty());
 
-    std::stringstream inputStreamB = createTestPacketStream({'A', 'B'}, 1, 1, false);
-    auto packetB = parsePacket(inputStreamB);
+    auto packetB = parsePacket(createTestPacketStream(1, 1, false),{'A', 'B'});
 
-    REQUIRE(streamWriter.write(packetB.payload, packetB.headerParams));
+    REQUIRE(streamWriter.write(std::move(packetB.payload), packetB.headerParams));
     REQUIRE(outputStream.str() == "ABCD");
   }
 }
@@ -76,12 +69,11 @@ TEST_CASE("OrderingStreamWriter. OrderingStreamWriter constructor sets timeLastU
 
   SECTION("When the stream is written to, timeLastUpdated is updated")
   {
-    std::stringstream inputStream = createTestPacketStream({'A', 'B'}, 1, 1, false);
-    auto packet = parsePacket(inputStream);
+    auto packet = parsePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
     initialTime = 501;
 
     REQUIRE(orderingStreamWriter.timeLastUpdated == 500);
-    orderingStreamWriter.write(packet.payload, packet.headerParams);
+    orderingStreamWriter.write(std::move(packet.payload), packet.headerParams);
     REQUIRE(orderingStreamWriter.timeLastUpdated == 501);
     REQUIRE(outputStream.str() == "AB");
   }

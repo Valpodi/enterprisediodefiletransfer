@@ -4,24 +4,11 @@
 #include <array>
 #include "EnterpriseDiodeHeader.hpp"
 
-EDHeader::EDHeader(std::istream& inputStream) :
-  headerParams(readHeaderParams(inputStream)),
-  padding({})
-{
-  advanceByPaddingSize(inputStream);
-}
 
 EDHeader::EDHeader(const std::vector<std::uint8_t>& frame) :
   headerParams(readHeaderParams(frame)),
   padding({})
 {
-}
-
-void EDHeader::advanceByPaddingSize(std::istream& inputStream)
-{
-  constexpr auto totalPaddingSize = (EnterpriseDiode::HeaderSizeInBytes - EnterpriseDiode::ControlHeaderSizeInBytes) + EnterpriseDiode::ControlHeaderPaddingSizeInBytes;
-  std::array<char, totalPaddingSize> temporaryBuffer{};
-  inputStream.read(temporaryBuffer.data(), totalPaddingSize);
 }
 
 template <typename T>
@@ -32,14 +19,6 @@ template <typename T>
   return value;
 }
 
-HeaderParams EDHeader::readHeaderParams(std::istream& inputStream)
-{
-  return {
-    read<std::uint32_t>(inputStream),
-    read<std::uint32_t>(inputStream),
-    read<bool>(inputStream)
-  };
-}
 
 HeaderParams EDHeader::readHeaderParams(const std::vector<std::uint8_t>& frame)
 {

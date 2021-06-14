@@ -9,7 +9,7 @@
 #include <sstream>
 
 
-std::stringstream createTestWrappedString(const std::string& payload, const BytesBuffer& mask={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
+std::string createTestWrappedString(const std::string& payload, const BytesBuffer& mask={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
 BytesBuffer createTestWrappedBytesBuffer(const std::string& payload, const BytesBuffer& mask={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
 
 bool isCloakDaggerEncoded(std::istream& inputStream);

@@ -6,7 +6,7 @@
 #include "CloakedDagger.hpp"
 
 
-std::stringstream createTestWrappedString(const std::string& payload, const BytesBuffer& mask)
+std::string createTestWrappedString(const std::string& payload, const BytesBuffer& mask)
 {
   if (mask.size() != 8)
   {
@@ -26,13 +26,12 @@ std::stringstream createTestWrappedString(const std::string& payload, const Byte
                             0xff, 0x5f, 0xdf, 0xd1});  // magic2
   bytes.insert(bytes.begin() + 20, mask.begin(), mask.end());
 
-  auto messageStream = std::stringstream(std::string(bytes.begin(), bytes.end()));
-  messageStream.seekp(0, std::ios::end);
+  auto messageStream = std::string(bytes.begin(), bytes.end());
 
-  auto count = 0;
+  unsigned long count = 0;
   for (auto payloadChar: payload)
   {
-    messageStream.put(static_cast<char>(payloadChar ^ mask[count++ % mask.size()]));
+    messageStream.push_back(static_cast<char>(payloadChar ^ mask[count++ % mask.size()]));
   }
 
   return messageStream;
@@ -40,7 +39,7 @@ std::stringstream createTestWrappedString(const std::string& payload, const Byte
 
 BytesBuffer createTestWrappedBytesBuffer(const std::string& payload, const BytesBuffer& mask)
 {
-  return MessageParsingHelpers::StringToBytes(createTestWrappedString(payload, mask).str());
+  return MessageParsingHelpers::StringToBytes(createTestWrappedString(payload, mask));
 }
 
 bool isCloakDaggerEncoded(std::istream& inputStream)

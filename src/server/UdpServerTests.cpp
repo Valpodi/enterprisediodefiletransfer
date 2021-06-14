@@ -20,12 +20,15 @@ TEST_CASE("UDP Server. Packets are received", "[integration]")
 
   boost::asio::io_service io_context;
   UdpServer udpServer(2002, io_context, 10);
-  udpServer.setCallback([&io_context, &dataReceived](std::istream& data) {
-    std::copy(std::istreambuf_iterator<char>(data), std::istreambuf_iterator<char>(), std::back_inserter(dataReceived));
+  udpServer.setCallback([&io_context, &dataReceived](BytesBuffer&&, BytesBuffer&& data) {
+    std::copy(data.begin(), data.end(), std::back_inserter(dataReceived));
     io_context.stop();
   });
 
-  std::vector<char> sendPayload{'A', 'B', 'C'};
+  std::vector<char> sendPayload(112 + 3);
+  sendPayload.push_back('A');
+  sendPayload.push_back('B');
+  sendPayload.push_back('C');
   auto handle = std::async(
     std::launch::async,
     [&io_context, sendPayload]() {

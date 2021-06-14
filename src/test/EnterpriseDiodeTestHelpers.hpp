@@ -12,7 +12,8 @@
 #include <Server.hpp>
 #include "BytesBuffer.hpp"
 
-std::stringstream createTestPacketStream(std::vector<char> data, char sessionID, char frameCount, bool eofFlag);
+
+BytesBuffer createTestPacketStream(std::uint8_t sessionID, std::uint8_t frameCount, std::uint8_t eofFlag);
 
 Server createEdServer(std::unique_ptr<UdpServerInterface> udpServer,
   std::uint32_t maxBufferSize,

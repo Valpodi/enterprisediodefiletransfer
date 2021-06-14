@@ -24,7 +24,7 @@ UdpServer::~UdpServer()
 
 void UdpServer::triggerWaitAndReadNextUdpPacket()
 {
-  frame = std::vector<std::uint8_t>(udpFrameSize);
+  frame = std::vector<std::uint8_t>(udpFrameSize - 112);
   header= std::vector<std::uint8_t>(112);
   std::array<boost::asio::mutable_buffer, 2> bufs = { boost::asio::buffer(header), boost::asio::buffer(frame) };
 
