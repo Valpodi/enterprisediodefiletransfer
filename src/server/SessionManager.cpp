@@ -62,11 +62,12 @@ bool SessionManager::isStreamExpired(std::uint32_t sessionId)
 
 void SessionManager::writeFileAndSaveIfComplete(Packet&& packet)
 {
+  const auto sessionId = packet.headerParams.sessionId;
   const bool fileComplete = streams.at(packet.headerParams.sessionId).write(std::move(packet));
   if (fileComplete)
   {
-    streams.at(packet.headerParams.sessionId).renameFile();
-    closeSession(packet.headerParams.sessionId);
+    streams.at(sessionId).renameFile();
+    closeSession(sessionId);
   }
 }
 
