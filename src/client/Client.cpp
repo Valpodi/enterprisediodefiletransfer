@@ -72,13 +72,14 @@ bool Client::sendFrame(std::istream& inputStream)
 
 ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize)
 {
+  incrementFrameCount();
   const auto payloadLength = inputStream.read((char*)&*(payloadBuffer.begin()), payloadSize).gcount();
+
   if (payloadLength > 0)
   {
-    incrementFrameCount();
     return {
-      boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
-      boost::asio::buffer(payloadBuffer.data(), (size_t)payloadLength)};
+      boost::asio::buffer(headerBuffer, EnterpriseDiode::HeaderSizeInBytes),
+      boost::asio::buffer(payloadBuffer, (size_t)payloadLength)};
   }
   else
   {
@@ -98,12 +99,11 @@ void Client::setEOF()
 
 ConstSocketBuffers Client::addEOFframe()
 {
-  incrementFrameCount();
   setEOF();
-  const auto filenameAsSisl = "{name: !str \"" + getFilenameFromPath() + "\"}";
+  filenameAsSisl = "{name: !str \"" + getFilenameFromPath() + "\"}";
   return {
-    boost::asio::buffer(headerBuffer.data(), EnterpriseDiode::HeaderSizeInBytes),
-    boost::asio::buffer(filenameAsSisl.data(), filenameAsSisl.length())};
+    boost::asio::buffer(headerBuffer, EnterpriseDiode::HeaderSizeInBytes),
+    boost::asio::buffer(filenameAsSisl, filenameAsSisl.length())};
 }
 
 void Client::setSessionID()
