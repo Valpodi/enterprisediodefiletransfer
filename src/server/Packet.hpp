@@ -23,7 +23,7 @@ struct Packet
   std::vector<std::uint8_t> payload;
 };
 
-Packet parsePacket(std::vector<std::uint8_t>&& payload);
+Packet parsePacket(std::vector<std::uint8_t>&& header, std::vector<std::uint8_t>&& payload);
 
 
 #endif //ENTERPRISEDIODETESTER_PACKET_HPP

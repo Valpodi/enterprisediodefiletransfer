@@ -16,14 +16,14 @@ Server::Server(
     udpServerInterface(std::move(udpServerInterface)),
     sessionManager(maxBufferSize, maxQueueLength, std::move(streamCreator), std::move(getTime), timeoutPeriod, diodeType)
 {
-  this->udpServerInterface->setCallback([this](std::vector<std::uint8_t>&& payload) { receivePacket(std::move(payload)); });
+  this->udpServerInterface->setCallback([this](std::vector<std::uint8_t>&& header, std::vector<std::uint8_t>&& payload) { receivePacket(std::move(header), std::move(payload)); });
 }
 
-void Server::receivePacket(std::vector<std::uint8_t>&& inputStream)
+void Server::receivePacket(std::vector<std::uint8_t>&& header, std::vector<std::uint8_t>&& payload)
 {
   try
   {
-    sessionManager.writeToStream(parsePacket(std::move(inputStream)));
+    sessionManager.writeToStream(parsePacket(std::move(header), std::move(payload)));
   }
   catch (const std::runtime_error& exception)
   {

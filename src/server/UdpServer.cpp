@@ -2,6 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "UdpServer.hpp"
+#include <iostream>
 
 UdpServer::UdpServer(
   std::uint16_t port,
@@ -24,8 +25,11 @@ UdpServer::~UdpServer()
 void UdpServer::triggerWaitAndReadNextUdpPacket()
 {
   frame = std::vector<std::uint8_t>(udpFrameSize);
+  header= std::vector<std::uint8_t>(112);
+  std::array<boost::asio::mutable_buffer, 2> bufs = { boost::asio::buffer(header), boost::asio::buffer(frame) };
+
   udpSocket.async_receive_from(
-    boost::asio::buffer(frame),
+    bufs,
     senderEndpoint,
     [this](boost::system::error_code errorCode, std::size_t udpPacketLength) {
       if (!errorCode)
@@ -39,9 +43,13 @@ void UdpServer::triggerWaitAndReadNextUdpPacket()
 
 void UdpServer::checkPacketLengthAndExecuteCallback(size_t udpPacketLength)
 {
-  if (callback && udpPacketLength > 0)
+  if (callback && udpPacketLength - 112 > 0)
   {
-    frame.resize(udpPacketLength);
-    callback(std::move(frame));
+    frame.resize(udpPacketLength - 112);
+    callback(std::move(header), std::move(frame));
+  }
+  else
+  {
+    std::cerr << "insufficient data in payload" << "\n";
   }
 }

@@ -28,6 +28,7 @@ private:
   boost::asio::ip::udp::socket udpSocket;
   boost::asio::ip::udp::endpoint senderEndpoint;
   std::vector<std::uint8_t> frame;
+  std::vector<std::uint8_t> header;
 
   };
 
