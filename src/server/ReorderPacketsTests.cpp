@@ -253,18 +253,18 @@ TEST_CASE("ReorderPackets. Import diode.")
 
   SECTION("The first frame of wrapped data remains unchanged")
   {
-    auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
-    REQUIRE_FALSE(queueManager.write({HeaderParams{0, 1, false, {}}, {wrappedInputStream.begin(), wrappedInputStream.end()}}, &stream));
-    REQUIRE(outputStream.str() == wrappedInputStream);
+    auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), static_cast<char>(0xf0)});
+    REQUIRE_FALSE(queueManager.write({HeaderParams{0, 1, false, {}}, wrappedInputStream.message}, &stream));
+    REQUIRE(outputStream.str() == std::string(wrappedInputStream.message.begin(), wrappedInputStream.message.end()));
   }
 
   SECTION("A two frame wrapped file is rewrapped with the key from the first frame.")
   {
-    auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
-    queueManager.write({HeaderParams{0, 1, false, {}}, {wrappedInputStream.begin(), wrappedInputStream.end()}}, &stream);
-    REQUIRE(outputStream.str() == wrappedInputStream);
-    auto wrappedInputStream2 = createTestWrappedString("def", {0xf0, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x12});
-    queueManager.write({HeaderParams{0, 2, false, {}}, {wrappedInputStream2.begin(), wrappedInputStream2.end()}}, &stream);
+    auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), static_cast<char>(0xf0)});
+    queueManager.write({HeaderParams{0, 1, false, wrappedInputStream.header}, wrappedInputStream.message}, &stream);
+    REQUIRE(outputStream.str() == std::string(wrappedInputStream.message.begin(), wrappedInputStream.message.end()));
+    auto wrappedInputStream2 = createTestWrappedString("def", {static_cast<char>(0xf0), 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), 0x12});
+    queueManager.write({HeaderParams{0, 2, false, wrappedInputStream2.header}, wrappedInputStream2.message}, &stream);
 
     std::stringstream unwrappedStream;
     unwrapFromStream(outputStream, unwrappedStream);
@@ -273,10 +273,10 @@ TEST_CASE("ReorderPackets. Import diode.")
 
   SECTION("Two wrapped frames out of order are rewrapped with the key from frame with frameCount 1.")
   {
-    auto wrappedInputStream = createTestWrappedString("def", {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
-    queueManager.write({HeaderParams{0, 2, false, {}}, {wrappedInputStream.begin(), wrappedInputStream.end()}}, &stream);
-    auto wrappedInputStream2 = createTestWrappedString("abc", {0xf0, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x12});
-    queueManager.write({HeaderParams{0, 1, false, {}}, {wrappedInputStream2.begin(), wrappedInputStream2.end()}}, &stream);
+    auto wrappedInputStream = createTestWrappedString("def", {0x12, 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), static_cast<char>(0xf0)});
+    queueManager.write({HeaderParams{0, 2, false, {}}, wrappedInputStream.message}, &stream);
+    auto wrappedInputStream2 = createTestWrappedString("abc", {static_cast<char>(0xf0), 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), 0x12});
+    queueManager.write({HeaderParams{0, 1, false, {}}, wrappedInputStream2.message}, &stream);
 
     std::stringstream unwrappedStream;
     unwrapFromStream(outputStream, unwrappedStream);
@@ -285,12 +285,12 @@ TEST_CASE("ReorderPackets. Import diode.")
 
   SECTION("A three frame wrapped file is rewrapped with the key from the first frame.")
   {
-    auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0});
-    queueManager.write({HeaderParams{0, 1, false, {}}, {wrappedInputStream.begin(), wrappedInputStream.end()}}, &stream);
-    auto wrappedInputStream2 = createTestWrappedString("def", {0xf0, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x12});
-    queueManager.write({HeaderParams{0, 2, false, {}}, {wrappedInputStream2.begin(), wrappedInputStream2.end()}}, &stream);
-    auto wrappedInputStream3 = createTestWrappedString("ghi", {0xf5, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0x34});
-    queueManager.write({HeaderParams{0, 3, false, {}}, {wrappedInputStream3.begin(), wrappedInputStream3.end()}}, &stream);
+    auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), static_cast<char>(0xf0)});
+    queueManager.write({HeaderParams{0, 1, false, {}}, wrappedInputStream.message}, &stream);
+    auto wrappedInputStream2 = createTestWrappedString("def", {static_cast<char>(0xf0), 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), 0x12});
+    queueManager.write({HeaderParams{0, 2, false, {}}, wrappedInputStream2.message}, &stream);
+    auto wrappedInputStream3 = createTestWrappedString("ghi", {static_cast<char>(0xf5), 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), 0x34});
+    queueManager.write({HeaderParams{0, 3, false, {}}, wrappedInputStream3.message}, &stream);
     std::string inputStream = std::string("{name: !str \"testFilename\"}");
     queueManager.write({HeaderParams{0, 4, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
 
