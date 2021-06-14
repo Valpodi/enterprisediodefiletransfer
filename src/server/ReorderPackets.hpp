@@ -29,7 +29,7 @@ public:
 
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
-  void addFrameToQueue(std::vector<std::uint8_t>&& inputStream, std::uint32_t frameCount, bool endOfFile);
+  void addFrameToQueue(Packet&& packet);
   std::optional<std::string> getFilenameFromStream(const BytesBuffer& eofFrame);
   std::string convertFromSisl(std::string sislFilename);
 
@@ -88,8 +88,7 @@ private:
   StreamingRewrapper streamingRewrapper;
   void writeFrame(StreamInterface *streamWrapper);
   void logOutOfOrderPackets(uint32_t frameCount);
-  BytesBuffer copyToBuffer(std::istream& inputStream) const;
   BytesBuffer createBuffer() const;
   BytesBuffer& copy(std::istream& inputStream, BytesBuffer&& newFrame) const;
-  static FrameDetails getDetails(std::vector<std::uint8_t>&& inputStream, uint32_t frameCount, bool endOfFile) ;
+  static FrameDetails getDetails(Packet&& packet) ;
 };

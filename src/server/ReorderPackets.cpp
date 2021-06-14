@@ -32,7 +32,7 @@ bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
   {
     return packet.headerParams.eOFFlag;
   }
-  addFrameToQueue(std::move(packet.payload), packet.headerParams.frameCount, packet.headerParams.eOFFlag);
+  addFrameToQueue(std::move(packet));
   return checkQueueAndWrite(streamWrapper);
 }
 
@@ -43,6 +43,25 @@ void ReorderPackets::logOutOfOrderPackets(uint32_t frameCount)
     std::cout << std::chrono::system_clock::now().time_since_epoch().count() << " Out of order frame: " << frameCount << "\n";
   }
   lastFrameReceived = frameCount;
+}
+
+void ReorderPackets::addFrameToQueue(Packet&& packet)
+{
+  if (queue.size() >= maxQueueLength)
+  {
+    if (!queueAlreadyExceeded)
+    {
+      std::cerr << "ReorderPackets: maxQueueLength exceeded." << std::endl;
+      queueAlreadyExceeded = true;
+    }
+    return;
+  }
+  queue.emplace(getDetails(std::move(packet)));
+}
+
+ReorderPackets::FrameDetails ReorderPackets::getDetails(Packet&& packet)
+{
+  return FrameDetails(packet.headerParams.frameCount, packet.headerParams.eOFFlag, std::move(packet.payload));
 }
 
 std::optional<std::string> ReorderPackets::getFilenameFromStream(const BytesBuffer& eofFrame)
@@ -113,23 +132,3 @@ void ReorderPackets::writeFrame(StreamInterface *streamWrapper)
   }
 }
 
-void ReorderPackets::addFrameToQueue(
-  std::vector<std::uint8_t>&& inputStream, std::uint32_t frameCount, bool endOfFile)
-{
-  if (queue.size() >= maxQueueLength)
-  {
-    if (!queueAlreadyExceeded)
-    {
-      std::cerr << "ReorderPackets: maxQueueLength exceeded." << std::endl;
-      queueAlreadyExceeded = true;
-    }
-    return;
-  }
-  queue.emplace(getDetails(std::move(inputStream), frameCount, endOfFile));
-}
-
-ReorderPackets::FrameDetails ReorderPackets::getDetails(
-  std::vector<std::uint8_t>&& inputStream, uint32_t frameCount, bool endOfFile)
-{
-  return FrameDetails(frameCount, endOfFile, std::move(inputStream));
-}
