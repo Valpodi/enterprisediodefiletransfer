@@ -16,10 +16,10 @@ OrderingStreamWriter::OrderingStreamWriter(
 {
 }
 
-bool OrderingStreamWriter::write(std::vector<std::uint8_t>&& data, const HeaderParams& headerParams)
+bool OrderingStreamWriter::write(Packet&& data)
 {
   timeLastUpdated = getTime();
-  return packetQueue.write(std::move(data), streamWrapper.get(), headerParams.frameCount, headerParams.eOFFlag);
+  return packetQueue.write(std::move(data.payload), streamWrapper.get(), data.headerParams.frameCount, data.headerParams.eOFFlag);
 }
 
 void OrderingStreamWriter::deleteFile()

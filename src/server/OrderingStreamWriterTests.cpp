@@ -14,7 +14,7 @@ TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue"
 
   auto packet = parsePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
 
-  streamWriter.write(std::move(packet.payload), packet.headerParams);
+  streamWriter.write(std::move(packet));
   REQUIRE(outputStream.str() == "AB");
 }
 
@@ -30,8 +30,8 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
     const std::string filename = "{name: !str \"testFilename\"}";
     auto packet2 = parsePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()});
 
-    REQUIRE_FALSE(streamWriter.write(std::move(packet.payload), packet.headerParams));
-    REQUIRE(streamWriter.write(std::move(packet2.payload), packet2.headerParams));
+    REQUIRE_FALSE(streamWriter.write(std::move(packet)));
+    REQUIRE(streamWriter.write(std::move(packet2)));
     REQUIRE(outputStream.str() == "AB");
   }
 
@@ -41,17 +41,17 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
     std::vector<char> vcFilename(filename.begin(), filename.end());
     auto packetC = parsePacket(createTestPacketStream(1, 3, true), {filename.begin(), filename.end()});
 
-    REQUIRE_FALSE(streamWriter.write(std::move(packetC.payload), packetC.headerParams));
+    REQUIRE_FALSE(streamWriter.write(std::move(packetC)));
     REQUIRE(outputStream.str().empty());
 
     auto packetA = parsePacket(createTestPacketStream(1, 2, false), {'C', 'D'});
 
-    REQUIRE_FALSE(streamWriter.write(std::move(packetA.payload), packetA.headerParams));
+    REQUIRE_FALSE(streamWriter.write(std::move(packetA)));
     REQUIRE(outputStream.str().empty());
 
     auto packetB = parsePacket(createTestPacketStream(1, 1, false),{'A', 'B'});
 
-    REQUIRE(streamWriter.write(std::move(packetB.payload), packetB.headerParams));
+    REQUIRE(streamWriter.write(std::move(packetB)));
     REQUIRE(outputStream.str() == "ABCD");
   }
 }
@@ -73,7 +73,7 @@ TEST_CASE("OrderingStreamWriter. OrderingStreamWriter constructor sets timeLastU
     initialTime = 501;
 
     REQUIRE(orderingStreamWriter.timeLastUpdated == 500);
-    orderingStreamWriter.write(std::move(packet.payload), packet.headerParams);
+    orderingStreamWriter.write(std::move(packet));
     REQUIRE(orderingStreamWriter.timeLastUpdated == 501);
     REQUIRE(outputStream.str() == "AB");
   }
