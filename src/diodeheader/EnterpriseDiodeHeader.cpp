@@ -6,8 +6,7 @@
 
 
 EDHeader::EDHeader(const std::vector<std::uint8_t>& frame) :
-  headerParams(readHeaderParams(frame)),
-  padding({})
+  headerParams(readHeaderParams(frame))
 {
 }
 

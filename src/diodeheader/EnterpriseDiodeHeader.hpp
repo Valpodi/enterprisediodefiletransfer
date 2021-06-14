@@ -25,12 +25,10 @@ namespace EnterpriseDiode
 class EDHeader
 {
 public:
-
   explicit EDHeader(const std::vector<std::uint8_t>& frame);
-  const HeaderParams headerParams;
+  HeaderParams headerParams;
 
 private:
-
   template <typename T>
   static T extract(const std::vector<std::uint8_t> &v, size_t pos)
   {
@@ -39,18 +37,7 @@ private:
     return value;
   }
 
-  static void checkStreamHasSpace(std::istream& inputStream)
-  {
-    if (inputStream.rdstate() & std::ifstream::eofbit)
-    {
-      throw std::runtime_error("Insufficient space in file for header");
-    }
-  }
-
   static HeaderParams readHeaderParams(const std::vector<std::uint8_t>& frame);
-
-private:
-  const std::array<std::uint8_t, 7> padding;
 };
 
 #endif //EDHEADER_HPP

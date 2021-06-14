@@ -56,12 +56,7 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
     }
     return;
   }
-  queue.emplace(getDetails(std::move(packet)));
-}
-
-ReorderPackets::FrameDetails ReorderPackets::getDetails(Packet&& packet)
-{
-  return FrameDetails(packet.headerParams.frameCount, packet.headerParams.eOFFlag, std::move(packet.payload));
+  queue.emplace(std::move(packet));
 }
 
 std::optional<std::string> ReorderPackets::getFilenameFromStream(const BytesBuffer& eofFrame)
@@ -105,9 +100,9 @@ std::string ReorderPackets::convertFromSisl(std::string sislFilename)
 
 bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
 {
-  while (!queue.empty() && (queue.top().frameCount == nextFrameCount))
+  while (!queue.empty() && (queue.top().headerParams.frameCount == nextFrameCount))
   {
-    if (queue.top().endOfFile)
+    if (queue.top().headerParams.eOFFlag)
     {
       streamWrapper->setStoredFilename(getFilenameFromStream(queue.top().getFrame()).value_or("rejected."));
       queue.pop();

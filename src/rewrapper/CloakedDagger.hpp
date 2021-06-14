@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstring>
 #include "BytesBuffer.hpp"
+#include <array>
 
 class CloakedDagger
 {

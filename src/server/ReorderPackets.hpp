@@ -6,9 +6,10 @@
 #include <queue>
 #include <rewrapper/StreamingRewrapper.hpp>
 #include <algorithm>
+#include "Packet.hpp"
 
 class StreamInterface;
-struct Packet;
+
 
 enum class DiodeType
 {
@@ -33,47 +34,6 @@ private:
   std::optional<std::string> getFilenameFromStream(const BytesBuffer& eofFrame);
   std::string convertFromSisl(std::string sislFilename);
 
-  struct FrameDetails {
-    std::uint32_t frameCount;
-    bool endOfFile;
-
-    FrameDetails(std::uint32_t frameCount, bool endOfFile, BytesBuffer&& frame):
-      frameCount(frameCount),
-      endOfFile(endOfFile),
-      frame(std::move(frame))
-    {}
-
-    FrameDetails(const FrameDetails&) = delete;
-    FrameDetails& operator=(FrameDetails&) = delete;
-
-    FrameDetails& operator=(FrameDetails&& rhs)
-    {
-      frameCount = std::move(rhs.frameCount);
-      endOfFile = std::move(rhs.endOfFile);
-      frame = std::move(rhs.frame);
-      return *this;
-    }
-
-    FrameDetails(FrameDetails&& rhs) :
-     frameCount(rhs.frameCount),
-     endOfFile(rhs.endOfFile),
-     frame(std::move(rhs.frame))
-    {
-    };
-
-    bool operator>(const FrameDetails& rhs) const
-    {
-      return (frameCount > rhs.frameCount);
-    }
-
-    BytesBuffer getFrame() const
-    {
-      return frame;
-    }
-
-  private:
-    BytesBuffer frame;
-  };
 
   bool queueAlreadyExceeded = false;
   std::uint32_t nextFrameCount = 1;
@@ -81,14 +41,11 @@ private:
   std::uint32_t maxBufferSize;
   std::uint32_t maxQueueLength;
   bool dropPackets;
-  std::priority_queue<FrameDetails, std::vector<FrameDetails>, std::greater<>> queue;
+  std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
   std::uint32_t maxFilenameLength;
   std::uint32_t maxSislLength = 1000;
   DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
   void writeFrame(StreamInterface *streamWrapper);
   void logOutOfOrderPackets(uint32_t frameCount);
-  BytesBuffer createBuffer() const;
-  BytesBuffer& copy(std::istream& inputStream, BytesBuffer&& newFrame) const;
-  static FrameDetails getDetails(Packet&& packet) ;
 };
