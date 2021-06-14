@@ -59,7 +59,7 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
   queue.emplace(std::move(packet));
 }
 
-std::optional<std::string> ReorderPackets::getFilenameFromStream(const BytesBuffer& eofFrame)
+std::optional<std::string> ReorderPackets::getFilenameFromStream(const BytesBuffer& eofFrame) const
 {
   const auto sislHeader = std::string(eofFrame.begin(), eofFrame.end());
   try

@@ -31,7 +31,7 @@ public:
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
-  std::optional<std::string> getFilenameFromStream(const BytesBuffer& eofFrame);
+  std::optional<std::string> getFilenameFromStream(const BytesBuffer& eofFrame) const;
   static std::string convertFromSisl(std::string sislFilename);
 
 
