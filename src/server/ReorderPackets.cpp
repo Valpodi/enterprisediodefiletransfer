@@ -10,10 +10,15 @@
 #include <rapidjson/document.h>
 #include <regex>
 
-ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQueueLength,
-                               DiodeType diodeType, std::uint32_t maxFilenameLength) :
+ReorderPackets::ReorderPackets(
+  std::uint32_t maxBufferSize,
+  std::uint32_t maxQueueLength,
+  bool dropPackets,
+  DiodeType diodeType,
+  std::uint32_t maxFilenameLength):
   maxBufferSize(maxBufferSize),
   maxQueueLength(maxQueueLength),
+  dropPackets(dropPackets),
   maxFilenameLength(maxFilenameLength),
   diodeType(diodeType)
 {

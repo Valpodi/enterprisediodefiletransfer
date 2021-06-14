@@ -142,11 +142,13 @@ TEST_CASE("ED server. Stream is closed if timeout is exceeded.", "[integration]"
   std::uint32_t capturedSessionId = 0;
   boost::asio::io_service fake_service;
 
-  Server edServer = Server(std::make_unique<UdpServerFake>(0, fake_service, 0, 0), 16, 2,
-                           [&outputStream, &capturedSessionId](std::uint32_t sessionId) {
-                             capturedSessionId = sessionId;
-                             return std::make_unique<StreamSpy>(outputStream, sessionId);
-                           }, []() { return std::time(nullptr); }, 3, DiodeType::basic);
+  Server edServer = Server(
+    std::make_unique<UdpServerFake>(0, fake_service, 0, 0), 16, 2, false,
+    [&outputStream, &capturedSessionId](std::uint32_t sessionId) {
+      capturedSessionId = sessionId;
+      return std::make_unique<StreamSpy>(outputStream, sessionId);
+    },
+    []() { return std::time(nullptr); }, 3, DiodeType::basic);
 
   std::stringstream stream = createTestPacketStream({'A', 'B'}, 1, 1, false);
   edServer.receivePacket(stream);

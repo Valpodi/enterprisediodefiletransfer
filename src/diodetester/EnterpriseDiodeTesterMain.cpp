@@ -105,10 +105,11 @@ int main(int argc, char **argv)
       EnterpriseDiode::UDPSocketSizeInBytes),
     maxBufferSize,
     params.maxQueueLength,
-    [](std::uint32_t sessionId)
-    { return std::make_unique<FileStream>(sessionId); },
-    []()
-    { return std::time(nullptr); }, 15, params.diodeType);
+    params.dropPackets,
+    [](std::uint32_t sessionId) { return std::make_unique<FileStream>(sessionId); },
+    []() { return std::time(nullptr); },
+    15,
+    params.diodeType);
 
   auto handleToSendingProcess = std::async(
     std::launch::async, []() {

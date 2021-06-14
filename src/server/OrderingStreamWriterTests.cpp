@@ -10,7 +10,8 @@
 TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic);
+  auto streamWriter = OrderingStreamWriter(
+    1, 1, false, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic);
 
   std::stringstream inputStream = createTestPacketStream({'A', 'B'}, 1, 1, false);
   auto packet = parsePacket(inputStream);
@@ -22,7 +23,8 @@ TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue"
 TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been received")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 5, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic);
+  auto streamWriter = OrderingStreamWriter(
+    1, 5, false, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic);
 
   SECTION("When the EOF packet is not queued")
   {
@@ -67,10 +69,9 @@ TEST_CASE("OrderingStreamWriter. OrderingStreamWriter constructor sets timeLastU
 {
   std::stringstream outputStream;
   std::uint32_t initialTime = 500;
-  OrderingStreamWriter orderingStreamWriter(1,
-                                            1,
-                                            std::make_unique<StreamSpy>(outputStream, 1),
-                                            [&initialTime]() mutable { return initialTime; }, DiodeType::basic);
+  OrderingStreamWriter orderingStreamWriter(
+    1, 1, false, std::make_unique<StreamSpy>(outputStream, 1), [&initialTime]() mutable { return initialTime; },
+    DiodeType::basic);
 
   REQUIRE(orderingStreamWriter.timeLastUpdated == 500);
 
