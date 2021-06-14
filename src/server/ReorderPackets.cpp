@@ -31,6 +31,10 @@ bool ReorderPackets::write(
   bool eOFFlag)
 {
   logOutOfOrderPackets(frameCount);
+  if (dropPackets)
+  {
+    return eOFFlag;
+  }
   addFrameToQueue(inputStream, frameCount, eOFFlag);
   return checkQueueAndWrite(streamWrapper);
 }
