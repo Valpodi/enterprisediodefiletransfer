@@ -2,6 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "UdpServer.hpp"
+#include <diodeheader/EnterpriseDiodeHeader.hpp>
 #include <iostream>
 
 UdpServer::UdpServer(
@@ -13,6 +14,10 @@ UdpServer::UdpServer(
   io_context(io_service),
   udpSocket(io_service, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port))
 {
+  if (udpFrameSize < EnterpriseDiode::HeaderSizeInBytes)
+  {
+    throw std::runtime_error("UDP Frame size MUST be greater than 112 bytes (was: " + std::to_string(udpFrameSize) + ")");
+  }
   udpSocket.set_option(boost::asio::socket_base::receive_buffer_size(static_cast<int>(udpSocketBufferSizeInBytes)));
   triggerWaitAndReadNextUdpPacket();
 }
@@ -24,8 +29,8 @@ UdpServer::~UdpServer()
 
 void UdpServer::triggerWaitAndReadNextUdpPacket()
 {
-  frame = std::vector<std::uint8_t>(udpFrameSize - 112);
-  header= std::vector<std::uint8_t>(112);
+  frame = std::vector<std::uint8_t>(udpFrameSize - EnterpriseDiode::HeaderSizeInBytes);
+  header= std::vector<std::uint8_t>(EnterpriseDiode::HeaderSizeInBytes);
   std::array<boost::asio::mutable_buffer, 2> bufs = { boost::asio::buffer(header), boost::asio::buffer(frame) };
 
   udpSocket.async_receive_from(
@@ -43,9 +48,9 @@ void UdpServer::triggerWaitAndReadNextUdpPacket()
 
 void UdpServer::checkPacketLengthAndExecuteCallback(size_t udpPacketLength)
 {
-  if (callback && udpPacketLength - 112 > 0)
+  if (callback && udpPacketLength - EnterpriseDiode::HeaderSizeInBytes > 0)
   {
-    frame.resize(udpPacketLength - 112);
+    frame.resize(udpPacketLength - EnterpriseDiode::HeaderSizeInBytes);
     callback(std::move(header), std::move(frame));
   }
   else
