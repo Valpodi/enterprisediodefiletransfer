@@ -17,11 +17,11 @@ ReorderPackets::ReorderPackets(
   bool dropPackets,
   DiodeType diodeType,
   std::uint32_t maxFilenameLength):
-  maxBufferSize(maxBufferSize),
-  maxQueueLength(maxQueueLength),
-  dropPackets(dropPackets),
-  maxFilenameLength(maxFilenameLength),
-  diodeType(diodeType)
+    sislFilename(maxFilenameLength),
+    maxBufferSize(maxBufferSize),
+    maxQueueLength(maxQueueLength),
+    dropPackets(dropPackets),
+    diodeType(diodeType)
 {
 }
 
@@ -40,7 +40,8 @@ void ReorderPackets::logOutOfOrderPackets(uint32_t frameCount)
 {
   if (frameCount != lastFrameReceived + 1)
   {
-    std::cout << std::chrono::system_clock::now().time_since_epoch().count() << " Out of order frame: " << frameCount << "\n";
+    std::cout << std::chrono::system_clock::now().time_since_epoch().count() << " Out of order frame: " << frameCount
+              << "\n";
   }
   lastFrameReceived = frameCount;
 }
@@ -59,52 +60,13 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
   queue.emplace(std::move(packet));
 }
 
-std::optional<std::string> ReorderPackets::getFilenameFromStream(const BytesBuffer& eofFrame) const
-{
-  const auto sislHeader = std::string(eofFrame.begin(), eofFrame.end());
-  try
-  {
-    if (sislHeader.size() > maxSislLength)
-    {
-      std::cerr << "SISL too long" << "\n";
-      return std::optional<std::string>();
-    }
-    const auto filename = convertFromSisl(sislHeader);
-    if (filename.size() > maxFilenameLength)
-    {
-      std::cerr << "Filename too long" << "\n";
-      return std::optional<std::string>();
-    }
-    std::regex filter("[a-zA-Z0-9\\.\\-_]+");
-
-    return std::regex_match(filename, filter) ? filename : std::optional<std::string>();
-  }
-  catch (UnableToParseSislException&)
-  {
-    std::cerr << "Unable to parse SISL filename. possible regex problem" << "\n";
-    return std::optional<std::string>();
-  }
-}
-
-std::string ReorderPackets::convertFromSisl(std::string sislFilename)
-{
-  if (sislFilename.find("\"}") == std::string::npos)
-  {
-    sislFilename += "\"}";
-  }
-  const auto json = SislTools::toJson(sislFilename);
-  rapidjson::Document doc;
-  doc.Parse(json.c_str());
-  return doc.HasMember("name") ? doc["name"].GetString() : "";
-}
-
 bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
 {
   while (!queue.empty() && (queue.top().headerParams.frameCount == nextFrameCount))
   {
     if (queue.top().headerParams.eOFFlag)
     {
-      streamWrapper->setStoredFilename(getFilenameFromStream(queue.top().getFrame()).value_or("rejected."));
+      streamWrapper->setStoredFilename(sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
       queue.pop();
       return true;
     }
@@ -115,7 +77,7 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
   return false;
 }
 
-void ReorderPackets::writeFrame(StreamInterface *streamWrapper)
+void ReorderPackets::writeFrame(StreamInterface* streamWrapper)
 {
   if (diodeType == DiodeType::import)
   {
@@ -126,4 +88,3 @@ void ReorderPackets::writeFrame(StreamInterface *streamWrapper)
     streamWrapper->write(queue.top().getFrame());
   }
 }
-

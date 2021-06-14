@@ -1,12 +1,13 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
+#include "Packet.hpp"
+#include "SISLFilename.hpp"
 #include <BytesBuffer.hpp>
+#include <algorithm>
 #include <optional>
 #include <queue>
 #include <rewrapper/StreamingRewrapper.hpp>
-#include <algorithm>
-#include "Packet.hpp"
 
 class StreamInterface;
 
@@ -31,10 +32,8 @@ public:
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
-  std::optional<std::string> getFilenameFromStream(const BytesBuffer& eofFrame) const;
-  static std::string convertFromSisl(std::string sislFilename);
 
-
+  SISLFilename sislFilename;
   bool queueAlreadyExceeded = false;
   std::uint32_t nextFrameCount = 1;
   std::uint32_t lastFrameReceived = 0;
@@ -42,8 +41,6 @@ private:
   std::uint32_t maxQueueLength;
   bool dropPackets;
   std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
-  std::uint32_t maxFilenameLength;
-  std::uint32_t maxSislLength = 1000;
   DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
   void writeFrame(StreamInterface *streamWrapper);
