@@ -19,7 +19,7 @@ OrderingStreamWriter::OrderingStreamWriter(
 bool OrderingStreamWriter::write(Packet&& data)
 {
   timeLastUpdated = getTime();
-  return packetQueue.write(std::move(data.payload), streamWrapper.get(), data.headerParams.frameCount, data.headerParams.eOFFlag);
+  return packetQueue.write(std::move(data), streamWrapper.get());
 }
 
 void OrderingStreamWriter::deleteFile()

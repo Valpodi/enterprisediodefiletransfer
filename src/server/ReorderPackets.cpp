@@ -2,6 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "ReorderPackets.hpp"
+#include "Packet.hpp"
 #include "StreamInterface.hpp"
 #include <SislTools/SislTools.hpp>
 #include <chrono>
@@ -19,14 +20,10 @@ ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQue
 {
 }
 
-bool ReorderPackets::write(
-  std::vector<std::uint8_t>&& inputStream,
-  StreamInterface* streamWrapper,
-  std::uint32_t frameCount,
-  bool eOFFlag)
+bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
 {
-  logOutOfOrderPackets(frameCount);
-  addFrameToQueue(std::move(inputStream), frameCount, eOFFlag);
+  logOutOfOrderPackets(packet.headerParams.frameCount);
+  addFrameToQueue(std::move(packet.payload), packet.headerParams.frameCount, packet.headerParams.eOFFlag);
   return checkQueueAndWrite(streamWrapper);
 }
 

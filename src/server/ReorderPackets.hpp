@@ -8,6 +8,7 @@
 #include <algorithm>
 
 class StreamInterface;
+struct Packet;
 
 enum class DiodeType
 {
@@ -17,14 +18,13 @@ enum class DiodeType
 
 class ReorderPackets
 {
-
 public:
   explicit ReorderPackets(
     std::uint32_t maxBufferSize,
     std::uint32_t maxQueueLength,
     DiodeType diodeType,
     std::uint32_t maxFilenameLength = 65);
-  bool write(std::vector<std::uint8_t>&& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
+  bool write(Packet&& packet, StreamInterface* streamWrapper);
 
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);

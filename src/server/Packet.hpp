@@ -11,9 +11,9 @@
 
 struct HeaderParams
 {
-  std::uint32_t sessionId;
-  std::uint32_t frameCount;
-  bool eOFFlag;
+  const std::uint32_t sessionId;
+  const std::uint32_t frameCount;
+  const bool eOFFlag;
 };
 
 
