@@ -20,13 +20,13 @@ ReorderPackets::ReorderPackets(std::uint32_t maxBufferSize, std::uint32_t maxQue
 }
 
 bool ReorderPackets::write(
-  std::istream& inputStream,
+  std::vector<std::uint8_t>&& inputStream,
   StreamInterface* streamWrapper,
   std::uint32_t frameCount,
   bool eOFFlag)
 {
   logOutOfOrderPackets(frameCount);
-  addFrameToQueue(inputStream, frameCount, eOFFlag);
+  addFrameToQueue(std::move(inputStream), frameCount, eOFFlag);
   return checkQueueAndWrite(streamWrapper);
 }
 
@@ -107,7 +107,8 @@ void ReorderPackets::writeFrame(StreamInterface *streamWrapper)
   }
 }
 
-void ReorderPackets::addFrameToQueue(std::istream& inputStream, std::uint32_t frameCount, bool endOfFile)
+void ReorderPackets::addFrameToQueue(
+  std::vector<std::uint8_t>&& inputStream, std::uint32_t frameCount, bool endOfFile)
 {
   if (queue.size() >= maxQueueLength)
   {
@@ -118,11 +119,11 @@ void ReorderPackets::addFrameToQueue(std::istream& inputStream, std::uint32_t fr
     }
     return;
   }
-  queue.emplace(getDetails(inputStream, frameCount, endOfFile));
+  queue.emplace(getDetails(std::move(inputStream), frameCount, endOfFile));
 }
 
-ReorderPackets::FrameDetails ReorderPackets::getDetails(std::istream& inputStream, uint32_t frameCount, bool endOfFile)
+ReorderPackets::FrameDetails ReorderPackets::getDetails(
+  std::vector<std::uint8_t>&& inputStream, uint32_t frameCount, bool endOfFile)
 {
-  return FrameDetails {
-    frameCount, endOfFile, BytesBuffer(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>())};
+  return FrameDetails(frameCount, endOfFile, std::move(inputStream));
 }

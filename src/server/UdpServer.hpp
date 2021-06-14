@@ -27,8 +27,8 @@ private:
   boost::asio::io_service& io_context;
   boost::asio::ip::udp::socket udpSocket;
   boost::asio::ip::udp::endpoint senderEndpoint;
-  boost::asio::streambuf receiveStreamBuffer;
-  std::istream outputPacketStream;
-};
+  std::vector<std::uint8_t> frame;
+
+  };
 
 #endif //UDPSERVER_HPP

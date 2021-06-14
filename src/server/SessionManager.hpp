@@ -20,7 +20,7 @@ public:
     std::uint32_t timeoutPeriod,
     DiodeType diodeType);
 
-  void writeToStream(Packet packet);
+  void writeToStream(Packet&& packet);
 
 private:
   void closeSession(std::uint32_t sessionId);
@@ -35,7 +35,7 @@ private:
   DiodeType diodeType;
   void createSessionIfNewId(std::uint32_t sessionId);
   bool isStreamExpired(std::uint32_t sessionId);
-  void writeFileAndSaveIfComplete(Packet packet);
+  void writeFileAndSaveIfComplete(Packet&& packet);
 };
 
 #endif //SESSIONMANAGER_HPP

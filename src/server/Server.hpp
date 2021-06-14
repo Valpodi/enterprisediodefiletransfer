@@ -24,7 +24,7 @@ public:
     std::uint32_t timeoutPeriod,
    DiodeType diodeType);
 
-  void receivePacket(std::istream& inputStream);
+  void receivePacket(std::vector<std::uint8_t>&& inputStream);
 
 private:
   std::unique_ptr<UdpServerInterface> udpServerInterface;

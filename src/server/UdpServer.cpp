@@ -10,8 +10,7 @@ UdpServer::UdpServer(
   std::uint32_t udpSocketBufferSizeInBytes) :
   udpFrameSize(udpFrameSize),
   io_context(io_service),
-  udpSocket(io_service, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)),
-  outputPacketStream(&receiveStreamBuffer)
+  udpSocket(io_service, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port))
 {
   udpSocket.set_option(boost::asio::socket_base::receive_buffer_size(static_cast<int>(udpSocketBufferSizeInBytes)));
   triggerWaitAndReadNextUdpPacket();
@@ -24,8 +23,9 @@ UdpServer::~UdpServer()
 
 void UdpServer::triggerWaitAndReadNextUdpPacket()
 {
+  frame = std::vector<std::uint8_t>(udpFrameSize);
   udpSocket.async_receive_from(
-    receiveStreamBuffer.prepare(udpFrameSize),
+    boost::asio::buffer(frame),
     senderEndpoint,
     [this](boost::system::error_code errorCode, std::size_t udpPacketLength) {
       if (!errorCode)
@@ -41,8 +41,7 @@ void UdpServer::checkPacketLengthAndExecuteCallback(size_t udpPacketLength)
 {
   if (callback && udpPacketLength > 0)
   {
-    receiveStreamBuffer.commit(udpPacketLength);
-    callback(outputPacketStream);
-    receiveStreamBuffer.consume(udpPacketLength);
+    frame.resize(udpPacketLength);
+    callback(std::move(frame));
   }
 }

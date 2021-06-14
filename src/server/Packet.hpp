@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <istream>
+#include <vector>
 
 struct HeaderParams
 {
@@ -19,10 +20,10 @@ struct HeaderParams
 struct Packet
 {
   HeaderParams headerParams;
-  std::istream& payload;
+  std::vector<std::uint8_t> payload;
 };
 
-Packet parsePacket(std::istream& payload);
+Packet parsePacket(std::vector<std::uint8_t>&& payload);
 
 
 #endif //ENTERPRISEDIODETESTER_PACKET_HPP

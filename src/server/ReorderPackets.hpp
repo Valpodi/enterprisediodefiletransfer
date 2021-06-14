@@ -24,11 +24,11 @@ public:
     std::uint32_t maxQueueLength,
     DiodeType diodeType,
     std::uint32_t maxFilenameLength = 65);
-  bool write(std::istream& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
+  bool write(std::vector<std::uint8_t>&& inputStream, StreamInterface* streamWrapper, std::uint32_t frameCount, bool eOFFlag);
 
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
-  void addFrameToQueue(std::istream& inputStream, std::uint32_t frameCount, bool endOfFile);
+  void addFrameToQueue(std::vector<std::uint8_t>&& inputStream, std::uint32_t frameCount, bool endOfFile);
   std::optional<std::string> getFilenameFromStream(const BytesBuffer& eofFrame);
   std::string convertFromSisl(std::string sislFilename);
 
@@ -36,7 +36,7 @@ private:
     std::uint32_t frameCount;
     bool endOfFile;
 
-    FrameDetails(std::uint32_t frameCount, bool endOfFile, BytesBuffer frame):
+    FrameDetails(std::uint32_t frameCount, bool endOfFile, BytesBuffer&& frame):
       frameCount(frameCount),
       endOfFile(endOfFile),
       frame(std::move(frame))
@@ -53,7 +53,7 @@ private:
       return *this;
     }
 
-    FrameDetails(const FrameDetails&& rhs) :
+    FrameDetails(FrameDetails&& rhs) :
      frameCount(rhs.frameCount),
      endOfFile(rhs.endOfFile),
      frame(std::move(rhs.frame))
@@ -89,5 +89,5 @@ private:
   BytesBuffer copyToBuffer(std::istream& inputStream) const;
   BytesBuffer createBuffer() const;
   BytesBuffer& copy(std::istream& inputStream, BytesBuffer&& newFrame) const;
-  static FrameDetails getDetails(std::istream& inputStream, uint32_t frameCount, bool endOfFile) ;
+  static FrameDetails getDetails(std::vector<std::uint8_t>&& inputStream, uint32_t frameCount, bool endOfFile) ;
 };

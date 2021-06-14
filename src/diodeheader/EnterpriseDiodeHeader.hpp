@@ -27,6 +27,7 @@ class EDHeader
 public:
 
   explicit EDHeader(std::istream& inputStream);
+  explicit EDHeader(const std::vector<std::uint8_t>& frame);
 
 private:
   template<typename HeaderFieldType>
@@ -43,6 +44,14 @@ private:
     return value;
   }
 
+  template <typename T>
+  static T extract(const std::vector<std::uint8_t> &v, int pos)
+  {
+    T value;
+    memcpy(&value, &v[pos], sizeof(T));
+    return value;
+  }
+
   static void checkStreamHasSpace(std::istream& inputStream)
   {
     if (inputStream.rdstate() & std::ifstream::eofbit)
@@ -53,6 +62,8 @@ private:
 
   static void advanceByPaddingSize(std::istream& inputStream);
   static HeaderParams readHeaderParams(std::istream& inputStream);
+  static HeaderParams readHeaderParams(const std::vector<std::uint8_t>& frame);
+
 
 public:
   const HeaderParams headerParams;

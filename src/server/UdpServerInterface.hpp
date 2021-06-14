@@ -14,13 +14,13 @@ public:
 
   virtual ~UdpServerInterface() = default;
 
-  void setCallback(std::function<void(std::istream&)> requestedCallback)
+  void setCallback(std::function<void(std::vector<std::uint8_t>&&)> requestedCallback)
   {
     callback = requestedCallback;
   }
 
 protected:
-  std::function<void(std::istream&)> callback;
+  std::function<void(std::vector<std::uint8_t>&&)> callback;
 };
 
 #endif //UDPSERVERINTERFACE_HPP

@@ -23,7 +23,7 @@ SessionManager::SessionManager(
 {
 }
 
-void SessionManager::writeToStream(Packet packet)
+void SessionManager::writeToStream(Packet&& packet)
 {
   createSessionIfNewId(packet.headerParams.sessionId);
 
@@ -35,7 +35,7 @@ void SessionManager::writeToStream(Packet packet)
     return;
   }
 
-  writeFileAndSaveIfComplete(packet);
+  writeFileAndSaveIfComplete(std::move(packet));
 }
 
 void SessionManager::createSessionIfNewId(const std::uint32_t sessionId)
@@ -58,9 +58,9 @@ bool SessionManager::isStreamExpired(std::uint32_t sessionId)
   return streams.at(sessionId).timeLastUpdated + timeoutPeriod < getTime();
 }
 
-void SessionManager::writeFileAndSaveIfComplete(Packet packet)
+void SessionManager::writeFileAndSaveIfComplete(Packet&& packet)
 {
-  const bool fileComplete = streams.at(packet.headerParams.sessionId).write(packet.payload, packet.headerParams);
+  const bool fileComplete = streams.at(packet.headerParams.sessionId).write(std::move(packet.payload), packet.headerParams);
   if (fileComplete)
   {
     streams.at(packet.headerParams.sessionId).renameFile();

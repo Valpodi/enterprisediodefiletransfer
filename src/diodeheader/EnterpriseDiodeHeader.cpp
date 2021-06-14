@@ -11,11 +11,25 @@ EDHeader::EDHeader(std::istream& inputStream) :
   advanceByPaddingSize(inputStream);
 }
 
+EDHeader::EDHeader(const std::vector<std::uint8_t>& frame) :
+  headerParams(readHeaderParams(frame)),
+  padding({})
+{
+}
+
 void EDHeader::advanceByPaddingSize(std::istream& inputStream)
 {
   constexpr auto totalPaddingSize = (EnterpriseDiode::HeaderSizeInBytes - EnterpriseDiode::ControlHeaderSizeInBytes) + EnterpriseDiode::ControlHeaderPaddingSizeInBytes;
   std::array<char, totalPaddingSize> temporaryBuffer{};
   inputStream.read(temporaryBuffer.data(), totalPaddingSize);
+}
+
+template <typename T>
+  T extract(const std::vector<std::uint8_t> &v, int pos)
+{
+  T value;
+  memcpy(&value, &v[pos], sizeof(T));
+  return value;
 }
 
 HeaderParams EDHeader::readHeaderParams(std::istream& inputStream)
@@ -24,6 +38,15 @@ HeaderParams EDHeader::readHeaderParams(std::istream& inputStream)
     read<std::uint32_t>(inputStream),
     read<std::uint32_t>(inputStream),
     read<bool>(inputStream)
+  };
+}
+
+HeaderParams EDHeader::readHeaderParams(const std::vector<std::uint8_t>& frame)
+{
+  return {
+    extract<std::uint32_t>(frame, 0),
+    extract<std::uint32_t>(frame, 4),
+    extract<bool>(frame, 8)
   };
 }
 
