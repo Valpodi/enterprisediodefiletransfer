@@ -149,6 +149,7 @@ class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
         self.create_wrapped_file("test_file", data)
         server_handle = self.start_ED_server_thread(import_diode=True)
         self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file", mtu=mtu_size).wait(timeout=5), 0)
+        time.sleep(2)
         self.assertEqual(data.encode(), self.unwrap_file("test_file"))
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
