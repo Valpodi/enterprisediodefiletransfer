@@ -1,5 +1,7 @@
 # Oakdoor Enterprise Data Diode File Transfer Application
 
+![CI build](https://github.com/github/oakdoor/actions/workflows/build.yml/badge.svg)
+
 This repository contains the source code and scripts necessary to build and run a udp file transfer client and server. This is designed for file transfer across the  [Oakdoor](https://oakdoor.io/) Enterprise Data Diodes, including the Import and Basic variants.
 
 The "tester" is a loopback application running a server and client simultaneously.
