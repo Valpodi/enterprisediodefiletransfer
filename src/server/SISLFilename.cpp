@@ -38,14 +38,15 @@ std::optional<std::string> SISLFilename::extractFilename(const BytesBuffer& eofF
   }
 }
 
-std::string SISLFilename::convertFromSisl(std::string sislFilename)
+std::string SISLFilename::convertFromSisl(const std::string& sislFrame)
 {
-  if (sislFilename.find("\"}") == std::string::npos)
-  {
-    sislFilename += "\"}";
-  }
-  const auto json = SislTools::toJson(sislFilename);
-  rapidjson::Document doc;
-  doc.Parse(json.c_str());
+  const auto doc = parseSisl(sislFrame);
   return doc.HasMember("name") ? doc["name"].GetString() : "";
+}
+
+rapidjson::Document SISLFilename::parseSisl(const std::string& sislFrame)
+{
+  rapidjson::Document doc;
+  doc.Parse(SislTools::toJson(sislFrame).c_str());
+  return doc;
 }

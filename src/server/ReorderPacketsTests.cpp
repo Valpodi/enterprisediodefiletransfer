@@ -81,7 +81,7 @@ TEST_CASE("ReorderPackets. Handling filename")
     auto inputStream = std::string("{name: !str \"te\0stFilename\"}");
     REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
     REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "te");
+    REQUIRE(stream.storedFilename == "rejected.12345");
   }
   SECTION("Handling filename with length > maxFilenameLength, 65")
   {

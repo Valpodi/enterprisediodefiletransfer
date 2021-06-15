@@ -5,6 +5,7 @@
 
 #include <BytesBuffer.hpp>
 #include <optional>
+#include <rapidjson/document.h>
 #include <string>
 
 class SISLFilename
@@ -16,7 +17,8 @@ public:
   [[nodiscard]] std::optional<std::string> extractFilename(const BytesBuffer& eofFrame) const;
 
 private:
-  static std::string convertFromSisl(std::string sislFilename);
+  static std::string convertFromSisl(const std::string& sislFilename);
+  static rapidjson::Document parseSisl(const std::string& sislFilename);
 
   const std::uint32_t maxSislLength;
   const std::uint32_t maxFilenameLength;
