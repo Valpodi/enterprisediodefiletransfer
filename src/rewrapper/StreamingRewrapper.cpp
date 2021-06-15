@@ -2,17 +2,16 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "StreamingRewrapper.hpp"
-#include "CloakedDagger.hpp"
 #include "BytesBuffer.hpp"
+#include "CloakedDagger.hpp"
 
-
-BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, std::uint32_t frameCount)
+BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, std::array<char, CloakedDagger::headerSize()> cloakedDaggerHeader, std::uint32_t frameCount)
 {
   if (input.at(0) != CloakedDagger::cloakedDaggerIdentifierByte)
   {
     return input;
   }
-  const auto inputChunkMask = getMaskFromHeader(input);
+  const auto inputChunkMask = getMaskFromHeader({cloakedDaggerHeader.begin(), cloakedDaggerHeader.end()});
 
   if (frameCount == 1)
   {

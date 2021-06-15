@@ -75,7 +75,7 @@ void ReorderPackets::writeFrame(StreamInterface* streamWrapper)
 {
   if (diodeType == DiodeType::import)
   {
-    streamWrapper->write(streamingRewrapper.rewrap(queue.top().getFrame(), nextFrameCount));
+    streamWrapper->write(streamingRewrapper.rewrap(queue.top().getFrame(), queue.top().headerParams.cloakedDaggerHeader, nextFrameCount));
   }
   else
   {

@@ -12,7 +12,7 @@ class StreamingRewrapper
 {
 public:
   StreamingRewrapper() = default;
-  BytesBuffer rewrap(const BytesBuffer& input, std::uint32_t frameCount);
+  BytesBuffer rewrap(const BytesBuffer& input, std::array<char, CloakedDagger::headerSize()> cloakedDaggerHeader, std::uint32_t frameCount);
 
 private:
   size_t mask_index {0};
