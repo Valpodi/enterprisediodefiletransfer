@@ -6,6 +6,7 @@
 #include <BytesBuffer.hpp>
 #include <optional>
 #include <rapidjson/document.h>
+#include <regex>
 #include <string>
 
 class SISLFilename
@@ -22,6 +23,7 @@ private:
 
   const std::uint32_t maxSislLength;
   const std::uint32_t maxFilenameLength;
+  const std::regex filter{"[a-zA-Z0-9\\.\\-_]+"};
 };
 
 #endif // ENTERPRISEDIODETESTER_SISLFILENAME_H

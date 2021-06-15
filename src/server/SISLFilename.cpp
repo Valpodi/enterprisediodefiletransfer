@@ -14,28 +14,34 @@ SISLFilename::SISLFilename(std::uint32_t maxSislLength, std::uint32_t maxFilenam
 std::optional<std::string> SISLFilename::extractFilename(const BytesBuffer& eofFrame) const
 {
   const auto sislHeader = std::string(eofFrame.begin(), eofFrame.end());
+
+  if (sislHeader.size() > maxSislLength)
+  {
+    std::cerr << "SISL too long" << "\n";
+    return std::optional<std::string>();
+  }
+
   try
   {
-    if (sislHeader.size() > maxSislLength)
-    {
-      std::cerr << "SISL too long" << "\n";
-      return std::optional<std::string>();
-    }
     const auto filename = convertFromSisl(sislHeader);
     if (filename.size() > maxFilenameLength)
     {
       std::cerr << "Filename too long" << "\n";
       return std::optional<std::string>();
     }
-    std::regex filter("[a-zA-Z0-9\\.\\-_]+");
-
     return std::regex_match(filename, filter) ? filename : std::optional<std::string>();
   }
-  catch (UnableToParseSislException&)
+  catch (UnableToParseSislException& ex)
   {
-    std::cerr << "Unable to parse SISL filename. possible regex problem" << "\n";
+    std::cerr << "Unable to parse SISL filename as SISL: " << ex.what() << "\n";
     return std::optional<std::string>();
   }
+  catch (std::regex_error& ex)
+  {
+    std::cerr << "Failed filename sanity checks: " << ex.what() << "\n";
+    return std::optional<std::string>();
+  }
+
 }
 
 std::string SISLFilename::convertFromSisl(const std::string& sislFrame)
