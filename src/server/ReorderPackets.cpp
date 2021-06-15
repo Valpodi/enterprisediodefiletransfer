@@ -28,10 +28,6 @@ ReorderPackets::ReorderPackets(
 bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
 {
   logOutOfOrderPackets(packet.headerParams.frameCount);
-  if (dropPackets)
-  {
-    return packet.headerParams.eOFFlag;
-  }
   addFrameToQueue(std::move(packet));
   return checkQueueAndWrite(streamWrapper);
 }
