@@ -7,7 +7,7 @@
 
 BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, std::array<char, CloakedDagger::headerSize()> cloakedDaggerHeader, std::uint32_t frameCount)
 {
-  if (input.at(0) != CloakedDagger::cloakedDaggerIdentifierByte)
+  if (cloakedDaggerHeader.at(0) != static_cast<char>(CloakedDagger::cloakedDaggerIdentifierByte))
   {
     return input;
   }

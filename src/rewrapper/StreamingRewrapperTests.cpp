@@ -26,8 +26,8 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
   SECTION("For file that looks wrapped throw if header not valid")
   {
     auto input = createTestWrappedString("AAA").message;
-    input[1] = 0xA;
-    auto invalidHeader = std::array<char, 48>({0});
+    auto invalidHeader = header;
+    invalidHeader[1] = 0xA;
     REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input, invalidHeader, 1), std::runtime_error);
   }
 

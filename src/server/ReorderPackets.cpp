@@ -4,12 +4,8 @@
 #include "ReorderPackets.hpp"
 #include "Packet.hpp"
 #include "StreamInterface.hpp"
-#include <SislTools/SislTools.hpp>
 #include <chrono>
 #include <iostream>
-#include <optional>
-#include <rapidjson/document.h>
-#include <regex>
 
 ReorderPackets::ReorderPackets(
   std::uint32_t maxBufferSize,
