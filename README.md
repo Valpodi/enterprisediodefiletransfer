@@ -1,4 +1,6 @@
-# Oakdoor Enterprise Data Diode File Transfer Application
+<p align="center"><img width=12.5% src="https://avatars.githubusercontent.com/u/49148719?s=100&v=4"></p>
+
+# Oakdoor Enterprise Data Diode File Transfer
 
 ![CI build](https://github.com/oakdoor/enterprisediodefiletransfer/actions/workflows/build.yml/badge.svg)
 
