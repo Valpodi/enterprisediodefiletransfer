@@ -40,42 +40,57 @@ The server, client and tester binaries may be found in the cmake-build folder.
 
 ## Sending and receiving files
 
+### Catcher
 On the receiving PC (the "catcher"), start the server application:
 
-    ./server --serverPort PORT --mtu MTUSIZE --queueLength QUEUELENGTH --importDiode IMPORTDIODE
+     ./server [-s PORT] [-m MTUSIZE] [-q QUEUELENGTH] [-i]
 
-Server arguments:
-1. PORT: The port the server will listen on.
-2. MTUSIZE: The size of the mtu in bytes.
-3. QUEUELENGTH: The number of packets to queue in the case of missing / out of order packets.
-3. IMPORTDIODE: default=false, set to true when using an import diode, so that the data gets re-wrapped.
+      -s, --serverPort PORT
+            Specifies the UDP port the server will listen on. Default value of 45000.
+      -m, --mtu MTUSIZE
+            Network MTU size. Default size of 1500.
+      -q, --queueLength QUEUELENGTH
+            The number of packets to queue in the case of missing / out of order packets. Default 1024 packets.
+      -i, --importDiode
+            Set this parameter if using the Oakdoor Enterprise Import Diode. This will re-wrap encapsulated files with a single key.
 
+### Pitcher
 On the sending PC (the "pitcher"), send the file:
     
-    ./client --filename FILENAME --address ADDRESS --clientPort PORT --mtu MTUSIZE --datarate DATARATE_MBPS
+      ./client -f FILENAME -a ADDRESS -c PORT [--mtu MTUSIZE] [--datarate DATARATE_MBPS]
 
-Client arguments:
-1. FILENAME: The path to the file to send.
+      -f, --filename FILENAME
+         Path of file to send. Note that the maximum length of the filename (not the path) is 65 characters, and the filename can only contain alphanumeric characters, dashes(-) and dots(.). Only the filename is sent to the destination. Parent folders are not reconstructed.
+      -a, --address ADDRESS
+         Target address of the UDP server or diode.
+      -c, --clientPort PORT
+         Target UDP Port.
+      -m, --mtu MTUSIZE
+         Size of the MTU in bytes
+      -r, --datarate DATARATE
+         The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
    
-   Note that the maximum length of the filename (not the path) is 65 characters, and the filename can only contain alphanumeric characters, dashes(-) and dots(.).
-2. ADDRESS: The IP address of the server.
-3. PORT: The port to send from.
-4. MTUSIZE: The size of the mtu in bytes.
-5. DATARATE_MBPS: The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
 
 Or if running the loopback tester:
 
-    ./tester --filename FILENAME --address ADDRESS --clientPort PORT --serverPort PORT --mtu MTUSIZE --datarate DATARATE_MBPS --importDiode IMPORTDIODE
+    ./tester -f FILENAME -a ADDRESS -c CLIENTPORT -s SERVERPORT [-m MTUSIZE] [--datarate DATARATE_MBPS] [-q reorder_packet_queue_size] [-i]
 
-Client arguments:
-1. FILENAME: The path to the file to send.
-
-   Note that the maximum length of the filename (not the path) is 65 characters, and the filename can only contain alphanumeric characters, dashes(-), dots(.) and underscore (_).
-2. ADDRESS: The IP address of the server.
-3. CLIENT PORT: The port to send from.
-4. SERVER PORT: The port the server will listen on.
-5. MTUSIZE: The size of the mtu in bytes.
-6. DATARATE_MBPS: The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
+      -f, --filename FILENAME
+            Path of file to send. Note that the maximum length of the filename (not the path) is 65 characters, and the filename can only contain alphanumeric characters, dashes(-) and dots(.). Only the filename is sent to the destination. Parent folders are not reconstructed.
+      -a, --address ADDRESS
+            Target address of the UDP server or diode.
+      -c, --clientPort PORT
+            Target UDP Port.
+      -s, --serverPort PORT
+            Specifies the UDP port the server will listen on.
+      -m, --mtu MTUSIZE
+            Network MTU size. Default size of 1500.
+      -q, --queueLength QUEUELENGTH
+            The number of packets to queue in the case of missing / out of order packets. Default 1024 packets.
+      -i, --importDiode
+            Set this parameter if using the Oakdoor Enterprise Import Diode. This will re-wrap encapsulated files with a single ke
+      -r, --datarate DATARATE
+         The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
 
 
 

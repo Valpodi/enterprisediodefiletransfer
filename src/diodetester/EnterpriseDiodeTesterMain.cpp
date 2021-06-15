@@ -33,24 +33,24 @@ inline Params parseArgs(int argc, char **argv)
   std::uint16_t clientPort;
   std::uint16_t serverPort;
   std::string filename;
-  double dataRateMbps;
-  std::uint16_t mtuSize;
+  double dataRateMbps = 0;
+  std::uint16_t mtuSize = 1500;
   std::uint16_t maxQueueLength = 1024;
   bool dropPackets = false;
   bool importDiode = false;
   const auto cli = clara::Help(showHelp) |
-                   clara::Opt(clientAddress, "client address")["-a"]["--address"]("address send packets to") |
-                   clara::Opt(clientPort, "client port")["-c"]["--clientPort"]("port to send packets to") |
-                   clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on") |
-                   clara::Opt(filename, "filename")["-f"]["--filename"]("name of a file you want to send") |
+                   clara::Opt(clientAddress, "client address")["-a"]["--address"]("address send packets to").required() |
+                   clara::Opt(clientPort, "client port")["-c"]["--clientPort"]("port to send packets to").required() |
+                   clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on").required() |
+                   clara::Opt(filename, "filename")["-f"]["--filename"]("name of a file you want to send").required() |
                    clara::Opt(dataRateMbps, "date rate in Megabits per second")["-r"]["--datarate"](
-                     "data rate of transfer") |
+                     "data rate of transfer. default as fast as possible") |
                    clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface") |
                    clara::Opt(maxQueueLength, "Queue Length")["-q"]["--queueLength"](
                      "Max length of queue for reordering packets") |
                    clara::Opt(dropPackets)["-d"]["--dropPackets"](
-                     "Server will write packets to disk if this flag is false, else will drop them and only count missing packets") |
-                   clara::Opt(importDiode, "import diode")["-i"]["--importDiode"](
+                     "Server will drop all received packets and only show missing packets") |
+                   clara::Opt(importDiode)["-i"]["--importDiode"](
                      "Set flag if using an import diode so that the server rewraps data before writing to file.");
 
   const auto result = cli.parse(clara::Args(argc, argv));

@@ -23,14 +23,14 @@ inline Params parseArgs(int argc, char **argv)
   std::string filename;
   std::string clientAddress;
   std::uint16_t clientPort;
-  std::uint16_t mtuSize;
+  std::uint16_t mtuSize = 1500;
   double dataRateMbps = 0;
   const auto cli = clara::Help(showHelp) |
-                   clara::Opt(filename, "filename")["-f"]["--filename"]("name of a file you want to send") |
-                   clara::Opt(clientAddress, "client address")["-a"]["--address"]("address send packets to") |
-                   clara::Opt(clientPort, "client port")["-c"]["--clientPort"]("port to send packets to") |
-                   clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface") |
-                   clara::Opt(dataRateMbps, "date rate in Megabits per second")["-r"]["--datarate"]("data rate of transfer");
+                   clara::Opt(filename, "filename")["-f"]["--filename"]("name of a file you want to send").required() |
+                   clara::Opt(clientAddress, "client address")["-a"]["--address"]("address send packets to").required() |
+                   clara::Opt(clientPort, "client port")["-c"]["--clientPort"]("port to send packets to").required() |
+                   clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface. default 1500") |
+                   clara::Opt(dataRateMbps, "date rate in Megabits per second")["-r"]["--datarate"]("data rate of transfer. default as fast as possible");
 
   const auto result = cli.parse(clara::Args(argc, argv));
   if (!result)
