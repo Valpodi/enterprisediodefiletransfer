@@ -8,7 +8,6 @@ project(EnterpriseDiodeTester)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_STANDARD 17)
 
-
 add_compile_options(-Wno-unknown-pragmas
         -Wall
         -Wextra
@@ -23,17 +22,17 @@ add_compile_options(-Wno-unknown-pragmas
         -Wconversion
         -Wpedantic)
 
-SET(BOOSTROOT /usr/include/boost169)
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-find_package(Boost)
+SET(BOOSTROOT /usr/include/boost169)
+find_package(Boost 1.69.0 REQUIRED)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-message("Boost found at:" ${Boost_LIBRARY_DIRS})
+message("Boost found at:" ${Boost_INCLUDE_DIR})
 
 include_directories(.)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
