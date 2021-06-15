@@ -23,16 +23,16 @@ struct Params
 inline Params parseArgs(int argc, char **argv)
 {
   bool showHelp = false;
-  std::uint16_t serverPort;
-  std::uint16_t mtuSize;
+  std::uint16_t serverPort = 45000;
+  std::uint16_t mtuSize = 1500;
   std::uint16_t maxQueueLength = 1024;
   bool dropPackets = false;
   bool importDiode = false;
   const auto cli = clara::Help(showHelp) |
-                   clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on") |
-                   clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface") |
+                   clara::Opt(serverPort, "server port")["-s"]["--serverPort"]("port to listen for packets on - default 45000") |
+                   clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface - default 1500") |
                    clara::Opt(maxQueueLength, "Queue Length")["-q"]["--queueLength"](
-                     "Max length of queue for reordering packets") |
+                     "Max length of queue for reordering packets - default 1024 packets") |
                    clara::Opt(dropPackets)["-d"]["--dropPackets"](
                      "Diagnostic tool: Server will not write packets to disk if this flag set (will only count missing frames), else will write them to a file as normal") |
                    clara::Opt(importDiode)["-i"]["--importDiode"](
