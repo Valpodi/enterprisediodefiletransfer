@@ -22,4 +22,5 @@ add_library(SERVER_LIBRARY_TESTS
         UdpServerTests.cpp
         ReorderPacketsTests.cpp
         OrderingStreamWriterTests.cpp
-        StreamSpy.hpp)
+        StreamSpy.hpp
+        SislFilenameTests.cpp)

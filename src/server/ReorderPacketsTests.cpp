@@ -29,60 +29,15 @@ TEST_CASE("ReorderPackets. Handling filename")
   std::stringstream outputStream;
   StreamSpy stream(outputStream, 1, notused1, notused2);
   auto queueManager = ReorderPackets(4, 1024, false, DiodeType::basic);
-  SECTION("Handling empty filename")
-  {
-    REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {}}, &stream));
-    REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "rejected.12345");
-  }
-  SECTION("Handling empty filename value in sisl")
-  {
-    const auto inputStream = std::string("{name: !str \"\"}");
-    REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
-    REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "rejected.12345");
-  }
-  SECTION("Handling invalid sisl filename")
-  {
-    auto inputStream = std::string("name: !str \"\"}");
-    REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
-    REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "rejected.12345");
-  }
-  SECTION("Handling sisl without name key")
-  {
-    auto inputStream = std::string("{something: !str \"\"}");
-    REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
-    REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "rejected.12345");
-  }
-  SECTION("Handling sisl that exceeds max sisl size")
-  {
-    std::string sislFilename = "{something: !str \"";
-    for(int i=0; i<1002; i++)
-    {
-      sislFilename += "a";
-    }
-    sislFilename += "\"}";
-    auto inputStream = std::string(sislFilename);
-    REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
-    REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "rejected.12345");
-  }
-  SECTION("Handling non-empty filename")
+
+  SECTION("good filename")
   {
     auto inputStream = std::string("{name: !str \"testFilename\"}");
     REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "testFilename");
   }
-  SECTION("Handling filename with null terminator")
-  {
-    auto inputStream = std::string("{name: !str \"te\0stFilename\"}");
-    REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
-    REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "rejected.12345");
-  }
+
   SECTION("Handling filename with length > maxFilenameLength, 65")
   {
     auto inputStream = std::string("{name: !str \"testFilenametestFilenametestFilenametestFilenametestFilenametestFilename\"}");
@@ -90,21 +45,6 @@ TEST_CASE("ReorderPackets. Handling filename")
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "rejected.12345");
   }
-  SECTION("Handling filename with allowable special characters")
-  {
-    auto inputStream = std::string("{name: !str \"example_file-name_09.txt\"}");
-    REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
-    REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "example_file-name_09.txt");
-  }
-  SECTION("Handling filename with illegal special characters")
-  {
-    auto inputStream = std::string("{name: !str \"/file\"}");
-    REQUIRE(queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
-    REQUIRE(outputStream.str().empty());
-    REQUIRE(stream.storedFilename == "rejected.12345");
-  }
-
 }
 
 TEST_CASE("ReorderPackets. Out-of-order packets")

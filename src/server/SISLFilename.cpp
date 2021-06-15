@@ -4,7 +4,6 @@
 #include <SislTools/SislTools.hpp>
 #include <iostream>
 #include <rapidjson/document.h>
-#include <regex>
 
 SISLFilename::SISLFilename(std::uint32_t maxSislLength, std::uint32_t maxFilenameLength):
     maxSislLength(maxSislLength),
@@ -15,9 +14,15 @@ std::optional<std::string> SISLFilename::extractFilename(const BytesBuffer& eofF
 {
   const auto sislHeader = std::string(eofFrame.begin(), eofFrame.end());
 
-  if (sislHeader.size() > maxSislLength)
+  if (sislHeader.size() > maxSislLength || sislHeader.size() < 2)
   {
-    std::cerr << "SISL too long" << "\n";
+    std::cerr << "SISL too long/short" << "\n";
+    return std::optional<std::string>();
+  }
+
+  if (sislHeader.at(0) != '{')
+  {
+    std::cerr << "EOF not SISL" << "\n";
     return std::optional<std::string>();
   }
 
