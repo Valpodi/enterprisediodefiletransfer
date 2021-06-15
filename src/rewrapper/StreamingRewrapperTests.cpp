@@ -20,7 +20,7 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
 
   SECTION("For file that looks wrapped throw if header not valid")
   {
-    auto input = createTestWrappedBytesBuffer("AAA");
+    auto input = createTestWrappedString("AAA").message;
     input[1] = 0xA;
 
     REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input, 1), std::runtime_error);
@@ -40,7 +40,7 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
 
   SECTION("Rewrap is called with framecount 1, returns the input - including the header")
   {
-    auto input = createTestWrappedBytesBuffer("AAA");
+    auto input = createTestWrappedString("AAA").message;
     auto output = streamingRewrapper.rewrap(input, 1);
     REQUIRE(output == input);
     REQUIRE(output.at(0) == CloakedDagger::cloakedDaggerIdentifierByte);
@@ -49,7 +49,7 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
 
   SECTION("If the first frame that rewrapper is given has frameCount != 1, the mask will not be set.")
   {
-    auto input = createTestWrappedBytesBuffer("AAA");
+    auto input = createTestWrappedString("AAA").message;
     REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input, 2), std::runtime_error);
   }
 

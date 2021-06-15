@@ -5,41 +5,35 @@
 #include "UnwrapperTestHelpers.hpp"
 #include "CloakedDagger.hpp"
 
-
-std::string createTestWrappedString(const std::string& payload, const BytesBuffer& mask)
+TestPacket createTestWrappedString(const std::string& payload, const std::array<char, 8>& mask)
 {
   if (mask.size() != 8)
   {
     throw std::runtime_error("Bad mask length");
   }
 
-  auto bytes = BytesBuffer({0xd1, 0xdf, 0x5f, 0xff, // magic1
+  auto header = std::array<char, CloakedDagger::headerSize()>({static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
                             0x00, 0x01, // major version
                             0x00, 0x00, // minor version
                             0x00, 0x00, 0x00, 0x30, // total length
                             0x00, 0x00, 0x00, 0x01, // encoding type
                             0x00, 0x03, // encoding config
                             0x00, 0x08, // encoding data length
-                             // mask will be here
+                            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mask will be here
                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 1
                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 2
-                            0xff, 0x5f, 0xdf, 0xd1});  // magic2
-  bytes.insert(bytes.begin() + 20, mask.begin(), mask.end());
+     static_cast<char>(0xff), 0x5f, static_cast<char>(0xdf), static_cast<char>(0xd1)});  // magic2
+  std::copy(mask.begin(), mask.end(), header.begin() + 20);
 
-  auto messageStream = std::string(bytes.begin(), bytes.end());
+  BytesBuffer messageStream {header.begin(), header.end()};
 
   unsigned long count = 0;
   for (auto payloadChar: payload)
   {
-    messageStream.push_back(static_cast<char>(payloadChar ^ mask[count++ % mask.size()]));
+    messageStream.push_back((static_cast<unsigned char>(payloadChar ^ mask[count++ % mask.size()])));
   }
 
-  return messageStream;
-}
-
-BytesBuffer createTestWrappedBytesBuffer(const std::string& payload, const BytesBuffer& mask)
-{
-  return MessageParsingHelpers::StringToBytes(createTestWrappedString(payload, mask));
+  return {header, messageStream};
 }
 
 bool isCloakDaggerEncoded(std::istream& inputStream)
