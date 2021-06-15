@@ -6,12 +6,11 @@
 OrderingStreamWriter::OrderingStreamWriter(
   std::uint32_t maxBufferSize,
   std::uint32_t maxQueueLength,
-  bool dropPackets,
-  std::unique_ptr<StreamInterface> stream,
+  std::unique_ptr<StreamInterface> streamWrapper,
   std::function<std::time_t()> getTime,
-  DiodeType diodeType):
-    packetQueue(maxBufferSize, maxQueueLength, dropPackets, diodeType),
-    streamWrapper(std::move(stream)),
+  DiodeType diodeType) :
+    packetQueue(maxBufferSize, maxQueueLength, diodeType),
+    streamWrapper(std::move(streamWrapper)),
     getTime(std::move(getTime)),
     timeLastUpdated(this->getTime())
 {

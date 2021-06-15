@@ -24,7 +24,6 @@ public:
   explicit ReorderPackets(
     std::uint32_t maxBufferSize,
     std::uint32_t maxQueueLength,
-    bool dropPackets,
     DiodeType diodeType,
     std::uint32_t maxFilenameLength = 65);
   bool write(Packet&& packet, StreamInterface* streamWrapper);
@@ -39,7 +38,6 @@ private:
   std::uint32_t lastFrameReceived = 0;
   std::uint32_t maxBufferSize;
   std::uint32_t maxQueueLength;
-  bool dropPackets;
   std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
   DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;

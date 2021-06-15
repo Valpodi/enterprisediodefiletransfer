@@ -14,13 +14,11 @@
 ReorderPackets::ReorderPackets(
   std::uint32_t maxBufferSize,
   std::uint32_t maxQueueLength,
-  bool dropPackets,
   DiodeType diodeType,
   std::uint32_t maxFilenameLength):
     sislFilename(maxFilenameLength),
     maxBufferSize(maxBufferSize),
     maxQueueLength(maxQueueLength),
-    dropPackets(dropPackets),
     diodeType(diodeType)
 {
 }

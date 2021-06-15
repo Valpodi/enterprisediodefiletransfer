@@ -9,20 +9,12 @@ Server::Server(
   std::unique_ptr<UdpServerInterface> udpServerInterface,
   std::uint32_t maxBufferSize,
   std::uint32_t maxQueueLength,
-  bool dropPackets,
   std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator,
   std::function<std::time_t()> getTime,
   std::uint32_t timeoutPeriod,
-  DiodeType diodeType):
+  DiodeType diodeType) :
     udpServerInterface(std::move(udpServerInterface)),
-    sessionManager(
-      maxBufferSize,
-      maxQueueLength,
-      dropPackets,
-      std::move(streamCreator),
-      std::move(getTime),
-      timeoutPeriod,
-      diodeType)
+    sessionManager(maxBufferSize, maxQueueLength, std::move(streamCreator), std::move(getTime), timeoutPeriod, diodeType)
 {
   this->udpServerInterface->setCallback([this](std::vector<std::uint8_t>&& header, std::vector<std::uint8_t>&& payload) { receivePacket(std::move(header), std::move(payload)); });
 }
