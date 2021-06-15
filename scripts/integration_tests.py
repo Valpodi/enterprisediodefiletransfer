@@ -105,7 +105,7 @@ class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
         while subprocess.call(f"lsof -i :{port}".split()):
             time.sleep(1)
             attempts -= 1
-            if attempts == 0:
+            if not attempts:
                 raise TimeoutError("Server failed to start")
 
     def start_ED_server_thread(self, set_drop_packets_flag=False, import_diode=False):
@@ -142,6 +142,17 @@ class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
         with open(f"{cls.build_folder}/files_received/{filename}", "rb") as file:
             return pysisl.unwraps(file.read())
 
+    @classmethod
+    def wait_for_received_file(cls, filename):
+        attempts = 10
+
+        while not os.path.isfile(f"{cls.build_folder}/files_received/{filename}"):
+            time.sleep(1)
+            attempts -= 1
+            if not attempts:
+                raise TimeoutError("Timed out waiting for received data")
+        return True
+
     def test_ed_server_import_mode_rewraps_files(self):
         data = "abcdefghij"
         # ed_header_size + cloak_dagger_header_size + ip_and_udp_header_size + len(data)/number_of_frames
@@ -149,7 +160,7 @@ class IntegrationTestsEnterpriseDiodeFileTransfer(unittest.TestCase):
         self.create_wrapped_file("test_file", data)
         server_handle = self.start_ED_server_thread(import_diode=True)
         self.assertEqual(self.send_file_with_ED_client(file_to_send="test_file", mtu=mtu_size).wait(timeout=5), 0)
-        time.sleep(2)
+        self.wait_for_received_file("test_file")
         self.assertEqual(data.encode(), self.unwrap_file("test_file"))
         server_handle.send_signal(signal.SIGINT)
         self.assertEqual(server_handle.wait(timeout=5), 0)
