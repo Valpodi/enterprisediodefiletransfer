@@ -7,15 +7,6 @@ set -eux
 DOCKERCOMMAND=${1:-"exit 1"}
 BUILDIMAGE=$(docker build -q -f docker/Dockerfile .)
 
-function cleanup()
-{
-  echo "cleanup! reset all file permissions to host owned"
-  HOSTUID=`id -u`
-  docker run -v $(pwd):$(pwd) "$BUILDIMAGE" /bin/bash -c "chown -R $HOSTUID $(pwd)"
-}
-
-trap cleanup EXIT
-
 
 docker run -v "$(pwd)":"$(pwd)" \
           "$BUILDIMAGE" \
