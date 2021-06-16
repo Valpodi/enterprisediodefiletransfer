@@ -34,20 +34,22 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
   SECTION("For single chunk rYaml files, ensure we don't 'rewrap'")
   {
     const auto data = BytesBuffer{'{'};
-    REQUIRE(streamingRewrapper.rewrap(data, header, 1) == data);
+    REQUIRE(streamingRewrapper.rewrap(data, std::array<char, CloakedDagger::headerSize()>(), 1) == data);
   }
 
   SECTION("For single chunk BMP files, ensure we don't 'rewrap'")
   {
     const auto data = BytesBuffer{'B'};
-    REQUIRE(streamingRewrapper.rewrap(data, header, 1) == data);
+    REQUIRE(streamingRewrapper.rewrap(data, std::array<char, CloakedDagger::headerSize()>(), 1) == data);
   }
 
   SECTION("Rewrap is called with framecount 1, returns the input - including the header")
   {
     auto input = createTestWrappedString("AAA");
-    auto output = streamingRewrapper.rewrap(input.message, input.header, 1);
-    REQUIRE(output == input.message);
+    BytesBuffer output = streamingRewrapper.rewrap(input.message, input.header, 1);
+    BytesBuffer fileWritten{input.header.begin(), input.header.end()};
+    fileWritten.insert(fileWritten.end(), input.message.begin(), input.message.end());
+    REQUIRE(output == fileWritten);
     REQUIRE(output.at(0) == CloakedDagger::cloakedDaggerIdentifierByte);
     REQUIRE(output.size() == CloakedDagger::headerSize() + 3);
   }

@@ -12,7 +12,7 @@ class StreamingRewrapper
 {
 public:
   StreamingRewrapper() = default;
-  BytesBuffer rewrap(const BytesBuffer& input, std::array<char, CloakedDagger::headerSize()> cloakedDaggerHeader, std::uint32_t frameCount);
+  BytesBuffer rewrap(const BytesBuffer& input, const std::array<char, CloakedDagger::headerSize()>& cloakedDaggerHeader, std::uint32_t frameCount);
 
 private:
   size_t mask_index {0};
@@ -21,7 +21,7 @@ private:
   static BytesBuffer getMaskFromHeader(const BytesBuffer& input);
   BytesBuffer constructXORedMask(const BytesBuffer& inputChunkMask) const;
   BytesBuffer rewrapData(const BytesBuffer& input, const BytesBuffer& newMask);
-  BytesBuffer handleFirstFrame(const BytesBuffer& input, const BytesBuffer& inputChunkMask);
+  void handleFirstFrame(const BytesBuffer& input, const BytesBuffer& inputChunkMask);
 };
 
 

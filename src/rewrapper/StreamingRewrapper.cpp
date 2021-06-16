@@ -5,7 +5,7 @@
 #include "BytesBuffer.hpp"
 #include "CloakedDagger.hpp"
 
-BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, std::array<char, CloakedDagger::headerSize()> cloakedDaggerHeader, std::uint32_t frameCount)
+BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, const std::array<char, CloakedDagger::headerSize()>& cloakedDaggerHeader, std::uint32_t frameCount)
 {
   if (cloakedDaggerHeader.at(0) != static_cast<char>(CloakedDagger::cloakedDaggerIdentifierByte))
   {
@@ -15,25 +15,27 @@ BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, std::array<char
 
   if (frameCount == 1)
   {
-    return handleFirstFrame(input, inputChunkMask);
+    handleFirstFrame(input, inputChunkMask);
+    BytesBuffer firstFrame{cloakedDaggerHeader.begin(), cloakedDaggerHeader.end()};
+    firstFrame.insert(firstFrame.end(), input.begin(), input.end());
+    return firstFrame;
   }
   return rewrapData(input, constructXORedMask(inputChunkMask));
 }
 
-BytesBuffer StreamingRewrapper::handleFirstFrame(const BytesBuffer& input, const BytesBuffer& inputChunkMask)
+void StreamingRewrapper::handleFirstFrame(const BytesBuffer& input, const BytesBuffer& inputChunkMask)
 {
   mask = inputChunkMask;
-  mask_index = input.size() - CloakedDagger::headerSize();
-  return input;
+  mask_index = input.size();
 }
 
 BytesBuffer StreamingRewrapper::rewrapData(const BytesBuffer& input, const BytesBuffer& newMask)
 {
   BytesBuffer output;
 
-  for (auto c=input.begin() + CloakedDagger::headerSize(); c != input.end(); c++)
+  for (unsigned char c : input)
   {
-    output.push_back(*c ^ newMask.at(mask_index % CloakedDagger::maskLength));
+    output.push_back(c ^ newMask.at(mask_index % CloakedDagger::maskLength));
     mask_index++;
   }
   return output;

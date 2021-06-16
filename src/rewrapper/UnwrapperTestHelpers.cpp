@@ -25,7 +25,7 @@ TestPacket createTestWrappedString(const std::string& payload, const std::array<
      static_cast<char>(0xff), 0x5f, static_cast<char>(0xdf), static_cast<char>(0xd1)});  // magic2
   std::copy(mask.begin(), mask.end(), header.begin() + 20);
 
-  BytesBuffer messageStream {header.begin(), header.end()};
+  BytesBuffer messageStream;
 
   unsigned long count = 0;
   for (auto payloadChar: payload)
