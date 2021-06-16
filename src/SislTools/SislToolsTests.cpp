@@ -2,7 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "SislTools.hpp"
-#include <catch.hpp>
+#include <test/catch.hpp>
 
 TEST_CASE("RapidJsonSislConverterInterface Strings Json to Sisl")
 {

@@ -5,9 +5,9 @@
 #include <vector>
 #include <string>
 #include <future>
-#include <EnterpriseDiodeTestHelpers.hpp>
+#include <test/EnterpriseDiodeTestHelpers.hpp>
 
-#include "catch.hpp"
+#include "test/catch.hpp"
 #include "diodeheader/EnterpriseDiodeHeader.hpp"
 #include "Server.hpp"
 #include "client/Client.hpp"

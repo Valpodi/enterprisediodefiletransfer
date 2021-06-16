@@ -5,8 +5,8 @@
 #include <vector>
 #include <string>
 
-#include "catch.hpp"
-#include "EnterpriseDiodeTestHelpers.hpp"
+#include "test/catch.hpp"
+#include "test/EnterpriseDiodeTestHelpers.hpp"
 #include "diodeheader/EnterpriseDiodeHeader.hpp"
 #include "Server.hpp"
 #include "StreamSpy.hpp"

@@ -2,7 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "RapidJsonSislConverter.hpp"
-#include <catch.hpp>
+#include <test/catch.hpp>
 
 TEST_CASE("Json parsing. Arrays not supported")
 {

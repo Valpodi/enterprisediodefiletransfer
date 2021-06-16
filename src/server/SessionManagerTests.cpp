@@ -2,8 +2,8 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include <sstream>
-#include <EnterpriseDiodeTestHelpers.hpp>
-#include "catch.hpp"
+#include <test/EnterpriseDiodeTestHelpers.hpp>
+#include "test/catch.hpp"
 #include "SessionManager.hpp"
 #include "StreamSpy.hpp"
 

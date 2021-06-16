@@ -6,9 +6,9 @@
 #include <string>
 #include <future>
 
-#include "catch.hpp"
+#include "test/catch.hpp"
 
-#include "EnterpriseDiodeTestHelpers.hpp"
+#include "test/EnterpriseDiodeTestHelpers.hpp"
 #include "diodeheader/EnterpriseDiodeHeader.hpp"
 #include "Client.hpp"
 #include "Timer.hpp"

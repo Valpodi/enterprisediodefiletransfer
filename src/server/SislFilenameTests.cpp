@@ -2,7 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "SISLFilename.hpp"
-#include <catch.hpp>
+#include <test/catch.hpp>
 
 inline BytesBuffer stringToBuffer(const std::string& string)
 {

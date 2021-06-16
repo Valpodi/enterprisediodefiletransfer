@@ -4,7 +4,7 @@
 #include "Packet.hpp"
 #include "ReorderPackets.hpp"
 #include "StreamSpy.hpp"
-#include "catch.hpp"
+#include "test/catch.hpp"
 #include <rewrapper/UnwrapperTestHelpers.hpp>
 
 TEST_CASE("ReorderPackets. Packets received in order are written to the output")

@@ -2,10 +2,10 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include <array>
-#include "catch.hpp"
+#include "test/catch.hpp"
 
 #include "EnterpriseDiodeHeader.hpp"
-#include "EnterpriseDiodeTestHelpers.hpp"
+#include "test/EnterpriseDiodeTestHelpers.hpp"
 
 
 TEST_CASE("ED Header. Header is created from a input stream. readHeaderParams constructs HeaderParams in order.")

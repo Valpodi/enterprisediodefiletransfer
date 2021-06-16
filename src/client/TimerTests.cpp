@@ -5,7 +5,7 @@
 #include <vector>
 #include <future>
 
-#include "catch.hpp"
+#include "test/catch.hpp"
 #include "Client.hpp"
 #include "Timer.hpp"
 #include "test/EnterpriseDiodeTestHelpers.hpp"

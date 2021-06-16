@@ -2,7 +2,7 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "BoostSpiritSislParser.hpp"
-#include <catch.hpp>
+#include <test/catch.hpp>
 
 TEST_CASE("SISL parsing. Can parse strings")
 {

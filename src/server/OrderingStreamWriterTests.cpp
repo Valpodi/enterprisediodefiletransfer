@@ -2,9 +2,9 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include <sstream>
-#include "catch.hpp"
+#include "test/catch.hpp"
 #include "OrderingStreamWriter.hpp"
-#include <EnterpriseDiodeTestHelpers.hpp>
+#include <test/EnterpriseDiodeTestHelpers.hpp>
 #include "StreamSpy.hpp"
 
 TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue")

@@ -5,7 +5,7 @@
 #include <vector>
 #include <future>
 
-#include "catch.hpp"
+#include "test/catch.hpp"
 
 #include "diodeheader/EnterpriseDiodeHeader.hpp"
 #include "UdpClient.hpp"
