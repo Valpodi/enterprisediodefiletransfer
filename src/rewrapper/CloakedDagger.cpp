@@ -41,20 +41,10 @@ void CloakedDagger::throwIfHeaderInvalid() const
   }
 }
 
-CloakedDagger CloakedDagger::createFromBuffer(const BytesBuffer& buffer)
+CloakedDagger CloakedDagger::createFromBuffer(const std::array<char, 48>& cloakedDaggerHeader)
 {
-  if (buffer.size() < CloakedDagger::headerSize())
-  {
-    throw std::runtime_error("Insufficient space in file for header: " + std::to_string(buffer.size()) );
-  }
-
-  std::vector<char> headerBuffer(
-    buffer.begin(),
-    buffer.begin() + CloakedDagger::headerSize());
-
-
   std::stringstream s;
-  s.write(headerBuffer.data(), headerBuffer.size());
+  s.write(cloakedDaggerHeader.data(), static_cast<long>(cloakedDaggerHeader.size()));
 
   return CloakedDagger(s);
 }

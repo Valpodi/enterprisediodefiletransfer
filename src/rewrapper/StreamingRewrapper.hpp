@@ -18,7 +18,7 @@ private:
   size_t mask_index {0};
   BytesBuffer mask = BytesBuffer(CloakedDagger::maskLength);
 
-  static BytesBuffer getMaskFromHeader(const BytesBuffer& input);
+  static BytesBuffer getMaskFromHeader(const std::array<char, CloakedDagger::headerSize()>& cloakedDaggerHeader);
   BytesBuffer constructXORedMask(const BytesBuffer& inputChunkMask) const;
   BytesBuffer rewrapData(const BytesBuffer& input, const BytesBuffer& newMask);
   void handleFirstFrame(const BytesBuffer& input, const BytesBuffer& inputChunkMask);

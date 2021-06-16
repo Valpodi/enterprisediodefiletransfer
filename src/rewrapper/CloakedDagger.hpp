@@ -17,8 +17,8 @@ public:
 
   explicit CloakedDagger(std::istream& inputStream);
 
-  static CloakedDagger createFromBuffer(const BytesBuffer& buffer);
   static constexpr size_t headerSize()   {  return 48; }
+  static CloakedDagger createFromBuffer(const std::array<char, 48>& cloakedDaggerHeader);
 
   const static size_t maskLength {8};
   static constexpr std::uint8_t cloakedDaggerIdentifierByte {0xd1};

@@ -11,7 +11,7 @@ BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, const std::arra
   {
     return input;
   }
-  const auto inputChunkMask = getMaskFromHeader({cloakedDaggerHeader.begin(), cloakedDaggerHeader.end()});
+  const auto inputChunkMask = getMaskFromHeader(cloakedDaggerHeader);
 
   if (frameCount == 1)
   {
@@ -57,9 +57,9 @@ BytesBuffer StreamingRewrapper::constructXORedMask(const BytesBuffer& inputChunk
   return newMask;
 }
 
-BytesBuffer StreamingRewrapper::getMaskFromHeader(const BytesBuffer& input)
+BytesBuffer StreamingRewrapper::getMaskFromHeader(const std::array<char, CloakedDagger::headerSize()>& cloakedDaggerHeader)
 {
-  const auto header = CloakedDagger::createFromBuffer(input);
+  const auto header = CloakedDagger::createFromBuffer(cloakedDaggerHeader);
 
   return BytesBuffer(header.key.begin(), header.key.end());
 }
