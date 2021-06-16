@@ -1,31 +1,23 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <array>
 #include "EnterpriseDiodeHeader.hpp"
-
+#include <Parsing.hpp>
+#include <array>
 
 EDHeader::EDHeader(const std::vector<std::uint8_t>& frame) :
   headerParams(readHeaderParams(frame))
 {
 }
 
-template <typename T>
-  T extract(const std::vector<std::uint8_t> &v, int pos)
-{
-  T value;
-  memcpy(&value, &v[pos], sizeof(T));
-  return value;
-}
-
 
 HeaderParams EDHeader::readHeaderParams(const std::vector<std::uint8_t>& frame)
 {
   return {
-    extract<std::uint32_t>(frame, 0),
-    extract<std::uint32_t>(frame, 4),
-    extract<bool>(frame, 8),
-    extract<std::array<char, 48>>(frame, EnterpriseDiode::HeaderSizeInBytes - 48)
+    Parsing::extract<std::uint32_t>(frame, 0),
+    Parsing::extract<std::uint32_t>(frame, 4),
+    Parsing::extract<bool>(frame, 8),
+    Parsing::extract<std::array<char, 48>>(frame, EnterpriseDiode::HeaderSizeInBytes - 48)
   };
 }
 

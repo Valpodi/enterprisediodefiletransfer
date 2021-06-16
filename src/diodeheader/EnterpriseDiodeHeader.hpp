@@ -29,14 +29,6 @@ public:
   HeaderParams headerParams;
 
 private:
-  template <typename T>
-  static T extract(const std::vector<std::uint8_t> &v, size_t pos)
-  {
-    T value;
-    memcpy(&value, &v[pos], sizeof(T));
-    return value;
-  }
-
   static HeaderParams readHeaderParams(const std::vector<std::uint8_t>& frame);
 };
 
