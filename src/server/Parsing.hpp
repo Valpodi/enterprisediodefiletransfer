@@ -9,11 +9,11 @@
 
 struct Parsing
 {
-  template <typename T>
-  static T extract(const std::vector<std::uint8_t> &v, int pos)
+  template <typename T, typename ARRAY>
+  static T extract(const ARRAY &v, unsigned long pos)
   {
     T value;
-    memcpy(&value, &v[pos], sizeof(T));
+    memcpy(&value, &v[static_cast<unsigned long>(pos)], sizeof(T));
     return value;
   }
 };

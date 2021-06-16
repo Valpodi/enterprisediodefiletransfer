@@ -1,28 +1,28 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <ios>
+#include "CloakedDagger.hpp"
+#include <BytesBuffer.hpp>
+#include <Parsing.hpp>
 #include <array>
 #include <boost/endian/conversion.hpp>
-#include <BytesBuffer.hpp>
-#include <sstream>
-#include "CloakedDagger.hpp"
+#include <iostream>
 
-CloakedDagger::CloakedDagger(std::istream& inputStream):
-  magic1(read<std::uint32_t>(inputStream)),
-  majorVersion(read<std::uint16_t>(inputStream)),
-  minorVersion(read<std::uint16_t>(inputStream)),
-  headerLength(read<std::uint32_t>(inputStream)),
-  encapsulationType(read<std::uint32_t>(inputStream)),
-  encapsulationConfig(read<std::uint16_t>(inputStream)),
-  encapsulationDataLength(read<std::uint16_t>(inputStream)),
-  key(readArray(inputStream)),
-  headerChecksumType(read<std::uint32_t>(inputStream)),
-  headerChecksumConfig(read<std::uint16_t>(inputStream)),
-  headerChecksumDataLength(read<std::uint16_t>(inputStream)),
-  dataChecksumType(read<std::uint32_t>(inputStream)),
-  dataChecksumDataLength(read<std::uint32_t>(inputStream)),
-  magic2(read<std::uint32_t>(inputStream))
+CloakedDagger::CloakedDagger(const std::array<char, 48>& cloakedDaggerHeader):
+  magic1(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 0)),
+  majorVersion(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 4)),
+  minorVersion(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 6)),
+  headerLength(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 8)),
+  encapsulationType(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 12)),
+  encapsulationConfig(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 16)),
+  encapsulationDataLength(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 18)),
+  key(Parsing::extract<std::array<char, maskLength>, std::array<char, 48>>(cloakedDaggerHeader, 20)),
+  headerChecksumType(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 28)),
+  headerChecksumConfig(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 32)),
+  headerChecksumDataLength(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 34)),
+  dataChecksumType(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 36)),
+  dataChecksumDataLength(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 40)),
+  magic2(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 44))
 {
   throwIfHeaderInvalid();
 }
@@ -43,10 +43,7 @@ void CloakedDagger::throwIfHeaderInvalid() const
 
 CloakedDagger CloakedDagger::createFromBuffer(const std::array<char, 48>& cloakedDaggerHeader)
 {
-  std::stringstream s;
-  s.write(cloakedDaggerHeader.data(), static_cast<long>(cloakedDaggerHeader.size()));
-
-  return CloakedDagger(s);
+  return CloakedDagger(cloakedDaggerHeader);
 }
 
 

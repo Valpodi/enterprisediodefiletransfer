@@ -1,9 +1,11 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include "MessageParsingHelpers.hpp"
 #include "UnwrapperTestHelpers.hpp"
 #include "CloakedDagger.hpp"
+#include "MessageParsingHelpers.hpp"
+#include <algorithm>
+#include <iostream>
 
 TestPacket createTestWrappedString(const std::string& payload, const std::array<char, 8>& mask)
 {
@@ -43,7 +45,10 @@ bool isCloakDaggerEncoded(std::istream& inputStream)
 
 void cloakDaggerUnwrap(std::istream& inputStream, std::ostream& outputStream)
 {
-  const CloakedDagger wrappedHeader(inputStream);
+  std::array<char, 48> headerBuffer{};
+  std::copy_n(std::istreambuf_iterator<char>(inputStream), 49, headerBuffer.begin());
+
+  const CloakedDagger wrappedHeader(headerBuffer);
 
   char readByte;
   uint64_t count = 0;

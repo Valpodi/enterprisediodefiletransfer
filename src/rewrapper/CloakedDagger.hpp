@@ -15,7 +15,7 @@ class CloakedDagger
 {
 public:
 
-  explicit CloakedDagger(std::istream& inputStream);
+  explicit CloakedDagger(const std::array<char, 48>& cloakedDaggerHeader);
 
   static constexpr size_t headerSize()   {  return 48; }
   static CloakedDagger createFromBuffer(const std::array<char, 48>& cloakedDaggerHeader);
@@ -40,39 +40,6 @@ public:
 
 private:
   void throwIfHeaderInvalid() const;
-
-  template <typename T>
-  static T read(std::istream& inputStream)
-  {
-    std::array<char, sizeof(T)> temporaryBuffer;
-    inputStream.read(temporaryBuffer.data(), sizeof(T));
-
-    checkStreamHasSpace(inputStream);
-
-    T value;
-    std::memcpy(&value, temporaryBuffer.data(), sizeof(T));
-
-    return value;
-  }
-
-  std::array<char, maskLength> readArray(std::istream& inputStream)
-  {
-    std::array<char, maskLength> temporaryBuffer;
-    inputStream.read(temporaryBuffer.data(), maskLength);
-
-    checkStreamHasSpace(inputStream);
-
-    return temporaryBuffer;
-  }
-
-  static void checkStreamHasSpace(std::istream& inputStream)
-  {
-    if (inputStream.rdstate() & std::ifstream::eofbit)
-    {
-      throw std::runtime_error("Insufficient space in file for header");
-    }
-  }
-
 };
 
 
