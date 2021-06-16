@@ -12,6 +12,11 @@ RUN yum install -y boost169-devel \
                    python3 \
                    python3-pip \
                    rapidjson-devel \
-                   valgrind
+                   valgrind \
+                   unzip
+
+RUN curl -L -o /codeql.zip https://github.com/github/codeql-cli-binaries/releases/download/v2.5.5/codeql-linux64.zip && \
+    unzip /codeql.zip && \
+    /codeql/codeql resolve languages
 
 RUN pip3 install nose pysisl
