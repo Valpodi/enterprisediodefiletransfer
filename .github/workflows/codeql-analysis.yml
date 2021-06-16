@@ -29,6 +29,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - uses: github/codeql-action/init@v1
+      with:
+        db-location: '${{ github.workspace }}/cmake-codeql/oakdoor-database'
+
     - name: run analysis
       run: ./scripts/runInDocker.sh scripts/runCodeQL.sh
 
