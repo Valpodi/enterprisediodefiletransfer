@@ -11,6 +11,7 @@ RUN yum install -y boost169-devel \
                    lsof \
                    python3 \
                    python3-pip \
-                   rapidjson-devel
+                   rapidjson-devel \
+                   valgrind
 
 RUN pip3 install nose pysisl

@@ -4,16 +4,18 @@
 
 set -eux
 
-BUILD_TYPE=${1}
+BUILD_TYPE=${1:-release}
 BUILD_TYPE_LOWERCASE="${BUILD_TYPE,,}"
 BUILD_TARGET="docker"
 BUILD_FOLDER=cmake-build-"$BUILD_TARGET"-"$BUILD_TYPE_LOWERCASE"
 BUILD_IMAGE=$(docker build -q -f docker/Dockerfile .)
 ARCHIVE=${2:-"no"}
 
-docker run -v "$(pwd)":"$(pwd)" \
-  "$BUILD_IMAGE" \
-  /bin/bash -c "pushd $(pwd) && scl enable devtoolset-9 \"HOME=/tmp ./scripts/compile.sh $BUILD_TYPE $BUILD_TARGET\" && ./scripts/runIntegrationTests.sh $BUILD_FOLDER && chown -R $(id -u):$(id -u) ."
+./scripts/runInDocker.sh "pushd $(pwd) && \
+                          scl enable devtoolset-9 \"HOME=/tmp ./scripts/compile.sh $BUILD_TYPE $BUILD_TARGET\" && \
+                          ./scripts/runIntegrationTests.sh $BUILD_FOLDER && \
+                          ./scripts/runValgrind.sh $BUILD_FOLDER"
+
 
 if [[ ${ARCHIVE} == "archive" ]]; then
   pushd cmake-build-docker-release
