@@ -28,11 +28,13 @@ TestPacket createTestWrappedString(const std::string& payload, const std::array<
 
   BytesBuffer messageStream;
 
-  unsigned long count = 0;
-  for (auto payloadChar: payload)
-  {
-    messageStream.push_back((static_cast<unsigned char>(payloadChar ^ mask[count++ % mask.size()])));
-  }
+  std::transform(
+    payload.begin(),
+    payload.end(),
+    std::back_inserter(messageStream),
+    [count=0, mask](const auto payloadChar) mutable {
+      return static_cast<unsigned char>(payloadChar ^ mask[count++ % mask.size()]);
+    });
 
   return {header, messageStream};
 }

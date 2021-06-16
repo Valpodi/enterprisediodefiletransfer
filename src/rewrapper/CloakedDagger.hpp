@@ -23,20 +23,20 @@ public:
   const static size_t maskLength {8};
   static constexpr std::uint8_t cloakedDaggerIdentifierByte {0xd1};
 
-  std::uint32_t magic1;
-  std::uint16_t majorVersion;
-  std::uint16_t minorVersion;
-  std::uint32_t headerLength;
-  std::uint32_t encapsulationType;
-  std::uint16_t encapsulationConfig;
-  std::uint16_t encapsulationDataLength;
-  std::array<char, maskLength> key; //encapsulationMask
-  std::uint32_t headerChecksumType;
-  std::uint16_t headerChecksumConfig;
-  std::uint16_t headerChecksumDataLength;
-  std::uint32_t dataChecksumType;
-  std::uint32_t dataChecksumDataLength;
-  std::uint32_t magic2;
+  const std::uint32_t magic1;
+  const std::uint16_t majorVersion;
+  const std::uint16_t minorVersion;
+  const std::uint32_t headerLength;
+  const std::uint32_t encapsulationType;
+  const std::uint16_t encapsulationConfig;
+  const std::uint16_t encapsulationDataLength;
+  const std::array<char, maskLength> key; //encapsulationMask
+  const std::uint32_t headerChecksumType;
+  const std::uint16_t headerChecksumConfig;
+  const std::uint16_t headerChecksumDataLength;
+  const std::uint32_t dataChecksumType;
+  const std::uint32_t dataChecksumDataLength;
+  const std::uint32_t magic2;
 
 private:
   void throwIfHeaderInvalid() const;

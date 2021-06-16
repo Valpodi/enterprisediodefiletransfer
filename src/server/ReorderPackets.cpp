@@ -56,7 +56,8 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
   {
     if (queue.top().headerParams.eOFFlag)
     {
-      streamWrapper->setStoredFilename(sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
+      streamWrapper->setStoredFilename(
+        sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
       queue.pop();
       return true;
     }
@@ -71,7 +72,10 @@ void ReorderPackets::writeFrame(StreamInterface* streamWrapper)
 {
   if (diodeType == DiodeType::import)
   {
-    streamWrapper->write(streamingRewrapper.rewrap(queue.top().getFrame(), queue.top().headerParams.cloakedDaggerHeader, nextFrameCount));
+    streamWrapper->write(
+      streamingRewrapper.rewrap(
+        queue.top().getFrame(), queue.top().headerParams.cloakedDaggerHeader,
+        nextFrameCount));
   }
   else
   {

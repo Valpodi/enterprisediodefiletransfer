@@ -31,16 +31,16 @@ public:
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
+  void writeFrame(StreamInterface *streamWrapper);
+  void logOutOfOrderPackets(uint32_t frameCount);
 
   SISLFilename sislFilename;
   bool queueAlreadyExceeded = false;
   std::uint32_t nextFrameCount = 1;
   std::uint32_t lastFrameReceived = 0;
-  std::uint32_t maxBufferSize;
-  std::uint32_t maxQueueLength;
+  const std::uint32_t maxBufferSize;
+  const std::uint32_t maxQueueLength;
   std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
-  DiodeType diodeType;
+  const DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
-  void writeFrame(StreamInterface *streamWrapper);
-  void logOutOfOrderPackets(uint32_t frameCount);
 };

@@ -22,11 +22,14 @@ class Packet
 {
 public:
   Packet(HeaderParams&& headerParams, std::vector<std::uint8_t>&& payload):
-      headerParams(std::move(headerParams)), payload(std::move(payload))
+      headerParams(std::move(headerParams)),
+      payload(std::move(payload))
   {
   }
 
-  Packet(Packet&& rhs) noexcept: headerParams(std::move(rhs.headerParams)), payload(std::move(rhs.payload)) {};
+  Packet(Packet&& rhs) noexcept:
+      headerParams(std::move(rhs.headerParams)),
+      payload(std::move(rhs.payload)){};
 
   Packet& operator=(Packet&& rhs) noexcept
   {
@@ -38,7 +41,9 @@ public:
   Packet(const Packet&) = delete;
   Packet& operator=(Packet&) = delete;
 
-  bool operator>(const Packet& rhs) const { return (headerParams.frameCount > rhs.headerParams.frameCount); }
+  bool operator>(const Packet& rhs) const {
+    return (headerParams.frameCount > rhs.headerParams.frameCount);
+  }
 
   [[nodiscard]] std::vector<std::uint8_t> getFrame() const { return payload; }
 

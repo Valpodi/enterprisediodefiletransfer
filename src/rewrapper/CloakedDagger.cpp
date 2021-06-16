@@ -9,20 +9,20 @@
 #include <iostream>
 
 CloakedDagger::CloakedDagger(const std::array<char, 48>& cloakedDaggerHeader):
-  magic1(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 0)),
-  majorVersion(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 4)),
-  minorVersion(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 6)),
-  headerLength(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 8)),
-  encapsulationType(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 12)),
-  encapsulationConfig(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 16)),
-  encapsulationDataLength(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 18)),
-  key(Parsing::extract<std::array<char, maskLength>, std::array<char, 48>>(cloakedDaggerHeader, 20)),
-  headerChecksumType(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 28)),
-  headerChecksumConfig(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 32)),
-  headerChecksumDataLength(Parsing::extract<std::uint16_t, std::array<char, 48>>(cloakedDaggerHeader, 34)),
-  dataChecksumType(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 36)),
-  dataChecksumDataLength(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 40)),
-  magic2(Parsing::extract<std::uint32_t, std::array<char, 48>>(cloakedDaggerHeader, 44))
+  magic1(Parsing::extract<std::uint32_t>(cloakedDaggerHeader, 0)),
+  majorVersion(Parsing::extract<std::uint16_t>(cloakedDaggerHeader, 4)),
+  minorVersion(Parsing::extract<std::uint16_t>(cloakedDaggerHeader, 6)),
+  headerLength(Parsing::extract<std::uint32_t>(cloakedDaggerHeader, 8)),
+  encapsulationType(Parsing::extract<std::uint32_t>(cloakedDaggerHeader, 12)),
+  encapsulationConfig(Parsing::extract<std::uint16_t>(cloakedDaggerHeader, 16)),
+  encapsulationDataLength(Parsing::extract<std::uint16_t>(cloakedDaggerHeader, 18)),
+  key(Parsing::extract<std::array<char, maskLength>>(cloakedDaggerHeader, 20)),
+  headerChecksumType(Parsing::extract<std::uint32_t>(cloakedDaggerHeader, 28)),
+  headerChecksumConfig(Parsing::extract<std::uint16_t>(cloakedDaggerHeader, 32)),
+  headerChecksumDataLength(Parsing::extract<std::uint16_t>(cloakedDaggerHeader, 34)),
+  dataChecksumType(Parsing::extract<std::uint32_t>(cloakedDaggerHeader, 36)),
+  dataChecksumDataLength(Parsing::extract<std::uint32_t>(cloakedDaggerHeader, 40)),
+  magic2(Parsing::extract<std::uint32_t>(cloakedDaggerHeader, 44))
 {
   throwIfHeaderInvalid();
 }
