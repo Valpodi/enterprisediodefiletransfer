@@ -37,6 +37,12 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
     REQUIRE(streamingRewrapper.rewrap(data, std::array<char, CloakedDagger::headerSize()>(), 1) == data);
   }
 
+  SECTION("Rewrap should throw if non wrapped file starts without { or B")
+  {
+    const auto data = BytesBuffer{'A'};
+    REQUIRE_THROWS_AS(streamingRewrapper.rewrap(data, std::array<char, CloakedDagger::headerSize()>(), 1), std::runtime_error);
+  }
+
   SECTION("For single chunk BMP files, ensure we don't 'rewrap'")
   {
     const auto data = BytesBuffer{'B'};

@@ -187,16 +187,23 @@ TEST_CASE("ReorderPackets. Import diode.")
   StreamSpy stream(outputStream, 1, notused1, notused2);
   auto queueManager = ReorderPackets(4, 1024, DiodeType::import, 65);
 
-  SECTION("Data which is not wrapped remains unchanged")
+  SECTION("Data which is not wrapped, sisl or bitmap throws an error")
   {
-    auto inputStream = std::string("BC");
-    REQUIRE_FALSE(queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
-    REQUIRE(outputStream.str() == "BC");
+    auto inputStream = std::string("AC");
+    REQUIRE_THROWS_AS(queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream),
+                                         std::runtime_error);
+  }
 
-    inputStream = std::string("DE");
+  SECTION("Data which starting with sisl or bmp starting char remains unchanged.")
+  {
+    auto inputStream = std::string("{A");
+    REQUIRE_FALSE(queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
+    REQUIRE(outputStream.str() == "{A");
+
+    inputStream = std::string("BC");
     REQUIRE_FALSE(queueManager.write({HeaderParams{0, 2, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream));
 
-    REQUIRE(outputStream.str() == "BCDE");
+    REQUIRE(outputStream.str() == "{ABC");
   }
 
   SECTION("The first frame of wrapped data remains unchanged")

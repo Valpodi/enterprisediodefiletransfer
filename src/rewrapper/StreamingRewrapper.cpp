@@ -9,6 +9,10 @@ BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, const std::arra
 {
   if (cloakedDaggerHeader.at(0) != static_cast<char>(CloakedDagger::cloakedDaggerIdentifierByte))
   {
+    if (input.at(0) != '{' && input.at(0) != 'B')
+        {
+          throw std::runtime_error("received data that was not wrapped, sisl nor bitmap!");
+        }
     return input;
   }
   const auto inputChunkMask = getMaskFromHeader(cloakedDaggerHeader);
