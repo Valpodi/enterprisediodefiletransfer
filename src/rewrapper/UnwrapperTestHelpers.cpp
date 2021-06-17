@@ -47,7 +47,8 @@ bool isCloakDaggerEncoded(std::istream& inputStream)
 void cloakDaggerUnwrap(std::istream& inputStream, std::ostream& outputStream)
 {
   std::array<char, 48> headerBuffer{};
-  std::copy_n(std::istreambuf_iterator<char>(inputStream), 49, headerBuffer.begin());
+  std::copy_n(std::istreambuf_iterator<char>(inputStream), 48, headerBuffer.begin());
+  inputStream.seekg(48); // move read iterator to 48 as copy_n only increments it n-1 times.
 
   const CloakedDagger wrappedHeader(headerBuffer);
 
@@ -56,8 +57,7 @@ void cloakDaggerUnwrap(std::istream& inputStream, std::ostream& outputStream)
 
   while (!inputStream.get(readByte).eof())
   {
-    outputStream.put(readByte ^ static_cast<char>(wrappedHeader.key[count % CloakedDagger::maskLength]));
-    count++;
+    outputStream.put(readByte ^ static_cast<char>(wrappedHeader.key[count++ % CloakedDagger::maskLength]));
   }
 }
 

@@ -54,7 +54,7 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
     REQUIRE(output.size() == CloakedDagger::headerSize() + 3);
   }
 
-  SECTION("If the first frame that rewrapper is given has frameCount != 1, the mask will not be set.")
+  SECTION("If the first frame that rewrapper is given has frameCount != 1, throw, as the mask has not been set.")
   {
     auto input = createTestWrappedString("AAA");
     REQUIRE_THROWS_AS(streamingRewrapper.rewrap(input.message, input.header, 2), std::runtime_error);
