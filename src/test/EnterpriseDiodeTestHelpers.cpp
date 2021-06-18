@@ -19,16 +19,16 @@ BytesBuffer createTestPacketStream(std::uint8_t sessionID, std::uint8_t frameCou
   if (wrapped)
   {
     auto cloakedDaggerHeader = BytesBuffer{0xd1, 0xdf, 0x5f, 0xff, // magic1
-                                      0x00, 0x01, // major version
-                                      0x00, 0x00, // minor version
-                                      0x00, 0x00, 0x00, 0x30, // total length
-                                      0x00, 0x00, 0x00, 0x01, // encoding type
-                                      0x00, 0x03, // encoding config
-                                      0x00, 0x08, // encoding data length
-                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mask will be here
-                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 1
-                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 2
-                                      0xff, 0x5f, 0xdf, 0xd1};
+                                           0x00, 0x01, // major version
+                                           0x00, 0x00, // minor version
+                                           0x00, 0x00, 0x00, 0x30, // total length
+                                           0x00, 0x00, 0x00, 0x01, // encoding type
+                                           0x00, 0x03, // encoding config
+                                           0x00, 0x08, // encoding data length
+                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mask will be here
+                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 1
+                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 2
+                                           0xff, 0x5f, 0xdf, 0xd1};
     packet.insert(packet.begin() + 64, cloakedDaggerHeader.begin(), cloakedDaggerHeader.end());
   }
 

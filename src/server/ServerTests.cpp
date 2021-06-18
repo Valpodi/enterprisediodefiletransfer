@@ -87,6 +87,47 @@ TEST_CASE("ED server.")
     REQUIRE(capturedSessionId == 2);
     REQUIRE(outputStream.str() == std::string("BC"));
   }
+
+  SECTION("Basic Diode server does not write the CDHeader even if it implies wrapping")
+  {
+    edServer.receivePacket(createTestPacketStream(1, 1, false, true), {'A'});
+
+    REQUIRE(outputStream.str() == "A");
+  }
+}
+
+TEST_CASE("ED server. Import Diode")
+{
+  std::stringstream outputStream;
+  std::uint32_t capturedSessionId = 0;
+  boost::asio::io_service fake_service;
+  Server edServer = createEdServer(std::make_unique<UdpServerFake>(0, fake_service, 0, 0), 16, 100,
+                                   capturedSessionId, outputStream, DiodeType::import);
+
+
+  SECTION("Blank CDHeader and starting bmp char is written to disk without CDHeader")
+  {
+    edServer.receivePacket(createTestPacketStream(1, 1, false, false), {'B'});
+    REQUIRE(outputStream.str() == "B");
+  }
+
+  SECTION("Blank CDHeader and starting sisl char is written to disk without CDHeader")
+  {
+    edServer.receivePacket(createTestPacketStream(1, 1, false, false), {'{'});
+    REQUIRE(outputStream.str() == "{");
+  }
+
+  SECTION("Blank CDHeader and starting char not sisl or bmp char is not written.")
+  {
+    edServer.receivePacket(createTestPacketStream(1, 1, false, false), {'A'});
+    REQUIRE(outputStream.str().empty());
+  }
+
+  SECTION("Import Diode server writes the CDHeader if it implies wrapping")
+  {
+    edServer.receivePacket(createTestPacketStream(1, 1, false, true), {'A'});
+    REQUIRE(outputStream.str() == cDHeader + "A");
+  }
 }
 
 TEST_CASE("ED server. Queue length Tests")
