@@ -10,7 +10,8 @@
 TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic);
+  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; },
+                                           DiodeType::basic);
 
   auto packet = parsePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
 
@@ -20,20 +21,9 @@ TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue"
 
 TEST_CASE("OrderingStreamWriter. Import diode - packet stream and cloakedDaggerHeader are written to the stream")
 {
-  const auto header = CloakedDaggerHeader({static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
-                                                 0x00, 0x01, // major version
-                                                 0x00, 0x00, // minor version
-                                                 0x00, 0x00, 0x00, 0x30, // total length
-                                                 0x00, 0x00, 0x00, 0x01, // encoding type
-                                                 0x00, 0x03, // encoding config
-                                                 0x00, 0x08, // encoding data length
-                                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mask will be here
-                                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 1
-                                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 2
-                                                 static_cast<char>(0xff), 0x5f, static_cast<char>(0xdf), static_cast<char>(0xd1)});  // magic2
-  const std::string cDHeader{header.begin(), header.end()};
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::import);
+  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; },
+                                           DiodeType::import);
 
   auto packet = parsePacket(createTestPacketStream(1, 1, false, true), {'A', 'B'});
 
@@ -44,11 +34,12 @@ TEST_CASE("OrderingStreamWriter. Import diode - packet stream and cloakedDaggerH
 TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been received")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 5, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic);
+  auto streamWriter = OrderingStreamWriter(1, 5, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; },
+                                           DiodeType::basic);
 
   SECTION("When the EOF packet is not queued")
   {
-    auto packet = parsePacket(createTestPacketStream(1, 1, false),{'A', 'B'});
+    auto packet = parsePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
 
     const std::string filename = "{name: !str \"testFilename\"}";
     auto packet2 = parsePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()});
@@ -72,14 +63,15 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
     REQUIRE_FALSE(streamWriter.write(std::move(packetA)));
     REQUIRE(outputStream.str().empty());
 
-    auto packetB = parsePacket(createTestPacketStream(1, 1, false),{'A', 'B'});
+    auto packetB = parsePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
 
     REQUIRE(streamWriter.write(std::move(packetB)));
     REQUIRE(outputStream.str() == "ABCD");
   }
 }
 
-TEST_CASE("OrderingStreamWriter. OrderingStreamWriter constructor sets timeLastUpdated to the the time returned by getTime")
+TEST_CASE(
+  "OrderingStreamWriter. OrderingStreamWriter constructor sets timeLastUpdated to the the time returned by getTime")
 {
   std::stringstream outputStream;
   std::uint32_t initialTime = 500;

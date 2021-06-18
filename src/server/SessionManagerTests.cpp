@@ -49,6 +49,34 @@ TEST_CASE("SessionManager.")
     }
   }
 
+  SECTION("SessionManager with import diode includes CDHeader writing to a new stream given a new sessionId.")
+  {
+    auto fakeGetTime = []() { return 10000; };
+    auto sessionManager = SessionManager(10, 10, streamSpyCreator, fakeGetTime, 5, DiodeType::import);
+
+    REQUIRE(outputStreams.empty());
+    sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false, true), {'B', 'C'}));
+    REQUIRE(outputStreams.at(0).str() == cDHeader + "BC");
+    REQUIRE(capturedSessionId == 1);
+    REQUIRE_FALSE(fileDeletedWasCalled);
+    REQUIRE_FALSE(fileRenameWasCalled);
+
+    SECTION("SessionManager renames file and closes stream given EOF packet")
+    {
+      const std::string filename = "{name: !str \"testFilename\"}";
+      sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, true, true), {filename.begin(), filename.end()}));
+
+      REQUIRE(outputStreams.at(0).str() == cDHeader + "BC");
+      REQUIRE(fileRenameWasCalled);
+
+      SECTION("After a session is closed, new packets with the same sessionID are written to a new stream")
+      {
+        sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false, true), {'F', 'G'}));
+        REQUIRE(outputStreams.at(1).str() == cDHeader + "FG");
+      }
+    }
+  }
+
   SECTION("SessionManager writes to 2 streams given 2 different sessionIds.")
   {
     auto fakeGetTime = []() { return 10000; };
