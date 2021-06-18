@@ -18,9 +18,7 @@ TestPacket createTestWrappedString(const std::string& payload, const std::array<
     static_cast<char>(0xf0)});
 
 bool isCloakDaggerEncoded(std::istream& inputStream);
-bool isCloakDaggerEncoded(const BytesBuffer& inputData);
 void cloakDaggerUnwrap(std::istream& inputStream, std::ostream& outputStream);
 void unwrapFromStream(std::istream& inputStream, std::ostream& outputStream);
-BytesBuffer unwrap(const BytesBuffer& inputData);
 
 #endif //REWRAPPER_UNWRAPPERTESTHELPERS_HPP
