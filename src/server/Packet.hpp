@@ -9,13 +9,14 @@
 #include <cstdint>
 #include <istream>
 #include <vector>
+#include <rewrapper/CloakedDaggerHeader.hpp>
 
 struct HeaderParams
 {
   std::uint32_t sessionId;
   std::uint32_t frameCount;
   bool eOFFlag;
-  std::array<char, CloakedDagger::headerSize()> cloakedDaggerHeader;
+  CloakedDaggerHeader cloakedDaggerHeader;
 };
 
 class Packet

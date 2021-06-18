@@ -6,9 +6,8 @@
 #include <Parsing.hpp>
 #include <array>
 #include <boost/endian/conversion.hpp>
-#include <iostream>
 
-CloakedDagger::CloakedDagger(const std::array<char, 48>& cloakedDaggerHeader):
+CloakedDagger::CloakedDagger(const CloakedDaggerHeader& cloakedDaggerHeader):
   magic1(Parsing::extract<std::uint32_t>(cloakedDaggerHeader, 0)),
   majorVersion(Parsing::extract<std::uint16_t>(cloakedDaggerHeader, 4)),
   minorVersion(Parsing::extract<std::uint16_t>(cloakedDaggerHeader, 6)),
@@ -41,7 +40,7 @@ void CloakedDagger::throwIfHeaderInvalid() const
   }
 }
 
-CloakedDagger CloakedDagger::createFromBuffer(const std::array<char, 48>& cloakedDaggerHeader)
+CloakedDagger CloakedDagger::createFromBuffer(const CloakedDaggerHeader& cloakedDaggerHeader)
 {
   return CloakedDagger(cloakedDaggerHeader);
 }

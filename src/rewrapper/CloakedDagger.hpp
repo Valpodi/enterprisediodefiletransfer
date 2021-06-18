@@ -9,16 +9,17 @@
 #include <cstddef>
 #include <cstring>
 #include "BytesBuffer.hpp"
+#include "CloakedDaggerHeader.hpp"
 #include <array>
 
 class CloakedDagger
 {
 public:
 
-  explicit CloakedDagger(const std::array<char, 48>& cloakedDaggerHeader);
+  explicit CloakedDagger(const CloakedDaggerHeader& cloakedDaggerHeader);
 
   static constexpr size_t headerSize()   {  return 48; }
-  static CloakedDagger createFromBuffer(const std::array<char, 48>& cloakedDaggerHeader);
+  static CloakedDagger createFromBuffer(const CloakedDaggerHeader& cloakedDaggerHeader);
 
   const static size_t maskLength {8};
   static constexpr std::uint8_t cloakedDaggerIdentifierByte {0xd1};

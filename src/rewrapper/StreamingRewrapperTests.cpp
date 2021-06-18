@@ -10,7 +10,7 @@
 TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
 {
   StreamingRewrapper streamingRewrapper;
-  auto header = std::array<char, CloakedDagger::headerSize()>({static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
+  auto header = CloakedDaggerHeader({static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
                                                                0x00, 0x01, // major version
                                                                0x00, 0x00, // minor version
                                                                0x00, 0x00, 0x00, 0x30, // total length
@@ -34,19 +34,19 @@ TEST_CASE("StreamingRewrapper. Wrapped files should remain wrapped")
   SECTION("For single chunk rYaml files, ensure we don't 'rewrap'")
   {
     const auto data = BytesBuffer{'{'};
-    REQUIRE(streamingRewrapper.rewrap(data, std::array<char, CloakedDagger::headerSize()>(), 1) == data);
+    REQUIRE(streamingRewrapper.rewrap(data, CloakedDaggerHeader(), 1) == data);
   }
 
   SECTION("Rewrap should throw if non wrapped file starts without { or B")
   {
     const auto data = BytesBuffer{'A'};
-    REQUIRE_THROWS_AS(streamingRewrapper.rewrap(data, std::array<char, CloakedDagger::headerSize()>(), 1), std::runtime_error);
+    REQUIRE_THROWS_AS(streamingRewrapper.rewrap(data, CloakedDaggerHeader(), 1), std::runtime_error);
   }
 
   SECTION("For single chunk BMP files, ensure we don't 'rewrap'")
   {
     const auto data = BytesBuffer{'B'};
-    REQUIRE(streamingRewrapper.rewrap(data, std::array<char, CloakedDagger::headerSize()>(), 1) == data);
+    REQUIRE(streamingRewrapper.rewrap(data, CloakedDaggerHeader(), 1) == data);
   }
 
   SECTION("Rewrap is called with framecount 1, returns the input - including the header")

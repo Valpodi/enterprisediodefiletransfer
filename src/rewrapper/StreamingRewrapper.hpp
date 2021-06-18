@@ -7,15 +7,16 @@
 
 #include <boost/optional.hpp>
 #include "CloakedDagger.hpp"
+#include "CloakedDaggerHeader.hpp"
 
 class StreamingRewrapper
 {
 public:
   StreamingRewrapper() = default;
-  BytesBuffer rewrap(const BytesBuffer& input, const std::array<char, CloakedDagger::headerSize()>& cloakedDaggerHeader, std::uint32_t frameCount);
+  BytesBuffer rewrap(const BytesBuffer& input, const CloakedDaggerHeader& cloakedDaggerHeader, std::uint32_t frameCount);
 
 private:
-  static BytesBuffer getMaskFromHeader(const std::array<char, CloakedDagger::headerSize()>& cloakedDaggerHeader);
+  static BytesBuffer getMaskFromHeader(const CloakedDaggerHeader& cloakedDaggerHeader);
   BytesBuffer constructXORedMask(const BytesBuffer& inputChunkMask) const;
   BytesBuffer rewrapData(const BytesBuffer& input, const BytesBuffer& newMask);
   void handleFirstFrame(const BytesBuffer& input, const BytesBuffer& inputChunkMask);

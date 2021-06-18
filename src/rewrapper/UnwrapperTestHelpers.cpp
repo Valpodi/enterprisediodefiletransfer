@@ -3,6 +3,7 @@
 
 #include "UnwrapperTestHelpers.hpp"
 #include "CloakedDagger.hpp"
+#include "CloakedDaggerHeader.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -13,7 +14,7 @@ TestPacket createTestWrappedString(const std::string& payload, const std::array<
     throw std::runtime_error("Bad mask length");
   }
 
-  auto header = std::array<char, CloakedDagger::headerSize()>({static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
+  auto header = CloakedDaggerHeader({static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
                             0x00, 0x01, // major version
                             0x00, 0x00, // minor version
                             0x00, 0x00, 0x00, 0x30, // total length
@@ -46,9 +47,9 @@ bool isCloakDaggerEncoded(std::istream& inputStream)
 
 void cloakDaggerUnwrap(std::istream& inputStream, std::ostream& outputStream)
 {
-  std::array<char, 48> headerBuffer{};
-  std::copy_n(std::istreambuf_iterator<char>(inputStream), 48, headerBuffer.begin());
-  inputStream.seekg(48); // move read iterator to 48 as copy_n only increments it n-1 times.
+  CloakedDaggerHeader headerBuffer{};
+  std::copy_n(std::istreambuf_iterator<char>(inputStream), CloakedDagger::headerSize(), headerBuffer.begin());
+  inputStream.seekg(CloakedDagger::headerSize()); // move read iterator to 48 as copy_n only increments it n-1 times.
 
   const CloakedDagger wrappedHeader(headerBuffer);
 

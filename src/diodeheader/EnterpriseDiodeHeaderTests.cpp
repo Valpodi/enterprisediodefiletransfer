@@ -14,7 +14,7 @@ TEST_CASE("ED Header. Header is created from a input stream. readHeaderParams co
                                                                     '\x02', '\x00', '\x00', '\x00',
                                                                     '\x01', '\x00', '\x00', '\x00',
                                                                     '\x00', '\x00', '\x00', '\x00'};
-  std::array<char, CloakedDagger::headerSize()> testCloakDaggerHeader{4};
+  CloakedDaggerHeader testCloakDaggerHeader{4};
   std::copy(testCloakDaggerHeader.begin(), testCloakDaggerHeader.end(), headerBuffer.begin() + EnterpriseDiode::HeaderSizeInBytes - testCloakDaggerHeader.size());
   auto edHeader = EDHeader({headerBuffer.begin(), headerBuffer.end()});
 

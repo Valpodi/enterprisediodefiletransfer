@@ -5,7 +5,7 @@
 #include "BytesBuffer.hpp"
 #include "CloakedDagger.hpp"
 
-BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, const std::array<char, CloakedDagger::headerSize()>& cloakedDaggerHeader, std::uint32_t frameCount)
+BytesBuffer StreamingRewrapper::rewrap(const BytesBuffer& input, const CloakedDaggerHeader& cloakedDaggerHeader, std::uint32_t frameCount)
 {
   if (cloakedDaggerHeader.at(0) != static_cast<char>(CloakedDagger::cloakedDaggerIdentifierByte))
   {
@@ -61,7 +61,7 @@ BytesBuffer StreamingRewrapper::constructXORedMask(const BytesBuffer& inputChunk
   return newMask;
 }
 
-BytesBuffer StreamingRewrapper::getMaskFromHeader(const std::array<char, CloakedDagger::headerSize()>& cloakedDaggerHeader)
+BytesBuffer StreamingRewrapper::getMaskFromHeader(const CloakedDaggerHeader& cloakedDaggerHeader)
 {
   const auto header = CloakedDagger::createFromBuffer(cloakedDaggerHeader);
 

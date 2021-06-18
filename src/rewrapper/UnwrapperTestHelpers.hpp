@@ -8,9 +8,10 @@
 #include <BytesBuffer.hpp>
 #include <sstream>
 #include "CloakedDagger.hpp"
+#include "CloakedDaggerHeader.hpp"
 
 struct TestPacket {
-  std::array<char, CloakedDagger::headerSize()> header;
+  CloakedDaggerHeader header;
   BytesBuffer message;
 };
 

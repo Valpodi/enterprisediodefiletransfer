@@ -4,7 +4,7 @@ add_library (REWRAPPER_LIBRARY
         CloakedDagger.hpp
         StreamingRewrapper.cpp
         StreamingRewrapper.hpp
-        )
+        CloakedDaggerHeader.hpp)
 
 add_library(REWRAPPER_LIBRARY_TESTS
         StreamingRewrapperTests.cpp

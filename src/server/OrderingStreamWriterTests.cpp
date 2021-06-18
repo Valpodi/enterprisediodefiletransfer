@@ -20,7 +20,7 @@ TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue"
 
 TEST_CASE("OrderingStreamWriter. Import diode - packet stream and cloakedDaggerHeader are written to the stream")
 {
-  const auto header = std::array<char, CloakedDagger::headerSize()>({static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
+  const auto header = CloakedDaggerHeader({static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
                                                  0x00, 0x01, // major version
                                                  0x00, 0x00, // minor version
                                                  0x00, 0x00, 0x00, 0x30, // total length
