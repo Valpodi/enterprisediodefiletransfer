@@ -13,10 +13,13 @@ Server::Server(
   std::function<std::time_t()> getTime,
   std::uint32_t timeoutPeriod,
   DiodeType diodeType) :
-    udpServerInterface(std::move(udpServerInterface)),
-    sessionManager(maxBufferSize, maxQueueLength, std::move(streamCreator), std::move(getTime), timeoutPeriod, diodeType)
+  udpServerInterface(std::move(udpServerInterface)),
+  sessionManager(maxBufferSize, maxQueueLength, std::move(streamCreator), std::move(getTime), timeoutPeriod, diodeType)
 {
-  this->udpServerInterface->setCallback([this](std::vector<std::uint8_t>&& header, std::vector<std::uint8_t>&& payload) { receivePacket(std::move(header), std::move(payload)); });
+  this->udpServerInterface->setCallback(
+    [this](std::vector<std::uint8_t>&& header, std::vector<std::uint8_t>&& payload) {
+      receivePacket(std::move(header), std::move(payload));
+    });
 }
 
 void Server::receivePacket(std::vector<std::uint8_t>&& header, std::vector<std::uint8_t>&& payload)
