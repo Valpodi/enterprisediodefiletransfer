@@ -25,13 +25,12 @@ BytesBuffer createTestPacketStream(std::uint8_t sessionID, std::uint8_t frameCou
                                            0x00, 0x00, 0x00, 0x01, // encoding type
                                            0x00, 0x03, // encoding config
                                            0x00, 0x08, // encoding data length
-                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mask will be here
+                                           0x15, 0x23, 0x44, 0x45, 0x67, 0x58, 0x59, 0x6f, // mask will be here
                                            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 1
                                            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 2
                                            0xff, 0x5f, 0xdf, 0xd1};
-    packet.insert(packet.begin() + 64, cloakedDaggerHeader.begin(), cloakedDaggerHeader.end());
+    std::copy(cloakedDaggerHeader.begin(), cloakedDaggerHeader.end(), packet.begin() + 64);
   }
-
   return packet;
 }
 

@@ -3,7 +3,6 @@
 
 #include "EnterpriseDiodeHeader.hpp"
 #include <Parsing.hpp>
-#include <array>
 
 EDHeader::EDHeader(const std::vector<std::uint8_t>& frame) :
   headerParams(readHeaderParams(frame))
