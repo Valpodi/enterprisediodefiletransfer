@@ -37,8 +37,10 @@ message("Boost found at:" ${Boost_INCLUDE_DIR})
 include_directories(.)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/server)
+include_directories(SYSTEM src/spdlog/include)
 
 add_subdirectory(src)
+add_subdirectory(src/spdlog)
 
 add_executable(UnitTests
         src/test/TestFramework.cpp
@@ -60,4 +62,5 @@ target_link_libraries(UnitTests
         REWRAPPER_LIBRARY
         pthread
         stdc++fs
+        spdlog::spdlog
         )

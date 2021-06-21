@@ -17,7 +17,8 @@ public:
     std::uint16_t targetPort,
     std::uint16_t mtuSize,
     double dataRateMbps,
-    std::string filename);
+    std::string filename,
+    const std::string& logLevel);
   void sendData(const std::string& filename);
 
 private:

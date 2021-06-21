@@ -2,25 +2,26 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "StreamInterface.hpp"
+#include "spdlog/spdlog.h"
 
 class DropStream: public StreamInterface
 {
 public:
   explicit DropStream(std::uint32_t sessionId)
   {
-    std::cout << "Session: " << sessionId << " started\n";
+    spdlog::info("Session: " + std::to_string(sessionId) + " started");
   }
   void deleteFile() override
   {
-    std::cerr << "File incomplete. Dropping stream" << "\n";
+    spdlog::error("File incomplete. Dropping stream");
   }
   void renameFile() override
   {
-    std::cout << "Transfer complete" << "\n";
+    spdlog::info("Transfer complete");
   }
   void setStoredFilename(std::string filename) override
   {
-    std::cout << "File: " << filename << " received" << "\n";
+    spdlog::info("File: " + filename + " received");
   }
   void write(const BytesBuffer&) override { }
 };

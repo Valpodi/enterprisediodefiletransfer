@@ -6,6 +6,7 @@
 #include "StreamInterface.hpp"
 #include <chrono>
 #include <iostream>
+#include "spdlog/spdlog.h"
 
 ReorderPackets::ReorderPackets(
   std::uint32_t maxBufferSize,
@@ -30,8 +31,7 @@ void ReorderPackets::logOutOfOrderPackets(uint32_t frameCount)
 {
   if (frameCount != lastFrameReceived + 1)
   {
-    std::cout << std::chrono::system_clock::now().time_since_epoch().count() << " Out of order frame: " << frameCount
-              << "\n";
+    spdlog::info(std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + std::string(" Out of order frame: ") + std::to_string(frameCount));
   }
   lastFrameReceived = frameCount;
 }
@@ -42,7 +42,7 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
   {
     if (!queueAlreadyExceeded)
     {
-      std::cerr << "ReorderPackets: maxQueueLength exceeded." << std::endl;
+      spdlog::error("ReorderPackets: maxQueueLength exceeded.");
       queueAlreadyExceeded = true;
     }
     return;

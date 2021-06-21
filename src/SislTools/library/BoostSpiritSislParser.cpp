@@ -6,8 +6,8 @@
 #include "rapidjson/stringbuffer.h"
 
 #include <functional>
-#include <iostream>
 #include <map>
+#include "spdlog/spdlog.h"
 
 #include "BoostSpiritSislParser.hpp"
 
@@ -114,7 +114,7 @@ std::string SislToolsInternal::parseSislToJson(std::string input)
 {
   if(input[0] != 0x7B)
   {
-    std::cout << "Invalid sisl, first character is not {" << std::endl;
+    spdlog::info("Invalid sisl, first character is not {");
     throw std::runtime_error("Invalid sisl, first character is not {");
   }
   Storage storage;

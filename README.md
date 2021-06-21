@@ -53,6 +53,8 @@ On the receiving PC (the "catcher"), start the server application:
             The number of packets to queue in the case of missing / out of order packets. Default 1024 packets.
       -i, --importDiode
             Set this parameter if using the Oakdoor Enterprise Import Diode. This will re-wrap encapsulated files with a single key.
+      -l, --logLevel
+            Logging level for program output. Default level is info.
 
 ### Pitcher
 On the sending PC (the "pitcher"), send the file:
@@ -69,7 +71,8 @@ On the sending PC (the "pitcher"), send the file:
          Size of the MTU in bytes
       -r, --datarate DATARATE
          The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
-   
+      -l, --logLevel
+            Logging level for program output. Default level is info.
 
 Or if running the loopback tester:
 
@@ -91,7 +94,8 @@ Or if running the loopback tester:
             Set this parameter if using the Oakdoor Enterprise Import Diode. This will re-wrap encapsulated files with a single ke
       -r, --datarate DATARATE
          The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
-
+      -l, --logLevel
+            Logging level for program output. Default level is info.
 
 
 ## CHANGELOG

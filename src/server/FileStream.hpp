@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include "spdlog/spdlog.h"
 
 class FileStream : public StreamInterface
 {
@@ -22,15 +23,15 @@ public:
   void deleteFile() override
   {
     outputStream.close();
-    std::cerr << "Removing .received. file" << "\n";
+    spdlog::error("Removing .received. file");
     std::filesystem::remove(".received." + std::to_string(tempFilename));
   }
 
   void renameFile() override
   {
     outputStream.close();
-    std::cout << "File complete. Renaming .received. file" << "\n";
-    std::cout << storedFilename << "\n";
+    spdlog::info("File complete. Renaming .received. file" );
+    spdlog::info(storedFilename);
     std::filesystem::rename(".received." + std::to_string(tempFilename), storedFilename);
   }
 

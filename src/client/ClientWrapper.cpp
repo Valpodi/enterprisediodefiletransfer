@@ -1,9 +1,9 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include "ClientWrapper.hpp"
-
 #include <utility>
+#include "spdlog/spdlog.h"
+#include "ClientWrapper.hpp"
 #include "Timer.hpp"
 
 ClientWrapper::ClientWrapper(
@@ -11,12 +11,14 @@ ClientWrapper::ClientWrapper(
   std::uint16_t targetPort,
   std::uint16_t mtuSize,
   double dataRateMbps,
-  std::string filename) :
+  std::string filename,
+  const std::string& logLevel) :
     edClient(std::make_shared<UdpClient>(targetAddress, targetPort),
              std::make_shared<Timer>(calculateTimerPeriod(dataRateMbps, mtuSize)),
              calculatePayloadSize(mtuSize),
              std::move(filename))
 {
+  spdlog::set_level(spdlog::level::from_str(logLevel));
 }
 
 void ClientWrapper::sendData(const std::string& filename)
@@ -28,10 +30,10 @@ void ClientWrapper::sendData(const std::string& filename)
   }
   catch(const std::exception& exc)
   {
-    std::cerr << "exception here " << exc.what() << std::endl;
+    spdlog::error(std::string("Exception Sending Data: ") + exc.what());
     throw std::runtime_error("sendData failed");
   }
-  std::cout << "Send complete" << std::endl;
+  spdlog::info("Send complete");
 }
 
 std::uint16_t calculatePayloadSize(std::uint16_t mtuSize)

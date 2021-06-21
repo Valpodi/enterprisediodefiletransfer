@@ -3,12 +3,12 @@
 
 #include "Client.hpp"
 #include <chrono>
-#include <iostream>
 #include <istream>
 #include <random>
 #include <filesystem>
 #include <boost/algorithm/string.hpp>
 #include <regex>
+#include "spdlog/spdlog.h"
 
 Client::Client(
   std::shared_ptr<UdpClientInterface> udpClient,
@@ -40,7 +40,7 @@ void Client::send(std::istream& inputStream)
     }
     catch (const std::exception& exception)
     {
-      std::cerr << "exception in send frame" << exception.what() << std::endl;
+      spdlog::error(std::string("exception in send frame ") + exception.what());
       return false;
     }
   });

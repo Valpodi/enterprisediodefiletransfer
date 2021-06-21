@@ -2,10 +2,10 @@
 #MIT License. For licence terms see LICENCE.md file.
 
 add_subdirectory(client)
-add_subdirectory(server)
 add_subdirectory(diodeheader)
-add_subdirectory(SislTools)
 add_subdirectory(rewrapper)
+add_subdirectory(server)
+add_subdirectory(SislTools)
 
 
 add_executable(tester
@@ -17,10 +17,11 @@ target_link_libraries(tester
         SERVER_LIBRARY
         HEADER_LIBRARY
         REWRAPPER_LIBRARY
-        ${Boost_LIBRARIES}
         SISL_TOOLS_LIBRARY
+        ${Boost_LIBRARIES}
         pthread
         stdc++fs
+        spdlog::spdlog
         )
 
 
@@ -31,10 +32,11 @@ add_executable(client
 target_link_libraries(client
         CLIENT_LIBRARY
         HEADER_LIBRARY
-        ${Boost_LIBRARIES}
         SISL_TOOLS_LIBRARY
+        ${Boost_LIBRARIES}
         pthread
         stdc++fs
+        spdlog::spdlog
         )
 
 
@@ -45,8 +47,9 @@ target_link_libraries(server
         SERVER_LIBRARY
         HEADER_LIBRARY
         REWRAPPER_LIBRARY
-        ${Boost_LIBRARIES}
         SISL_TOOLS_LIBRARY
+        ${Boost_LIBRARIES}
         pthread
         stdc++fs
+        spdlog::spdlog
         )

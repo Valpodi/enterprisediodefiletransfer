@@ -4,6 +4,7 @@
 #include <SislTools/SislTools.hpp>
 #include <iostream>
 #include <rapidjson/document.h>
+#include "spdlog/spdlog.h"
 
 SISLFilename::SISLFilename(std::uint32_t maxSislLength, std::uint32_t maxFilenameLength):
     maxSislLength(maxSislLength),
@@ -16,13 +17,13 @@ std::optional<std::string> SISLFilename::extractFilename(const BytesBuffer& eofF
 
   if (sislHeader.size() > maxSislLength || sislHeader.size() < 2)
   {
-    std::cerr << "SISL too long/short" << "\n";
+    spdlog::error("SISL too long/short");
     return std::optional<std::string>();
   }
 
   if (sislHeader.at(0) != '{')
   {
-    std::cerr << "EOF not SISL" << "\n";
+    spdlog::error("EOF not SISL");
     return std::optional<std::string>();
   }
 
@@ -31,19 +32,19 @@ std::optional<std::string> SISLFilename::extractFilename(const BytesBuffer& eofF
     const auto filename = convertFromSisl(sislHeader);
     if (filename.size() > maxFilenameLength)
     {
-      std::cerr << "Filename too long" << "\n";
+      spdlog::error("Filename too long");
       return std::optional<std::string>();
     }
     return std::regex_match(filename, filter) ? filename : std::optional<std::string>();
   }
   catch (UnableToParseSislException& ex)
   {
-    std::cerr << "Unable to parse SISL filename as SISL: " << ex.what() << "\n";
+    spdlog::error(std::string("Unable to parse SISL filename as SISL: ") + ex.what());
     return std::optional<std::string>();
   }
   catch (std::regex_error& ex)
   {
-    std::cerr << "Failed filename sanity checks: " << ex.what() << "\n";
+    spdlog::error(std::string("Failed filename sanity checks: ") + ex.what());
     return std::optional<std::string>();
   }
 
