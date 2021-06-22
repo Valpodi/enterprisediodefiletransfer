@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.13.4)
 
-project(EnterpriseDiodeTester)
+project(EnterpriseDiodeFileTransfer)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_STANDARD 17)
