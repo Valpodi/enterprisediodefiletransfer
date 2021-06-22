@@ -1,4 +1,4 @@
 [submodule "src/spdlog"]
 	path = src/spdlog
-	url = git@github.com:oakdoor/spdlog.git
+	url = git@github.com:gabime/spdlog.git
 	branch = v1.x
