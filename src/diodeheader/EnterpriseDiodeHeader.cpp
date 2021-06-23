@@ -16,7 +16,7 @@ HeaderParams EDHeader::readHeaderParams(const std::vector<std::uint8_t>& frame)
     Parsing::extract<std::uint32_t>(frame, 0),
     Parsing::extract<std::uint32_t>(frame, 4),
     Parsing::extract<bool>(frame, 8),
-    Parsing::extract<CloakedDaggerHeader>(frame, EnterpriseDiode::HeaderSizeInBytes - CloakedDagger::headerSize())
+    Parsing::extract_array(frame, EnterpriseDiode::HeaderSizeInBytes - CloakedDagger::headerSize())
   };
 }
 
