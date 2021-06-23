@@ -28,6 +28,7 @@ const CloakedDaggerHeader WrappedHeader = CloakedDaggerHeader(
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 2
    static_cast<char>(0xff), 0x5f, static_cast<char>(0xdf), static_cast<char>(0xd1)});  // magic2
 
+std::array<char, 112> createWrappedEDHeader(std::array<char, 8> mask);
 const std::string CDWrappedHeaderString{WrappedHeader.begin(), WrappedHeader.end()};
 
 Server createEdServer(std::unique_ptr<UdpServerInterface> udpServer,

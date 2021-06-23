@@ -34,6 +34,31 @@ BytesBuffer createTestPacketStream(std::uint8_t sessionID, std::uint8_t frameCou
   return packet;
 }
 
+std::array<char, 112> createWrappedEDHeader(std::array<char, 8> mask)
+{
+  std::array<char, EnterpriseDiode::HeaderSizeInBytes> headerBuffer{'\x03', '\x00', '\x00', '\x00',
+                                                                    '\x01', '\x00', '\x00', '\x00',
+                                                                    '\x00', '\x00', '\x00', '\x00',
+                                                                    '\x00', '\x00', '\x00', '\x00'};
+  const auto cdHeaderBytes = BytesBuffer(
+    {0xd1, 0xdf, 0x5f, 0xff, // magic1
+     0x00, 0x01, // major version
+     0x00, 0x00, // minor version
+     0x00, 0x00, 0x00, 0x30, // total length
+     0x00, 0x00, 0x00, 0x01, // encoding type
+     0x00, 0x03, // encoding config
+     0x00, 0x08, // encoding data length
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mask
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 1
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 2
+     0xff, 0x5f, 0xdf, 0xd1});  // magic2
+  std::copy(cdHeaderBytes.begin(), cdHeaderBytes.end(),
+            headerBuffer.begin() + EnterpriseDiode::HeaderSizeInBytes - CloakedDagger::headerSize());
+  std::copy(mask.begin(), mask.end(),
+            headerBuffer.begin() + EnterpriseDiode::HeaderSizeInBytes - CloakedDagger::headerSize() + 20);
+  return headerBuffer;
+}
+
 Server createEdServer(
   std::unique_ptr<UdpServerInterface> udpServer,
   std::uint32_t maxBufferSize,
