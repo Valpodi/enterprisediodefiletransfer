@@ -56,7 +56,7 @@ TEST_CASE("SessionManager.")
 
     REQUIRE(outputStreams.empty());
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false, true), {'B', 'C'}));
-    REQUIRE(outputStreams.at(0).str() == cDHeader + "BC");
+    REQUIRE(outputStreams.at(0).str() == CDWrappedHeaderString + "BC");
     REQUIRE(capturedSessionId == 1);
     REQUIRE_FALSE(fileDeletedWasCalled);
     REQUIRE_FALSE(fileRenameWasCalled);
@@ -66,13 +66,13 @@ TEST_CASE("SessionManager.")
       const std::string filename = "{name: !str \"testFilename\"}";
       sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, true, true), {filename.begin(), filename.end()}));
 
-      REQUIRE(outputStreams.at(0).str() == cDHeader + "BC");
+      REQUIRE(outputStreams.at(0).str() == CDWrappedHeaderString + "BC");
       REQUIRE(fileRenameWasCalled);
 
       SECTION("After a session is closed, new packets with the same sessionID are written to a new stream")
       {
         sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false, true), {'F', 'G'}));
-        REQUIRE(outputStreams.at(1).str() == cDHeader + "FG");
+        REQUIRE(outputStreams.at(1).str() == CDWrappedHeaderString + "FG");
       }
     }
   }

@@ -15,7 +15,7 @@
 
 BytesBuffer createTestPacketStream(std::uint8_t sessionID, std::uint8_t frameCount, std::uint8_t eofFlag, bool wrapped=false);
 
-const auto header = CloakedDaggerHeader(
+const CloakedDaggerHeader WrappedHeader = CloakedDaggerHeader(
   {static_cast<char>(0xd1), static_cast<char>(0xdf), 0x5f, static_cast<char>(0xff), // magic1
    0x00, 0x01, // major version
    0x00, 0x00, // minor version
@@ -28,7 +28,7 @@ const auto header = CloakedDaggerHeader(
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header 2
    static_cast<char>(0xff), 0x5f, static_cast<char>(0xdf), static_cast<char>(0xd1)});  // magic2
 
-const std::string cDHeader{header.begin(), header.end()};
+const std::string CDWrappedHeaderString{WrappedHeader.begin(), WrappedHeader.end()};
 
 Server createEdServer(std::unique_ptr<UdpServerInterface> udpServer,
   std::uint32_t maxBufferSize,

@@ -126,13 +126,13 @@ TEST_CASE("ED server. Import Diode")
   SECTION("Import Diode server writes the CDHeader if it is the first frame and is wrapped")
   {
     edServer.receivePacket(createTestPacketStream(1, 1, false, true), {'\x11'});
-    REQUIRE(outputStream.str() == cDHeader + "\x11");
+    REQUIRE(outputStream.str() == CDWrappedHeaderString + "\x11");
 
     SECTION("Check the second wrapped packet is rewrapped and the CDHeader is not rewritten")
     {
       edServer.receivePacket(createTestPacketStream(1, 2, false, true), {'\x12'});
-      REQUIRE_FALSE(outputStream.str() == cDHeader + "\x11\x12");
-      REQUIRE(outputStream.str().size() == cDHeader.size() + 2);
+      REQUIRE_FALSE(outputStream.str() == CDWrappedHeaderString + "\x11\x12");
+      REQUIRE(outputStream.str().size() == CDWrappedHeaderString.size() + 2);
     }
   }
 }

@@ -28,7 +28,7 @@ TEST_CASE("OrderingStreamWriter. Import diode - packet stream and cloakedDaggerH
   auto packet = parsePacket(createTestPacketStream(1, 1, false, true), {'A', 'B'});
 
   streamWriter.write(std::move(packet));
-  REQUIRE(outputStream.str() == cDHeader + "AB");
+  REQUIRE(outputStream.str() == CDWrappedHeaderString + "AB");
 }
 
 TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been received")

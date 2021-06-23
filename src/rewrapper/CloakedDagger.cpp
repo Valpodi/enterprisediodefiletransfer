@@ -40,9 +40,3 @@ void CloakedDagger::throwIfHeaderInvalid() const
   }
 }
 
-CloakedDagger CloakedDagger::createFromBuffer(const CloakedDaggerHeader& cloakedDaggerHeader)
-{
-  return CloakedDagger(cloakedDaggerHeader);
-}
-
-
