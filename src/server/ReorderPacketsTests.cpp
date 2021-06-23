@@ -194,7 +194,7 @@ TEST_CASE("ReorderPackets. Import diode.")
                                          std::runtime_error);
   }
 
-  SECTION("Data which starting with sisl or bmp starting char remains unchanged.")
+  SECTION("Data with blank CDHeader starting with sisl or bmp starting char remains unchanged.")
   {
     auto inputStream = std::string("{A");
     REQUIRE_FALSE(queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream));

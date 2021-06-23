@@ -13,7 +13,8 @@ TEST_CASE("ED Header. Header is created from a input stream. readHeaderParams co
                                                                     '\x01', '\x00', '\x00', '\x00',
                                                                     '\x00', '\x00', '\x00', '\x00'};
   CloakedDaggerHeader testCloakDaggerHeader{4};
-  std::copy(testCloakDaggerHeader.begin(), testCloakDaggerHeader.end(), headerBuffer.begin() + EnterpriseDiode::HeaderSizeInBytes - testCloakDaggerHeader.size());
+  std::copy(testCloakDaggerHeader.begin(), testCloakDaggerHeader.end(),
+            headerBuffer.begin() + EnterpriseDiode::HeaderSizeInBytes - testCloakDaggerHeader.size());
   auto edHeader = EDHeader({headerBuffer.begin(), headerBuffer.end()});
 
   REQUIRE(edHeader.headerParams.sessionId == 3);
@@ -52,4 +53,13 @@ TEST_CASE("ED Header. calculateMaxBufferSize returns max buffer size given speci
 {
   REQUIRE(EnterpriseDiode::calculateMaxBufferSize(1500) == 1472);
   REQUIRE(EnterpriseDiode::calculateMaxBufferSize(9000) == 8972);
+}
+
+TEST_CASE("ED Header. Constructing EDHeader from bytesbuffer with size less than EDHeaderSize throws.")
+{
+  std::array<char, EnterpriseDiode::HeaderSizeInBytes - 1> headerBuffer{'\x00', '\xFF', '\xFF', '\xFF',
+                                                                        '\x00', '\xFF', '\xFF', '\xFF',
+                                                                        '\x01', '\x00', '\x00', '\x00',
+                                                                        '\x00', '\x00', '\x00', '\x00'};
+  REQUIRE_THROWS_AS(EDHeader({headerBuffer.begin(), headerBuffer.end()}), std::runtime_error);
 }

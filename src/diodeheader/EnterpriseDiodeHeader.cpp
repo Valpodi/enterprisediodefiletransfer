@@ -12,6 +12,10 @@ EDHeader::EDHeader(const std::vector<std::uint8_t>& frame) :
 
 HeaderParams EDHeader::readHeaderParams(const std::vector<std::uint8_t>& frame)
 {
+  if (frame.size() < EnterpriseDiode::HeaderSizeInBytes)
+  {
+    throw std::runtime_error("Header size too small");
+  }
   return {
     Parsing::extract<std::uint32_t>(frame, 0),
     Parsing::extract<std::uint32_t>(frame, 4),

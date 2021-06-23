@@ -30,7 +30,7 @@ UdpServer::~UdpServer()
 void UdpServer::triggerWaitAndReadNextUdpPacket()
 {
   frame = std::vector<std::uint8_t>(udpFrameSize - EnterpriseDiode::HeaderSizeInBytes);
-  header= std::vector<std::uint8_t>(EnterpriseDiode::HeaderSizeInBytes);
+  header = std::vector<std::uint8_t>(EnterpriseDiode::HeaderSizeInBytes);
   std::array<boost::asio::mutable_buffer, 2> bufs = { boost::asio::buffer(header), boost::asio::buffer(frame) };
 
   udpSocket.async_receive_from(
