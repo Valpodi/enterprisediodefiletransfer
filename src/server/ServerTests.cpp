@@ -66,20 +66,6 @@ TEST_CASE("ED server.")
     }
   }
 
-  SECTION("Packets with invalid headers are not written to the output")
-  {
-    edServer.receivePacket(BytesBuffer(EnterpriseDiode::HeaderSizeInBytes - 1), {});
-
-    REQUIRE(outputStream.str() == std::string(""));
-
-    SECTION("Subsequent packet with valid header is written to the output")
-    {
-      edServer.receivePacket(createTestPacketStream(1, 1, false),{'X', ' '} );
-
-      REQUIRE(outputStream.str() == std::string("X "));
-    }
-  }
-
   SECTION("Session ID is passed to the stream manager")
   {
     edServer.receivePacket(createTestPacketStream(2, 1, false), {'B', 'C'});
