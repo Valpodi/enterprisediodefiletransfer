@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+        with:
+          submodules: 'true'
 
       - name: build Enterprise Diode File Transfer app
         run: ./scripts/compileAndTestInDocker.sh release archive
