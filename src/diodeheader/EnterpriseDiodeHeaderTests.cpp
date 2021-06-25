@@ -55,6 +55,12 @@ TEST_CASE("ED Header. calculateMaxBufferSize returns max buffer size given speci
   REQUIRE(EnterpriseDiode::calculateMaxBufferSize(9000) == 8972);
 }
 
+TEST_CASE("ED Header. calculateMaxBufferSize throws error if given MTU size is less than 576.")
+{
+  REQUIRE_THROWS_AS(EnterpriseDiode::calculateMaxBufferSize(0), std::runtime_error);
+  REQUIRE_THROWS_AS(EnterpriseDiode::calculateMaxBufferSize(575), std::runtime_error);
+}
+
 TEST_CASE("ED Header. Constructing EDHeader from bytesbuffer with size less than EDHeaderSize throws.")
 {
   std::array<char, EnterpriseDiode::HeaderSizeInBytes - 1> headerBuffer{'\x00', '\xFF', '\xFF', '\xFF',
