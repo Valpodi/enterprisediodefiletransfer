@@ -48,7 +48,7 @@ On the receiving PC (the "catcher"), start the server application:
       -s, --serverPort PORT
             Specifies the UDP port the server will listen on. Default value of 45000.
       -m, --mtu MTUSIZE
-            Network MTU size. Default size of 1500.
+            Network MTU size in bytes. Default size of 1500.
       -q, --queueLength QUEUELENGTH
             The number of packets to queue in the case of missing / out of order packets. Default 1024 packets.
       -i, --importDiode
@@ -70,7 +70,7 @@ On the sending PC (the "pitcher"), send the file:
       -m, --mtu MTUSIZE
          Size of the MTU in bytes
       -r, --datarate DATARATE
-         The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
+         The desired datarate in megabits per second. Defaults to 0 (as fast as possible)
       -l, --logLevel
             Logging level for program output. Default level is info.
 
@@ -87,13 +87,13 @@ Or if running the loopback tester:
       -s, --serverPort PORT
             Specifies the UDP port the server will listen on.
       -m, --mtu MTUSIZE
-            Network MTU size. Default size of 1500.
+            Network MTU size in bytes. Default size of 1500.
       -q, --queueLength QUEUELENGTH
             The number of packets to queue in the case of missing / out of order packets. Default 1024 packets.
       -i, --importDiode
             Set this parameter if using the Oakdoor Enterprise Import Diode. This will re-wrap encapsulated files with a single ke
       -r, --datarate DATARATE
-         The desired datarate in megabytes per second. Defaults to 0 (as fast as possible)
+         The desired datarate in megabits per second. Defaults to 0 (as fast as possible)
       -l, --logLevel
             Logging level for program output. Default level is info.
 
