@@ -10,17 +10,6 @@
 #include "Timer.hpp"
 #include "test/EnterpriseDiodeTestHelpers.hpp"
 
-
-TEST_CASE("Timer. On timer runTimer, the sendFrame is called")
-{
-  bool callbackWasCalled{false};
-  auto timer = std::make_shared<FreeRunningTimer>();
-
-  timer->runTimer([&callbackWasCalled]() {callbackWasCalled = true; return false;});
-
-  REQUIRE(callbackWasCalled);
-}
-
 TEST_CASE("Timer. On manual timer tick, the sendFrame is called")
 {
   bool callbackWasCalled{false};

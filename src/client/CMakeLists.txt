@@ -8,7 +8,8 @@ add_library(CLIENT_LIBRARY
         Timer.cpp
         Client.cpp
         ClientWrapper.cpp
-        )
+        FreeRunningTimer.cpp
+        FreeRunningTimer.hpp)
 
 add_library(CLIENT_LIBRARY_TESTS
         ClientTests.cpp

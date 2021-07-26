@@ -70,14 +70,4 @@ public:
   }
 };
 
-class FreeRunningTimer : public TimerInterface
-{
-public:
-  void runTimer(std::function<bool()> callback) override
-  {
-    tickCallback = callback;
-    while (callback()) {}
-  }
-};
-
 #endif //TESTHELPERS_HPP
