@@ -7,7 +7,7 @@
 class FreeRunningTimer : public TimerInterface
 {
 public:
-  void runTimer(std::function<bool()>) override {}
+  void runTimer(std::function<bool()>) override;
 };
 
 #endif // FREERUNNINGTIMER_HPP

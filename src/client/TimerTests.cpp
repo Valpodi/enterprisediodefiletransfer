@@ -9,6 +9,7 @@
 #include "Client.hpp"
 #include "Timer.hpp"
 #include "test/EnterpriseDiodeTestHelpers.hpp"
+#include "FreeRunningTimer.hpp"
 
 TEST_CASE("Timer. On manual timer tick, the sendFrame is called")
 {
@@ -40,4 +41,12 @@ TEST_CASE("Timer. Calculate the timer period for a given data rate and size pack
           boost::posix_time::microseconds(12).total_microseconds());
   REQUIRE(calculateTimerPeriod(500, 1500).total_microseconds() ==
           boost::posix_time::microseconds(23).total_microseconds());
+}
+
+TEST_CASE("FreeRunningTimer. On timer runTimer, the sendFrame is called")
+{
+  bool callbackWasCalled{false};
+  std::make_shared<FreeRunningTimer>()->runTimer([&callbackWasCalled]() {callbackWasCalled = true; return false;});
+
+  REQUIRE(callbackWasCalled);
 }

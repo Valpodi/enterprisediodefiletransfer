@@ -2,12 +2,11 @@
 // MIT License. For licence terms see LICENCE.md file
 
 #include "TimerInterface.hpp"
+#include "FreeRunningTimer.hpp"
 
-class FreeRunningTimer : public TimerInterface
+
+void FreeRunningTimer::runTimer(std::function<bool()> callback)
 {
-public:
-  void runTimer(std::function<bool()> callback) override
-  {
-    while (callback()) {}
-  }
-};
+  while (callback()) {}
+}
+
