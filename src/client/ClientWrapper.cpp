@@ -1,10 +1,11 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <utility>
-#include "spdlog/spdlog.h"
 #include "ClientWrapper.hpp"
+#include "FreeRunningTimer.hpp"
 #include "Timer.hpp"
+#include "spdlog/spdlog.h"
+#include <utility>
 
 ClientWrapper::ClientWrapper(
   const std::string& targetAddress,
@@ -13,12 +14,31 @@ ClientWrapper::ClientWrapper(
   double dataRateMbps,
   std::string filename,
   const std::string& logLevel) :
-    edClient(std::make_shared<UdpClient>(targetAddress, targetPort),
-             std::make_shared<Timer>(calculateTimerPeriod(dataRateMbps, mtuSize)),
-             calculatePayloadSize(mtuSize),
-             std::move(filename))
+    edClient(
+      std::make_shared<UdpClient>(targetAddress, targetPort),
+      selectTimer(mtuSize, dataRateMbps),
+      calculatePayloadSize(mtuSize),
+      std::move(filename))
 {
   spdlog::set_level(spdlog::level::from_str(logLevel));
+}
+
+std::shared_ptr<TimerInterface> ClientWrapper::selectTimer(uint16_t mtuSize, double dataRateMbps)
+{
+  if (isZero(dataRateMbps))
+  {
+    spdlog::debug("Selecting free running timer");
+    return std::make_shared<FreeRunningTimer>();
+  }
+  else
+  {
+    return std::make_shared<Timer>(calculateTimerPeriod(dataRateMbps, mtuSize));
+  }
+}
+
+bool ClientWrapper::isZero(double dataRateMbps)
+{
+  return std::abs(dataRateMbps) < 0.001;
 }
 
 void ClientWrapper::sendData(const std::string& filename)

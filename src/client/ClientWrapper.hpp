@@ -10,10 +10,13 @@
 #include "UdpClient.hpp"
 #include "diodeheader/EnterpriseDiodeHeader.hpp"
 
+class TimerInterface;
+
 class ClientWrapper
 {
 public:
-  ClientWrapper(const std::string& targetAddress,
+  ClientWrapper(
+    const std::string& targetAddress,
     std::uint16_t targetPort,
     std::uint16_t mtuSize,
     double dataRateMbps,
@@ -24,6 +27,8 @@ public:
 private:
   Client edClient;
 
+  static std::shared_ptr<TimerInterface> selectTimer(uint16_t mtuSize, double dataRateMbps);
+  static bool isZero(double dataRateMbps);
 };
 
 std::uint16_t calculatePayloadSize(std::uint16_t mtuSize);
