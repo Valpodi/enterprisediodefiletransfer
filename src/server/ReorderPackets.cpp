@@ -4,6 +4,7 @@
 #include "ReorderPackets.hpp"
 #include "Packet.hpp"
 #include "StreamInterface.hpp"
+#include "TotalFrames.hpp"
 #include <chrono>
 #include <iostream>
 #include "spdlog/spdlog.h"
@@ -22,6 +23,7 @@ ReorderPackets::ReorderPackets(
 
 bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
 {
+  ++totalFrames;
   logOutOfOrderPackets(packet.headerParams.frameCount);
   addFrameToQueue(std::move(packet));
   return checkQueueAndWrite(streamWrapper);

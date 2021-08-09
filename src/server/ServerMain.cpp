@@ -11,6 +11,7 @@
 #include "UdpServer.hpp"
 #include "FileStream.hpp"
 #include "DropStream.hpp"
+#include "TotalFrames.hpp"
 
 struct Params
 {
@@ -116,4 +117,6 @@ int main(int argc, char **argv)
     spdlog::error(std::string("Caught exception: ") + exception.what());
     throw;
   }
+
+  std::cout << "Total Frames: " << totalFrames << "\n";
 }
