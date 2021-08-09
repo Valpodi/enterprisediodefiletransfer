@@ -14,7 +14,9 @@ add_library(SERVER_LIBRARY
         DropStream.hpp
         SISLFilename.cpp
         SISLFilename.hpp
-        Parsing.hpp)
+        Parsing.hpp
+        TotalFrames.cpp
+        TotalFrames.hpp)
 
 add_library(SERVER_LIBRARY_TESTS
         ../test/EnterpriseDiodeTestHelpers.cpp
