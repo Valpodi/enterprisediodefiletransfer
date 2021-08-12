@@ -23,7 +23,6 @@ ReorderPackets::ReorderPackets(
 
 bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
 {
-  ++totalFrames;
   logOutOfOrderPackets(packet.headerParams.frameCount);
   addFrameToQueue(std::move(packet));
   return checkQueueAndWrite(streamWrapper);
@@ -33,14 +32,16 @@ void ReorderPackets::logOutOfOrderPackets(uint32_t frameCount)
 {
   if (frameCount != lastFrameReceived + 1)
   {
-    spdlog::info(std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + std::string(" Out of order frame: ") + std::to_string(frameCount));
+    //spdlog::info(std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + std::string(" Out of order frame: ") + std::to_string(frameCount));
+    outOfOrderFrames++;
   }
   lastFrameReceived = frameCount;
 }
 
 void ReorderPackets::addFrameToQueue(Packet&& packet)
 {
-  if (queue.size() >= maxQueueLength)
+  queueSize = queue.size();
+  if (queueSize >= maxQueueLength)
   {
     if (!queueAlreadyExceeded)
     {
@@ -50,6 +51,7 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
     return;
   }
   queue.emplace(std::move(packet));
+  queueUsagePeak = queueSize > queueUsagePeak ? queueSize : queueUsagePeak;
 }
 
 bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)

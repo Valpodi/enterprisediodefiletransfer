@@ -4,6 +4,7 @@
 #include "UdpServer.hpp"
 #include <diodeheader/EnterpriseDiodeHeader.hpp>
 #include <iostream>
+#include "TotalFrames.hpp"
 
 UdpServer::UdpServer(
   std::uint16_t port,
@@ -39,6 +40,7 @@ void UdpServer::triggerWaitAndReadNextUdpPacket()
     [this](boost::system::error_code errorCode, std::size_t udpPacketLength) {
       if (!errorCode)
       {
+        ++totalFrames;
         checkPacketLengthAndExecuteCallback(udpPacketLength);
         triggerWaitAndReadNextUdpPacket();
       }

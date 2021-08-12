@@ -132,7 +132,8 @@ int main(int argc, char **argv)
       params.mtuSize,
       params.dataRateMbps,
       params.filename,
-      params.logLevel
+      params.logLevel,
+      0
     ).sendData(params.filename);
   }
   catch (const std::exception& exception)

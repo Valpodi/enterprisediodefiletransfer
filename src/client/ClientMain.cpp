@@ -8,6 +8,7 @@
 #include "spdlog/spdlog.h"
 
 #include "ClientWrapper.hpp"
+#include "TotalFrames.hpp"
 
 struct Params
 {
@@ -17,6 +18,7 @@ struct Params
   double dataRateMbps;
   std::uint16_t mtuSize;
   std::string logLevel;
+  std::uint16_t sendPeriod;
 };
 
 inline Params parseArgs(int argc, char **argv)
@@ -26,6 +28,7 @@ inline Params parseArgs(int argc, char **argv)
   std::string clientAddress;
   std::uint16_t clientPort;
   std::uint16_t mtuSize = 1500;
+    std::uint16_t sendPeriod = 0;
   double dataRateMbps = 0;
   std::string logLevel = "info";
   const auto cli = clara::Help(showHelp) |
@@ -34,7 +37,8 @@ inline Params parseArgs(int argc, char **argv)
                    clara::Opt(clientPort, "client port")["-c"]["--clientPort"]("port to send packets to").required() |
                    clara::Opt(mtuSize, "MTU size")["-m"]["--mtu"]("MTU size of the network interface. default 1500") |
                    clara::Opt(dataRateMbps, "date rate in Megabits per second")["-r"]["--datarate"]("data rate of transfer. default as fast as possible") |
-                   clara::Opt(logLevel, "Log level")["-l"]["--logLevel"]("Logging level for program output - default info");
+                   clara::Opt(logLevel, "Log level")["-l"]["--logLevel"]("Logging level for program output - default info") |
+                   clara::Opt(sendPeriod, "Send period")["-p"]["--sendPeriod"]("Time in uSecs to allow for packet to be sent, before starting next packet - default calculated from mtu and rate");
 
   const auto result = cli.parse(clara::Args(argc, argv));
   if (!result)
@@ -51,7 +55,7 @@ inline Params parseArgs(int argc, char **argv)
     exit(1);
   }
 
-  return {clientAddress, clientPort, filename, dataRateMbps, mtuSize, logLevel};
+  return {clientAddress, clientPort, filename, dataRateMbps, mtuSize, logLevel, sendPeriod};
 }
 
 int main(int argc, char **argv)
@@ -68,7 +72,8 @@ int main(int argc, char **argv)
       params.mtuSize,
       params.dataRateMbps,
       params.filename,
-      params.logLevel
+      params.logLevel,
+      params.sendPeriod
     ).sendData(params.filename);
   }
   catch (const std::exception& exception)
@@ -76,4 +81,6 @@ int main(int argc, char **argv)
     spdlog::error(std::string("Caught exception: ") + exception.what());
     return 2;
   }
+
+  std::cout << "Total Frames: " << totalFrames << "\n";
 }

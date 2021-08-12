@@ -13,19 +13,24 @@ ClientWrapper::ClientWrapper(
   std::uint16_t mtuSize,
   double dataRateMbps,
   std::string filename,
-  const std::string& logLevel) :
+  const std::string& logLevel,
+  std::uint16_t sendPeriod) :
     edClient(
       std::make_shared<UdpClient>(targetAddress, targetPort),
-      selectTimer(mtuSize, dataRateMbps),
+      selectTimer(mtuSize, dataRateMbps, sendPeriod),
       calculatePayloadSize(mtuSize),
       std::move(filename))
 {
   spdlog::set_level(spdlog::level::from_str(logLevel));
 }
 
-std::shared_ptr<TimerInterface> ClientWrapper::selectTimer(uint16_t mtuSize, double dataRateMbps)
+std::shared_ptr<TimerInterface> ClientWrapper::selectTimer(uint16_t mtuSize, double dataRateMbps, uint16_t sendPeriod)
 {
-  if (isZero(dataRateMbps))
+  if (sendPeriod > 0)
+  {
+    return std::make_shared<Timer>(sendPeriod);
+  }
+  else if (isZero(dataRateMbps))
   {
     spdlog::debug("Selecting free running timer");
     return std::make_shared<FreeRunningTimer>();

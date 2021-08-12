@@ -17,7 +17,7 @@ struct Params
 {
   std::uint16_t serverPort;
   std::uint16_t mtuSize;
-  std::uint16_t maxQueueLength;
+  std::uint32_t maxQueueLength;
   bool dropPackets;
   DiodeType diodeType;
 };
@@ -27,7 +27,7 @@ inline Params parseArgs(int argc, char **argv)
   bool showHelp = false;
   std::uint16_t serverPort = 45000;
   std::uint16_t mtuSize = 1500;
-  std::uint16_t maxQueueLength = 1024;
+  std::uint32_t maxQueueLength = 1024;
   bool dropPackets = false;
   bool importDiode = false;
   std::string logLevel = "info";
@@ -93,6 +93,7 @@ int main(int argc, char **argv)
 {
   const auto params = parseArgs(argc, argv);
   spdlog::info("Starting Enterprise Diode Server application.");
+  spdlog::info("16384 byte ostream buf test");
   signal(SIGINT, ServerApplication::signalHandler);
 
   const auto maxBufferSize = EnterpriseDiode::calculateMaxBufferSize(params.mtuSize);
@@ -119,4 +120,6 @@ int main(int argc, char **argv)
   }
 
   std::cout << "Total Frames: " << totalFrames << "\n";
+  std::cout << "Out Of Order Frames: " << outOfOrderFrames << "\n";
+  std::cout << "Max size of Queue: " << queueUsagePeak << "\n";
 }

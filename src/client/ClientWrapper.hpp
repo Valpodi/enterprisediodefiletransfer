@@ -21,13 +21,14 @@ public:
     std::uint16_t mtuSize,
     double dataRateMbps,
     std::string filename,
-    const std::string& logLevel);
+    const std::string& logLevel,
+    std::uint16_t sendperiod );
   void sendData(const std::string& filename);
 
 private:
   Client edClient;
 
-  static std::shared_ptr<TimerInterface> selectTimer(uint16_t mtuSize, double dataRateMbps);
+  static std::shared_ptr<TimerInterface> selectTimer(uint16_t mtuSize, double dataRateMbps, uint16_t sendPeriod);
   static bool isZero(double dataRateMbps);
 };
 

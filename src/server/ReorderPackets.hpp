@@ -43,4 +43,6 @@ private:
   std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
   const DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
+
+  long unsigned int queueSize;
 };

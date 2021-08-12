@@ -8,6 +8,7 @@
 #include <iostream>
 #include <random>
 #include "spdlog/spdlog.h"
+#include "TotalFrames.hpp"
 
 class FileStream : public StreamInterface
 {
@@ -16,8 +17,13 @@ public:
     sessionId(sessionId),
     tempFilename(setTempFilename())
   {
+    const unsigned int outputBufferSize = 16384;
+    char outputBuffer[outputBufferSize];
+    
+    outputStream.rdbuf()->pubsetbuf(outputBuffer, outputBufferSize);
     outputStream.open(".received." + std::to_string(tempFilename));
     outputStream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+    spdlog::info("Session: " + std::to_string(sessionId) + " started");
   }
 
   void deleteFile() override
@@ -33,11 +39,14 @@ public:
     spdlog::info("File complete. Renaming .received. file" );
     spdlog::info(storedFilename);
     std::filesystem::rename(".received." + std::to_string(tempFilename), storedFilename);
+    spdlog::info("Max size of Queue: " + std::to_string(queueUsagePeak));
+    queueUsagePeak = 0;
   }
 
   void setStoredFilename(std::string filename) override
   {
     storedFilename = (filename == "rejected.") ? filename+std::to_string(tempFilename) : filename;
+    spdlog::info("File: " + filename + " received");
   }
 
   void write(const BytesBuffer& inputData) override

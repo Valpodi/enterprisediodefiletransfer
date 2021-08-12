@@ -3,6 +3,7 @@
 
 #include <boost/asio/ip/udp.hpp>
 #include "UdpClient.hpp"
+#include "TotalFrames.hpp"
 
 UdpClient::UdpClient(const std::string& address, std::uint16_t port) :
   io_context(),
@@ -21,4 +22,5 @@ boost::asio::ip::udp::endpoint UdpClient::findEndpoints(const std::string& addre
 void UdpClient::send(ConstSocketBuffers inputBuffers)
 {
   s.send_to(inputBuffers, endpoints);
+  ++totalFrames;
 }
