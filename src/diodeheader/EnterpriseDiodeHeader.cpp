@@ -28,9 +28,13 @@ namespace EnterpriseDiode
 {
   std::uint16_t calculateMaxBufferSize(std::uint16_t mtuSize)
   {
-    if (mtuSize < 576)
+    // Testing only : using  very small < 576 byte mtu
+    //if (mtuSize < 576)
+    if (mtuSize < 222)
     {
-      throw std::runtime_error("MTU should be greater than 576");
+    // Testing only : using  very small < 576 byte mtu
+      //throw std::runtime_error("MTU should be greater than 576");
+      throw std::runtime_error("MTU should be greater than 222");
     }
     // IP frame size = 20 & UDP frame size = 8
     return std::uint16_t(((short) mtuSize - 20) - 8);
