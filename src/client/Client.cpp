@@ -72,8 +72,18 @@ bool Client::sendFrame(std::istream& inputStream)
 
 ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize)
 {
+  static bool sislFileRead = false;
+  static std::streamsize length = 0;
+
   incrementFrameCount();
-  const auto payloadLength = inputStream.read((char*)&*(payloadBuffer.begin()), payloadSize).gcount();
+  if (!sislFileRead)
+  {
+    spdlog::info("reading stream");
+    length = inputStream.read((char*)&*(payloadBuffer.begin()), payloadSize).gcount();
+    sislFileRead = true;
+  }
+
+  const auto payloadLength = length;
 
   if (payloadLength > 0)
   {
