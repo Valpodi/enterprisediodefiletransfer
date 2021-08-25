@@ -72,21 +72,24 @@ bool Client::sendFrame(std::istream& inputStream)
 
 ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint32_t payloadSize)
 {
+//  spdlog::info("generateEDPacket called");
   static bool sislFileRead = false;
+  static int counter;
   static std::streamsize length = 0;
-
   incrementFrameCount();
+
   if (!sislFileRead)
   {
+    counter = 0;
     spdlog::info("reading stream");
     length = inputStream.read((char*)&*(payloadBuffer.begin()), payloadSize).gcount();
     sislFileRead = true;
   }
-
   const auto payloadLength = length;
 
-  if (payloadLength > 0)
+  if (counter < 100000)
   {
+    ++counter;
     return {
       boost::asio::buffer(headerBuffer, EnterpriseDiode::HeaderSizeInBytes),
       boost::asio::buffer(payloadBuffer, (size_t)payloadLength)};

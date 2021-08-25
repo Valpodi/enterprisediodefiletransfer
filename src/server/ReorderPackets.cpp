@@ -32,8 +32,8 @@ void ReorderPackets::logOutOfOrderPackets(uint32_t frameCount)
 {
   if (frameCount != lastFrameReceived + 1)
   {
-    //spdlog::info(std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + std::string(" Out of order frame: ") + std::to_string(frameCount));
-    outOfOrderFrames++;
+    spdlog::info(std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + std::string(" Out of order frame: ") + std::to_string(frameCount));
+    spdlog::info(std::string("Last frame received was: ") + std::to_string(lastFrameReceived));
   }
   lastFrameReceived = frameCount;
 }
@@ -46,6 +46,8 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
     if (!queueAlreadyExceeded)
     {
       spdlog::error("ReorderPackets: maxQueueLength exceeded.");
+      spdlog::info(std::string("Last frame received was: ") + std::to_string(lastFrameReceived));
+      spdlog::error(std::string("Frame count of frame received was: ") + std::to_string(packet.headerParams.frameCount));
       queueAlreadyExceeded = true;
     }
     return;
