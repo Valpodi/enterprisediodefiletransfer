@@ -48,7 +48,7 @@ void UdpServer::triggerWaitAndReadNextUdpPacket()
 
 void UdpServer::checkPacketLengthAndExecuteCallback(size_t udpPacketLength)
 {
-  if (callback && udpPacketLength - EnterpriseDiode::HeaderSizeInBytes > 0)
+  if (callback && ((std::int32_t)udpPacketLength - (std::int32_t)EnterpriseDiode::HeaderSizeInBytes > 0))
   {
     frame.resize(udpPacketLength - EnterpriseDiode::HeaderSizeInBytes);
     callback(std::move(header), std::move(frame));
