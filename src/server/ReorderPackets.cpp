@@ -24,16 +24,19 @@ ReorderPackets::ReorderPackets(
 bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
 {
   logOutOfOrderPackets(packet.headerParams.frameCount);
-  addFrameToQueue(std::move(packet));
-  return checkQueueAndWrite(streamWrapper);
+  //addFrameToQueue(std::move(packet));
+  //return checkQueueAndWrite(streamWrapper);
+  (void)streamWrapper;
+  return false;
 }
 
 void ReorderPackets::logOutOfOrderPackets(uint32_t frameCount)
 {
   if (frameCount != lastFrameReceived + 1)
   {
-    spdlog::info(std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + std::string(" Out of order frame: ") + std::to_string(frameCount));
-    spdlog::info(std::string("Last frame received was: ") + std::to_string(lastFrameReceived));
+    //spdlog::info(std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + std::string(" Out of order frame: ") + std::to_string(frameCount));
+    //spdlog::info(std::string("Last frame received was: ") + std::to_string(lastFrameReceived));
+    outOfOrderFrames++;
   }
   lastFrameReceived = frameCount;
 }
