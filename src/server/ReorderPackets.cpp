@@ -49,7 +49,7 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
     {
       spdlog::error("ReorderPackets: maxQueueLength exceeded.");
       spdlog::error(std::string("Last frame: ") + std::to_string(lastFrameReceived) +
-           std::string(" This frame: ") + std::to_string(packet.headerParams.frameCount));
+                         std::string(" This frame: ") + std::to_string(packet.headerParams.frameCount));
       queueAlreadyExceeded = true;
     }
     return;
@@ -63,7 +63,7 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
   if (unloadQueueThreadState == idle)
   {
     //ReorderPackets conv_ptr;
-    boost::thread queueProcessorThread(&ReorderPackets::unloadQueueThread, this, streamWrapper);
+    boost::thread queueProcessorThread(boost::bind(&ReorderPackets::unloadQueueThread, this, streamWrapper));
     unloadQueueThreadState = running;
     spdlog::info("started thread");
     return false;
