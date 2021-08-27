@@ -6,6 +6,7 @@
 #include "StreamSpy.hpp"
 #include "test/catch.hpp"
 #include <rewrapper/UnwrapperTestHelpers.hpp>
+#include <boost/thread.hpp>
 
 TEST_CASE("ReorderPackets. Packets received in order are written to the output")
 {

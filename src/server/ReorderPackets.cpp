@@ -8,6 +8,7 @@
 #include <chrono>
 #include <iostream>
 #include "spdlog/spdlog.h"
+#include <boost/thread.hpp>
 
 ReorderPackets::ReorderPackets(
   std::uint32_t maxBufferSize,
@@ -24,10 +25,8 @@ ReorderPackets::ReorderPackets(
 bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
 {
   logOutOfOrderPackets(packet.headerParams.frameCount);
-  //addFrameToQueue(std::move(packet));
-  //return checkQueueAndWrite(streamWrapper);
-  (void)streamWrapper;
-  return false;
+  addFrameToQueue(std::move(packet));
+  return checkQueueAndWrite(streamWrapper);
 }
 
 void ReorderPackets::logOutOfOrderPackets(uint32_t frameCount)
@@ -49,8 +48,8 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
     if (!queueAlreadyExceeded)
     {
       spdlog::error("ReorderPackets: maxQueueLength exceeded.");
-      spdlog::info(std::string("Last frame received was: ") + std::to_string(lastFrameReceived));
-      spdlog::error(std::string("Frame count of frame received was: ") + std::to_string(packet.headerParams.frameCount));
+      spdlog::error(std::string("Last frame: ") + std::to_string(lastFrameReceived) +
+           std::string(" This frame: ") + std::to_string(packet.headerParams.frameCount));
       queueAlreadyExceeded = true;
     }
     return;
@@ -61,20 +60,55 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
 
 bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
 {
-  while (!queue.empty() && (queue.top().headerParams.frameCount == nextFrameCount))
+  if (unloadQueueThreadState == idle)
   {
-    if (queue.top().headerParams.eOFFlag)
-    {
-      streamWrapper->setStoredFilename(
-        sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
-      queue.pop();
-      return true;
-    }
-    writeFrame(streamWrapper);
-    queue.pop();
-    ++nextFrameCount;
+    //ReorderPackets conv_ptr;
+    boost::thread queueProcessorThread(&ReorderPackets::unloadQueueThread, this, streamWrapper);
+    unloadQueueThreadState = running;
+    spdlog::info("started thread");
+    return false;
   }
-  return false;
+  else if (unloadQueueThreadState == done)
+  {
+    queueProcessorThread.interrupt();
+    queueProcessorThread.join();
+    spdlog::info("exited thread");
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
+{
+  try
+  {
+    while (!queue.empty())
+    {
+      while (queue.top().headerParams.frameCount == nextFrameCount)
+      {
+        if (queue.top().headerParams.eOFFlag)
+        {
+          streamWrapper->setStoredFilename(
+            sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
+          queue.pop();
+          unloadQueueThreadState = done;
+        }
+        writeFrame(streamWrapper);
+        queue.pop();
+        ++nextFrameCount;
+      }
+      boost::this_thread::sleep(boost::posix_time::microseconds(10));
+    }
+  }
+  catch (boost::thread_interrupted&)
+  {
+    unloadQueueThreadState = interrupted;
+    spdlog::info("exiting thread");
+    return;
+  }
 }
 
 void ReorderPackets::writeFrame(StreamInterface* streamWrapper)

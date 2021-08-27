@@ -8,6 +8,7 @@
 #include <optional>
 #include <queue>
 #include <rewrapper/StreamingRewrapper.hpp>
+#include <boost/thread.hpp>
 
 class StreamInterface;
 
@@ -33,6 +34,7 @@ private:
   void addFrameToQueue(Packet&& packet);
   void writeFrame(StreamInterface *streamWrapper);
   void logOutOfOrderPackets(uint32_t frameCount);
+  void unloadQueueThread(StreamInterface* streamWrapper);
 
   SISLFilename sislFilename;
   bool queueAlreadyExceeded = false;
@@ -43,6 +45,10 @@ private:
   std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
   const DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
+
+  enum unloadQueueThreadStatus { idle, running, done, interrupted, error };
+  unloadQueueThreadStatus unloadQueueThreadState = idle;
+  boost::thread queueProcessorThread;
 
   long unsigned int queueSize;
 };

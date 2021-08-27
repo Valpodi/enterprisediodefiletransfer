@@ -16,7 +16,8 @@ public:
     std::uint16_t port,
     boost::asio::io_service& io_service,
     std::uint32_t udpFrameSize,
-    std::uint32_t udpSocketBufferSizeInBytes = 268435456);
+    //std::uint32_t udpSocketBufferSizeInBytes = 268435456);
+    std::uint32_t udpSocketBufferSizeInBytes = 536870912);
 
   ~UdpServer() override;
 

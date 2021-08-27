@@ -94,6 +94,7 @@ int main(int argc, char **argv)
   const auto params = parseArgs(argc, argv);
   spdlog::info("Starting Enterprise Diode Server application.");
   spdlog::info("16384 byte ostream buf test");
+  spdlog::info("512M byte socket buf test");
   signal(SIGINT, ServerApplication::signalHandler);
 
   const auto maxBufferSize = EnterpriseDiode::calculateMaxBufferSize(params.mtuSize);
