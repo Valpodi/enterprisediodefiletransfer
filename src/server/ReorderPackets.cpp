@@ -85,21 +85,18 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
 {
   try
   {
-    while (!queue.empty())
+    while (!queue.empty() && (queue.top().headerParams.frameCount == nextFrameCount))
     {
-      while (queue.top().headerParams.frameCount == nextFrameCount)
+      if (queue.top().headerParams.eOFFlag)
       {
-        if (queue.top().headerParams.eOFFlag)
-        {
-          streamWrapper->setStoredFilename(
-            sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
-          queue.pop();
-          unloadQueueThreadState = done;
-        }
-        writeFrame(streamWrapper);
+        streamWrapper->setStoredFilename(
+          sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
         queue.pop();
-        ++nextFrameCount;
+        unloadQueueThreadState = done;
       }
+      writeFrame(streamWrapper);
+      queue.pop();
+      ++nextFrameCount;
       boost::this_thread::sleep(boost::posix_time::microseconds(10));
     }
   }
