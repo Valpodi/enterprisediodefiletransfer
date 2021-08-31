@@ -70,6 +70,7 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
   }
   else if (unloadQueueThreadState == done)
   {
+    spdlog::info("exiting thread");
     queueProcessorThread.interrupt();
     queueProcessorThread.join();
     spdlog::info("exited thread");
@@ -85,7 +86,7 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
 {
   try
   {
-    while (!queue.empty())
+    while (!queue.empty() && unloadQueueThreadState != done)
     {
       while (queue.top().headerParams.frameCount == nextFrameCount)
       {
@@ -95,10 +96,14 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
             sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
           queue.pop();
           unloadQueueThreadState = done;
+          throw std::string("done.");
+        } 
+        else 
+        {
+          writeFrame(streamWrapper);
+          queue.pop();
+          ++nextFrameCount;
         }
-        writeFrame(streamWrapper);
-        queue.pop();
-        ++nextFrameCount;
       }
       boost::this_thread::sleep(boost::posix_time::microseconds(10));
     }
@@ -106,7 +111,12 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
   catch (boost::thread_interrupted&)
   {
     unloadQueueThreadState = interrupted;
-    spdlog::info("exiting thread");
+    spdlog::info("interrupted. exiting thread");
+    return;
+  }
+  catch (std::string ex)
+  {
+    spdlog::info(ex);
     return;
   }
 }
