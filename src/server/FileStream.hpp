@@ -17,7 +17,7 @@ public:
     sessionId(sessionId),
     tempFilename(setTempFilename())
   {
-    const unsigned int outputBufferSize = 16384;
+    const unsigned int outputBufferSize = 8192;
     char outputBuffer[outputBufferSize];
     
     outputStream.rdbuf()->pubsetbuf(outputBuffer, outputBufferSize);
@@ -51,7 +51,13 @@ public:
 
   void write(const BytesBuffer& inputData) override
   {
+    //spdlog::info("writing bytes:");
+    //for (int i = 0 ; i < 5; i++)
+    //{
+      spdlog::info(inputData.data()[0]);
+    //}
     outputStream.write(reinterpret_cast<const char*>(inputData.data()), static_cast<long>(inputData.size()));
+    outputStream.flush();
   }
 
 private:

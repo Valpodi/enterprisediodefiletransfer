@@ -87,7 +87,7 @@ ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint
   }
   const auto payloadLength = length;
 
-  if (counter < 1000000)
+  if (counter < 100)
   {
     ++counter;
     return {

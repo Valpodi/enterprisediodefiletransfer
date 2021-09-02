@@ -8,7 +8,7 @@
 #include <optional>
 #include <queue>
 #include <rewrapper/StreamingRewrapper.hpp>
-#include <boost/thread.hpp>
+#include <thread>
 
 class StreamInterface;
 
@@ -29,6 +29,11 @@ public:
     std::uint32_t maxFilenameLength = 65);
   bool write(Packet&& packet, StreamInterface* streamWrapper);
 
+  enum unloadQueueThreadStatus { idle, running, done, interrupted, error, empty };
+  unloadQueueThreadStatus unloadQueueThreadState = idle;
+
+//  virtual ~ReorderPackets() = default;
+
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
@@ -46,9 +51,8 @@ private:
   const DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
 
-  enum unloadQueueThreadStatus { idle, running, done, interrupted, error };
-  unloadQueueThreadStatus unloadQueueThreadState = idle;
-  boost::thread queueProcessorThread;
+  std::thread* queueProcessorThread;
+  std::uint32_t lastFrameWritten = 0;
 
   long unsigned int queueSize;
 };
