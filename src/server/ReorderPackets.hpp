@@ -9,6 +9,7 @@
 #include <queue>
 #include <rewrapper/StreamingRewrapper.hpp>
 #include <thread>
+#include "Queue.hpp"
 
 class StreamInterface;
 
@@ -32,8 +33,6 @@ public:
   enum unloadQueueThreadStatus { idle, running, done, interrupted, error, empty };
   unloadQueueThreadStatus unloadQueueThreadState = idle;
 
-//  virtual ~ReorderPackets() = default;
-
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
@@ -47,7 +46,9 @@ private:
   std::uint32_t lastFrameReceived = 0;
   const std::uint32_t maxBufferSize;
   const std::uint32_t maxQueueLength;
-  std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
+  //std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
+  Queue queue;
+  
   const DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;
 

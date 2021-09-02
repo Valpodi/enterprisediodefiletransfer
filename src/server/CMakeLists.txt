@@ -16,7 +16,9 @@ add_library(SERVER_LIBRARY
         SISLFilename.hpp
         Parsing.hpp
         TotalFrames.cpp
-        TotalFrames.hpp)
+        TotalFrames.hpp
+        Queue.cpp
+        Queue.hpp)
 
 add_library(SERVER_LIBRARY_TESTS
         ../test/EnterpriseDiodeTestHelpers.cpp

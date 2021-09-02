@@ -9,6 +9,7 @@
 #include <iostream>
 #include "spdlog/spdlog.h"
 #include <thread>
+#include "Queue.hpp"
 
 ReorderPackets::ReorderPackets(
   std::uint32_t maxBufferSize,
@@ -21,11 +22,6 @@ ReorderPackets::ReorderPackets(
     diodeType(diodeType)
 {
 }
-
-// ReorderPackets::~ReorderPackets()
-// {
-//   unloadQueueThreadState = interrupted;
-// }
 
 bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
 {
