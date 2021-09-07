@@ -35,7 +35,7 @@ public:
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
-  void writeFrame(StreamInterface *streamWrapper);
+  void writeFrame(StreamInterface *streamWrapper, Packet&&);
   void logOutOfOrderPackets(uint32_t frameCount);
   void unloadQueueThread(StreamInterface* streamWrapper);
 
@@ -47,10 +47,14 @@ private:
   const std::uint32_t maxQueueLength;
   //std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
 
+  TestQueue queue;
+
   //TestQueue&& queue = std::move(TestQueue());
 
-  TestQueue queueInstance;
-  TestQueue&& queue = std::move(queueInstance);
+  //TestQueue queueInstance;
+  //TestQueue&& queue = std::move(queueInstance);
+  
+  ///std::mutex queueIsBusy;
 
   const DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;

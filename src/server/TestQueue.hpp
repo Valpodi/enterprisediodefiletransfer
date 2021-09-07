@@ -12,7 +12,8 @@ class TestQueue
 {
 public:
   TestQueue();
-
+  TestQueue(TestQueue&& fromQueue);
+  
   void emplace(Packet&& packet);
   const Packet& top();
   void pop();
