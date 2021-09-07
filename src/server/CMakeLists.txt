@@ -2,6 +2,8 @@
 #MIT License. For licence terms see LICENCE.md file.
 
 add_library(SERVER_LIBRARY
+        TestQueue.cpp
+        TestQueue.hpp
         UdpServer.cpp
         UdpServerInterface.hpp
         OrderingStreamWriter.cpp
@@ -10,7 +12,6 @@ add_library(SERVER_LIBRARY
         SessionManager.cpp
         FileStream.hpp
         StreamInterface.hpp
-        Queue.cpp
         Packet.cpp
         DropStream.hpp
         SISLFilename.cpp

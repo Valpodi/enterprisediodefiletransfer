@@ -1,23 +1,23 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include "Queue.hpp"
+#include "TestQueue.hpp"
 #include "Packet.hpp"
 
-Queue::Queue()
+TestQueue::TestQueue()
 {
-  std::priority_queue<Packet, std::vector<Packet>, std::greater<>> xqueue;
-  std::mutex queueIsBusy;
+  //std::priority_queue<Packet, std::vector<Packet>, std::greater<>> xqueue;
+  //std::mutex queueIsBusy;
 }
   
-void Queue::emplace(Packet&& packet)
+void TestQueue::emplace(Packet&& packet)
 {
   queueIsBusy.lock();
   xqueue.emplace(std::move(packet));
   queueIsBusy.unlock();
 }
 
-const Packet& Queue::top()
+const Packet& TestQueue::top()
 {
   queueIsBusy.lock();
   const Packet& packet = xqueue.top();
@@ -25,14 +25,14 @@ const Packet& Queue::top()
   return packet;
 } 
 
-void Queue::pop()
+void TestQueue::pop()
 {
   queueIsBusy.lock();
   xqueue.pop();
   queueIsBusy.unlock();
 }
 
-size_t Queue::size()
+size_t TestQueue::size()
 {
   //queueIsBusy.lock();
   size_t size = xqueue.size();
@@ -40,7 +40,7 @@ size_t Queue::size()
   return size;
 }
 
-bool Queue::empty()
+bool TestQueue::empty()
 {
   //queueIsBusy.lock();
   bool isEmpty = xqueue.empty();

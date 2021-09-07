@@ -1,17 +1,17 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#ifndef ENTERPRISEDIODETESTER_QUEUE_HPP
-#define ENTERPRISEDIODETESTER_QUEUE_HPP
+#ifndef ENTERPRISEDIODETESTER_TESTQUEUE_HPP
+#define ENTERPRISEDIODETESTER_TESTQUEUE_HPP
 
 #include "Packet.hpp"
 #include <queue>
 #include <mutex>
 
-class Queue
+class TestQueue
 {
 public:
-  Queue();
+  TestQueue();
 
   void emplace(Packet&& packet);
   const Packet& top();
@@ -25,4 +25,4 @@ private:
 
 };
 
-#endif // ENTERPRISEDIODETESTER_QUEUE_HPP
+#endif // ENTERPRISEDIODETESTER_TESTQUEUE_HPP

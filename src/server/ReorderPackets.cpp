@@ -2,7 +2,6 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "ReorderPackets.hpp"
-#include "Queue.hpp"
 #include "Packet.hpp"
 #include "StreamInterface.hpp"
 #include "TotalFrames.hpp"
@@ -10,7 +9,6 @@
 #include <iostream>
 #include <thread>
 #include "spdlog/spdlog.h"
-
 
 ReorderPackets::ReorderPackets(
   std::uint32_t maxBufferSize,
@@ -22,7 +20,6 @@ ReorderPackets::ReorderPackets(
     maxQueueLength(maxQueueLength),
     diodeType(diodeType)
 {
-  Queue myQueue;
 }
 
 bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
