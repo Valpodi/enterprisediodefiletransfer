@@ -35,7 +35,7 @@ public:
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
-  void writeFrame(StreamInterface *streamWrapper, Packet&&);
+  void writeFrame(StreamInterface *streamWrapper);
   void logOutOfOrderPackets(uint32_t frameCount);
   void unloadQueueThread(StreamInterface* streamWrapper);
 
