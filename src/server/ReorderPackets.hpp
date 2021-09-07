@@ -13,7 +13,6 @@
 
 class StreamInterface;
 
-
 enum class DiodeType
 {
   import,
@@ -46,8 +45,8 @@ private:
   std::uint32_t lastFrameReceived = 0;
   const std::uint32_t maxBufferSize;
   const std::uint32_t maxQueueLength;
-  //std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
-  Queue queue;
+  std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
+  //Queue myQueue;
   
   const DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;

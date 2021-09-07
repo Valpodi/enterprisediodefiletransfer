@@ -19,6 +19,26 @@ ClientWrapper::ClientWrapper(
       std::make_shared<UdpClient>(targetAddress, targetPort),
       selectTimer(mtuSize, dataRateMbps, sendPeriod),
       calculatePayloadSize(mtuSize),
+      1,
+      std::move(filename))
+{
+  spdlog::set_level(spdlog::level::from_str(logLevel));
+}
+
+ClientWrapper::ClientWrapper(
+  const std::string& targetAddress,
+  std::uint16_t targetPort,
+  std::uint16_t mtuSize,
+  double dataRateMbps,
+  std::string filename,
+  const std::string& logLevel,
+  std::uint16_t sendPeriod,
+  std::uint32_t numberOfPackets) :
+    edClient(
+      std::make_shared<UdpClient>(targetAddress, targetPort),
+      selectTimer(mtuSize, dataRateMbps, sendPeriod),
+      calculatePayloadSize(mtuSize),
+      numberOfPackets,
       std::move(filename))
 {
   spdlog::set_level(spdlog::level::from_str(logLevel));

@@ -5,24 +5,22 @@
 #define ENTERPRISEDIODETESTER_QUEUE_HPP
 
 #include "Packet.hpp"
-#include <algorithm>
-#include <optional>
 #include <queue>
 #include <mutex>
 
 class Queue
 {
 public:
-  explicit Queue();
+  Queue();
 
   void emplace(Packet&& packet);
-  void pop();
   const Packet& top();
+  void pop();
   size_t size();
   bool empty();
 
 private:
-  std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
+  std::priority_queue<Packet, std::vector<Packet>, std::greater<Packet>> xqueue;
   std::mutex queueIsBusy;
 
 };

@@ -10,15 +10,14 @@ add_library(SERVER_LIBRARY
         SessionManager.cpp
         FileStream.hpp
         StreamInterface.hpp
+        Queue.cpp
         Packet.cpp
         DropStream.hpp
         SISLFilename.cpp
         SISLFilename.hpp
         Parsing.hpp
         TotalFrames.cpp
-        TotalFrames.hpp
-        Queue.cpp
-        Queue.hpp)
+        TotalFrames.hpp)
 
 add_library(SERVER_LIBRARY_TESTS
         ../test/EnterpriseDiodeTestHelpers.cpp

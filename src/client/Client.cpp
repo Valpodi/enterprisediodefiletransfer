@@ -20,6 +20,23 @@ Client::Client(
     maxPayloadSize(maxPayloadSize),
     headerBuffer({}),
     payloadBuffer(maxPayloadSize),
+    numberOfPackets(1),
+    filename(std::move(filename))
+{
+}
+
+Client::Client(
+  std::shared_ptr<UdpClientInterface> udpClient,
+  std::shared_ptr<TimerInterface> timer,
+  std::uint16_t maxPayloadSize,
+  std::uint32_t numberOfPackets,
+  std::string filename):
+    udpClient(udpClient),
+    edTimer(timer),
+    maxPayloadSize(maxPayloadSize),
+    headerBuffer({}),
+    payloadBuffer(maxPayloadSize),
+    numberOfPackets(numberOfPackets),
     filename(std::move(filename))
 {
 }
@@ -74,7 +91,7 @@ ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint
 {
 //  spdlog::info("generateEDPacket called");
   static bool sislFileRead = false;
-  static int counter;
+  static uint32_t counter;
   static std::streamsize length = 0;
   incrementFrameCount();
 
@@ -87,7 +104,7 @@ ConstSocketBuffers Client::generateEDPacket(std::istream& inputStream, std::uint
   }
   const auto payloadLength = length;
 
-  if (counter < 100)
+  if (counter < numberOfPackets)
   {
     ++counter;
     return {

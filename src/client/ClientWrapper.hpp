@@ -22,7 +22,18 @@ public:
     double dataRateMbps,
     std::string filename,
     const std::string& logLevel,
-    std::uint16_t sendperiod );
+    std::uint16_t sendperiod);
+
+  ClientWrapper(
+    const std::string& targetAddress,
+    std::uint16_t targetPort,
+    std::uint16_t mtuSize,
+    double dataRateMbps,
+    std::string filename,
+    const std::string& logLevel,
+    std::uint16_t sendperiod,
+    std::uint32_t numberOfPackets);
+
   void sendData(const std::string& filename);
 
 private:

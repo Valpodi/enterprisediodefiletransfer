@@ -29,7 +29,7 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 SET(BOOSTROOT /usr/include/boost169)
-find_package(Boost 1.69.0 REQUIRED thread)
+find_package(Boost 1.69.0 REQUIRED)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 message("Boost found at:" ${Boost_INCLUDE_DIR})

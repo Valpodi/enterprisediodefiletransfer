@@ -3,43 +3,47 @@
 
 #include "Queue.hpp"
 #include "Packet.hpp"
-#include <mutex>
 
 Queue::Queue()
 {
+  std::priority_queue<Packet, std::vector<Packet>, std::greater<>> xqueue;
+  std::mutex queueIsBusy;
 }
   
 void Queue::emplace(Packet&& packet)
 {
   queueIsBusy.lock();
-  queue.emplace(std::move(packet));
-  queueIsBusy.unlock();
-}
-
-void Queue::pop()
-{
-  queueIsBusy.lock();
-  queue.pop();
+  xqueue.emplace(std::move(packet));
   queueIsBusy.unlock();
 }
 
 const Packet& Queue::top()
 {
   queueIsBusy.lock();
-  return queue.top();
+  const Packet& packet = xqueue.top();
   queueIsBusy.unlock();
+  return packet;
 } 
+
+void Queue::pop()
+{
+  queueIsBusy.lock();
+  xqueue.pop();
+  queueIsBusy.unlock();
+}
 
 size_t Queue::size()
 {
-  queueIsBusy.lock();
-  return queue.size();
-  queueIsBusy.unlock();
+  //queueIsBusy.lock();
+  size_t size = xqueue.size();
+  //queueIsBusy.unlock();
+  return size;
 }
 
 bool Queue::empty()
 {
-  queueIsBusy.lock();
-  return queue.empty();
-  queueIsBusy.unlock();
+  //queueIsBusy.lock();
+  bool isEmpty = xqueue.empty();
+  //queueIsBusy.unlock();
+  return isEmpty;
 }

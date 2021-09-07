@@ -2,14 +2,15 @@
 // MIT License. For licence terms see LICENCE.md file.
 
 #include "ReorderPackets.hpp"
+#include "Queue.hpp"
 #include "Packet.hpp"
 #include "StreamInterface.hpp"
 #include "TotalFrames.hpp"
 #include <chrono>
 #include <iostream>
-#include "spdlog/spdlog.h"
 #include <thread>
-#include "Queue.hpp"
+#include "spdlog/spdlog.h"
+
 
 ReorderPackets::ReorderPackets(
   std::uint32_t maxBufferSize,
@@ -21,6 +22,7 @@ ReorderPackets::ReorderPackets(
     maxQueueLength(maxQueueLength),
     diodeType(diodeType)
 {
+  Queue myQueue;
 }
 
 bool ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
@@ -48,7 +50,7 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
   {
     if (!queueAlreadyExceeded)
     {
-      spdlog::error("ReorderPackets: maxQueueLength exceeded.");
+      spdlog::error("ReorderPackets: maxQueueLength exceeded." + std::to_string(queueSize));
       spdlog::error(std::string("Last frame: ") + std::to_string(lastFrameReceived) +
            std::string(" This frame: ") + std::to_string(packet.headerParams.frameCount));
       queueAlreadyExceeded = true;
@@ -57,6 +59,7 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
   }
   queue.emplace(std::move(packet));
   queueUsagePeak = queueSize > queueUsagePeak ? queueSize : queueUsagePeak;
+  spdlog::info("size=" + std::to_string(queue.size()));
 }
 
 bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
@@ -74,7 +77,6 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
     spdlog::info("exiting thread");
     queueProcessorThread->join();
     spdlog::info("exited thread");
-    //unloadQueueThreadState = idle;
     return true;
   }
   else
@@ -85,49 +87,55 @@ bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
 
 void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
 {
-  std::this_thread::sleep_for(std::chrono::microseconds(50));
+  std::this_thread::sleep_for(std::chrono::microseconds(30));
   try
   {
-    while (!queue.empty() && unloadQueueThreadState == running)
+    while (unloadQueueThreadState == running)
     {
-      while (queue.top().headerParams.frameCount == nextFrameCount)
+      if (!queue.empty() && queue.top().headerParams.frameCount == nextFrameCount)
       {
         if (queue.top().headerParams.eOFFlag)
         {
+          //spdlog::info(__LINE__);
           streamWrapper->setStoredFilename(
             sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
-          queue.pop();
-          ++nextFrameCount;
           unloadQueueThreadState = done;
           throw std::string("done.");
         } 
         else 
         {
+          //spdlog::info(__LINE__);
           writeFrame(streamWrapper);
           queue.pop();
           ++nextFrameCount;
         }
       }
-      while (queue.top().headerParams.frameCount <= lastFrameWritten && queue.size() > 0)
+      else if (!queue.empty())
       {
-        spdlog::info("discarding frame: " + std::to_string(queue.top().headerParams.frameCount));
-        queue.pop();
-        spdlog::info("queue size:" + std::to_string(queue.size()));
+        spdlog::info("#unexpected frame: " + std::to_string(queue.top().headerParams.frameCount) + " - expected: " + std::to_string(nextFrameCount));
+        spdlog::info("#queue size:" + std::to_string(queue.size()));
+        if (queue.top().headerParams.frameCount <= lastFrameWritten)
+        {
+          spdlog::info("#discarding frame: " + std::to_string(queue.top().headerParams.frameCount));
+          queue.pop();
+          spdlog::info("#queue size:" + std::to_string(queue.size()));
+        }
+        else
+        {
+          unloadQueueThreadState = error;
+          throw std::string("unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
+        }
       }
-      if (queue.top().headerParams.frameCount != nextFrameCount)
+      else
       {
-        spdlog::info("unexpected frame: " + std::to_string(queue.top().headerParams.frameCount));
-        spdlog::info("queue size:" + std::to_string(queue.size()));
-        unloadQueueThreadState = error;
-        throw std::string("unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
+        std::this_thread::sleep_for(std::chrono::microseconds(30));
       }
-      //std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
     unloadQueueThreadState = empty;
-    spdlog::info("exiting thread while expecting frame: " + std::to_string(nextFrameCount));
-    spdlog::info("queue size:" + std::to_string(queue.size()));
-    spdlog::info("frame on top of queue: " + std::to_string(queue.top().headerParams.frameCount));
-    throw std::string("unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
+    spdlog::info("#exiting thread while expecting frame: " + std::to_string(nextFrameCount));
+    spdlog::info("#queue size:" + std::to_string(queue.size()));
+    spdlog::info("#frame on top of queue: " + std::to_string(queue.top().headerParams.frameCount));
+    throw std::string("#unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
   }
   catch (std::string ex)
   {
@@ -151,8 +159,8 @@ void ReorderPackets::writeFrame(StreamInterface* streamWrapper)
   else
   {
     lastFrameWritten = queue.top().headerParams.frameCount;
-    spdlog::info("frame: " + std::to_string(lastFrameWritten));
-    spdlog::info(queue.top().getFrame()[0]);
+    //spdlog::info("write: " + std::to_string(queue.top().getFrame()[0]));
     streamWrapper->write(queue.top().getFrame());
+    spdlog::info("#frame: " + std::to_string(lastFrameWritten));
   }
 }

@@ -51,13 +51,9 @@ public:
 
   void write(const BytesBuffer& inputData) override
   {
-    //spdlog::info("writing bytes:");
-    //for (int i = 0 ; i < 5; i++)
-    //{
-      spdlog::info(inputData.data()[0]);
-    //}
+    //spdlog::info("wrote: " + std::to_string(inputData.data()[0]));
     outputStream.write(reinterpret_cast<const char*>(inputData.data()), static_cast<long>(inputData.size()));
-    outputStream.flush();
+    //outputStream.flush();
   }
 
 private:
