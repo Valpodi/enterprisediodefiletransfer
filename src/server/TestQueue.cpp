@@ -6,7 +6,7 @@
 
 TestQueue::TestQueue()
 {
-  //std::priority_queue<Packet, std::vector<Packet>, std::greater<>> xqueue;
+  //std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
   //std::mutex queueIsBusy;
 }
 
@@ -15,35 +15,66 @@ TestQueue::TestQueue(TestQueue&& fromQueue)
   std::unique_lock<std::mutex> lock_a(fromQueue.queueIsBusy, std::defer_lock);
   std::unique_lock<std::mutex> lock_b(queueIsBusy, std::defer_lock);
   std::lock(lock_a, lock_b);
-  std::swap(fromQueue.xqueue, xqueue);
+  std::swap(fromQueue.queue, queue);
 }  
 
 void TestQueue::emplace(Packet&& packet)
 {
   std::unique_lock<std::mutex> lock_b(queueIsBusy);
-  xqueue.emplace(std::move(packet));
+  queue.emplace(std::move(packet));
 }
 
 const Packet& TestQueue::top()
 {
   std::unique_lock<std::mutex> lock_b(queueIsBusy);
-  return xqueue.top();
+  return queue.top();
 } 
 
 void TestQueue::pop()
 {
   std::unique_lock<std::mutex> lock_b(queueIsBusy);
-  xqueue.pop();
+  queue.pop();
 }
 
 size_t TestQueue::size()
 {
   std::unique_lock<std::mutex> lock_b(queueIsBusy);
-  return xqueue.size();
+  return queue.size();
 }
 
 bool TestQueue::empty()
 {
   std::unique_lock<std::mutex> lock_b(queueIsBusy);
-  return xqueue.empty();
+  return queue.empty();
 }
+
+std::optional<Packet> TestQueue::nextInSequencedPacket(std::uint32_t nextFrameCount)
+{
+  std::unique_lock<std::mutex> lock_b(queueIsBusy);
+  if (queue.empty()) return {};
+  if (queue.top().headerParams.frameCount == nextFrameCount)
+  {
+    // Priority queue does not support moving out of top of queue, so we need const cast to remove the const reference and allow move
+    Packet topFrame(std::move(const_cast<Packet&>(queue.top())));
+    queue.pop();
+    return {std::move(topFrame)};
+  }
+  if (queue.top().headerParams.frameCount <= lastFrameWritten)
+  {
+    spdlog::info("#discarding frame: " + std::to_string(queue.top().headerParams.frameCount));
+    queue.pop();
+    spdlog::info("#queue size:" + std::to_string(queue.size()));
+  }
+  return {};
+}
+
+//      else
+//      {
+//        unloadQueueThreadState = error;
+//        throw std::string("unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
+//      }
+//      else
+//      {
+//        std::this_thread::sleep_for(std::chrono::microseconds(30));
+//      }
+  };

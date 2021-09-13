@@ -7,6 +7,7 @@
 #include "Packet.hpp"
 #include <queue>
 #include <mutex>
+#include <optional>
 
 class TestQueue
 {
@@ -19,9 +20,10 @@ public:
   void pop();
   size_t size();
   bool empty();
+  std::optional<Packet> nextInSequencedPacket(std::uint32_t nextFrameCount);
 
 private:
-  std::priority_queue<Packet, std::vector<Packet>, std::greater<Packet>> xqueue;
+  std::priority_queue<Packet, std::vector<Packet>, std::greater<Packet>> queue;
   std::mutex queueIsBusy;
 
 };
