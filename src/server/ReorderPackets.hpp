@@ -29,13 +29,12 @@ public:
     std::uint32_t maxFilenameLength = 65);
   bool write(Packet&& packet, StreamInterface* streamWrapper);
 
-  enum unloadQueueThreadStatus { idle, running, done, interrupted, error, empty };
-  unloadQueueThreadStatus unloadQueueThreadState = idle;
+  TestQueue::unloadQueueThreadStatus unloadQueueThreadState = TestQueue::idle;
 
 private:
   bool checkQueueAndWrite(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
-  void writeFrame(StreamInterface *streamWrapper);
+  void writeFrame(StreamInterface *streamWrapper, Packet&&);
   void logOutOfOrderPackets(uint32_t frameCount);
   void unloadQueueThread(StreamInterface* streamWrapper);
 

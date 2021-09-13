@@ -15,6 +15,8 @@ public:
   TestQueue();
   TestQueue(TestQueue&& fromQueue);
   
+  enum unloadQueueThreadStatus { idle, running, done, interrupted, error, empty };
+
   void emplace(Packet&& packet);
   const Packet& top();
   void pop();
