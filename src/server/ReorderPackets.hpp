@@ -45,16 +45,8 @@ private:
   std::uint32_t lastFrameReceived = 0;
   const std::uint32_t maxBufferSize;
   const std::uint32_t maxQueueLength;
-  //std::priority_queue<Packet, std::vector<Packet>, std::greater<>> queue;
 
   TestQueue queue;
-
-  //TestQueue&& queue = std::move(TestQueue());
-
-  //TestQueue queueInstance;
-  //TestQueue&& queue = std::move(queueInstance);
-  
-  ///std::mutex queueIsBusy;
 
   const DiodeType diodeType;
   StreamingRewrapper streamingRewrapper;

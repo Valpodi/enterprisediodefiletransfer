@@ -90,6 +90,46 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
     while (unloadQueueThreadState == running)
     {
       queue.processQueue();
+      // if (!queue.empty())
+      // {
+      //   Packet packet = queue.top();
+      // }
+      // if (queue.top().headerParams.frameCount == nextFrameCount)
+      // {
+      //   if (queue.top().headerParams.eOFFlag)
+      //   {
+      //     streamWrapper->setStoredFilename(
+      //       sislFilename.extractFilename(queue.top().getFrame()).value_or("rejected."));
+      //     unloadQueueThreadState = done;
+      //     throw std::string("done.");
+      //   } 
+      //   else 
+      //   {
+      //     writeFrame(streamWrapper);
+      //     queue.pop();
+      //     ++nextFrameCount;
+      //   }
+      // }
+      // else if (!queue.empty())
+      // {
+      //   spdlog::info("#unexpected frame: " + std::to_string(queue.top().headerParams.frameCount) + " - expected: " + std::to_string(nextFrameCount));
+      //   spdlog::info("#queue size:" + std::to_string(queue.size()));
+      //   if (queue.top().headerParams.frameCount <= lastFrameWritten)
+      //   {
+      //     spdlog::info("#discarding frame: " + std::to_string(queue.top().headerParams.frameCount));
+      //     queue.pop();
+      //     spdlog::info("#queue size:" + std::to_string(queue.size()));
+      //   }
+      //   else
+      //   {
+      //     unloadQueueThreadState = error;
+      //     throw std::string("unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
+      //   }
+      // }
+      // else
+      // {
+      //   std::this_thread::sleep_for(std::chrono::microseconds(30));
+      // }
     }
     unloadQueueThreadState = empty;
     spdlog::info("#exiting thread while expecting frame: " + std::to_string(nextFrameCount));
