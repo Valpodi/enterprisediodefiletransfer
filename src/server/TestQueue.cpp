@@ -49,23 +49,24 @@ bool TestQueue::empty()
   return queue.empty();
 }
 
-std::optional<Packet> TestQueue::nextInSequencedPacket(std::uint32_t nextFrameCount, std::uint32_t lastFrameWritten)
+std::pair<TestQueue::sequencedPacketStatus, std::optional<Packet>> TestQueue::nextInSequencedPacket(std::uint32_t nextFrameCount, std::uint32_t lastFrameWritten)
 {
   std::unique_lock<std::mutex> lock_b(queueIsBusy);
-  if (queue.empty()) return {};
+  if (queue.empty()) return std::make_pair<TestQueue::sequencedPacketStatus, std::optional<Packet>>(sequencedPacketStatus::q_empty, {});
   if (queue.top().headerParams.frameCount == nextFrameCount)
   {
     // Priority queue does not support moving out of top of queue, so we need const cast to remove the const reference and allow move
     Packet topFrame(std::move(const_cast<Packet&>(queue.top())));
     queue.pop();
-    return {std::move(topFrame)};
+    return std::make_pair(sequencedPacketStatus::found, std::move(topFrame));
   }
   if (queue.top().headerParams.frameCount <= lastFrameWritten)
   {
     spdlog::info("#discarding frame: " + std::to_string(queue.top().headerParams.frameCount));
     queue.pop();
     spdlog::info("#queue size:" + std::to_string(queue.size()));
+    return std::make_pair<TestQueue::sequencedPacketStatus, std::optional<Packet>>(sequencedPacketStatus::discarded, {});
   }
-  spdlog::info("waiting for frame...");
-  return {};
+//  spdlog::info("waiting for frame...");
+  return std::make_pair<TestQueue::sequencedPacketStatus, std::optional<Packet>>(sequencedPacketStatus::waiting, {});
 }
