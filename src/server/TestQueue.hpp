@@ -15,14 +15,14 @@ public:
   TestQueue();
   TestQueue(TestQueue&& fromQueue);
   
-  enum unloadQueueThreadStatus { idle, running, done, interrupted, error, empty };
+  enum unloadQueueThreadStatus { idle, running, done, interrupted, error, q_empty };
 
   void emplace(Packet&& packet);
   const Packet& top();
   void pop();
   size_t size();
   bool empty();
-  std::optional<Packet> nextInSequencedPacket(std::uint32_t nextFrameCount);
+  std::optional<Packet> nextInSequencedPacket(std::uint32_t nextFrameCount, std::uint32_t lastFrameWritten);
 
 private:
   std::priority_queue<Packet, std::vector<Packet>, std::greater<Packet>> queue;

@@ -58,20 +58,20 @@ void ReorderPackets::addFrameToQueue(Packet&& packet)
   }
   queue.emplace(std::move(packet));
   queueUsagePeak = queueSize > queueUsagePeak ? queueSize : queueUsagePeak;
-  spdlog::info("size=" + std::to_string(queue.size()));
+  //spdlog::info("size=" + std::to_string(queueSize));
 }
 
 bool ReorderPackets::checkQueueAndWrite(StreamInterface* streamWrapper)
 {
-  if (unloadQueueThreadState == idle)
+  if (unloadQueueThreadState == TestQueue::idle)
   {
-    unloadQueueThreadState = running;
+    unloadQueueThreadState = TestQueue::running;
     queueProcessorThread = new std::thread(&ReorderPackets::unloadQueueThread, this, streamWrapper);
     //queueProcessorThread.detach();
     spdlog::info("started thread");
     return false;
   }
-  else if (unloadQueueThreadState == done)
+  else if (unloadQueueThreadState == TestQueue::done)
   {
     spdlog::info("exiting thread");
     queueProcessorThread->join();
@@ -91,8 +91,9 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
   {
     while (unloadQueueThreadState == TestQueue::running)
     {
-      if (auto packet = queue.nextInSequencedPacket(nextFrameCount))
+      if (auto nextpacket = queue.nextInSequencedPacket(nextFrameCount, lastFrameWritten))
       {
+        Packet packet = reinterpret_cast<Packet&&>(nextpacket);
         if (packet.headerParams.eOFFlag)
         {
           streamWrapper->setStoredFilename(
@@ -102,7 +103,7 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
         } 
         else 
         {
-          writeFrame(streamWrapper, packet);
+          writeFrame(streamWrapper, std::move(packet));
           ++nextFrameCount;
         }
       }

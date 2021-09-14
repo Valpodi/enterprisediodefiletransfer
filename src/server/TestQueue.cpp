@@ -3,6 +3,7 @@
 
 #include "TestQueue.hpp"
 #include "Packet.hpp"
+#include "spdlog/spdlog.h"
 
 TestQueue::TestQueue()
 {
@@ -48,7 +49,7 @@ bool TestQueue::empty()
   return queue.empty();
 }
 
-std::optional<Packet> TestQueue::nextInSequencedPacket(std::uint32_t nextFrameCount)
+std::optional<Packet> TestQueue::nextInSequencedPacket(std::uint32_t nextFrameCount, std::uint32_t lastFrameWritten)
 {
   std::unique_lock<std::mutex> lock_b(queueIsBusy);
   if (queue.empty()) return {};
@@ -65,16 +66,6 @@ std::optional<Packet> TestQueue::nextInSequencedPacket(std::uint32_t nextFrameCo
     queue.pop();
     spdlog::info("#queue size:" + std::to_string(queue.size()));
   }
+  spdlog::info("waiting for frame...");
   return {};
 }
-
-//      else
-//      {
-//        unloadQueueThreadState = error;
-//        throw std::string("unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
-//      }
-//      else
-//      {
-//        std::this_thread::sleep_for(std::chrono::microseconds(30));
-//      }
-  };
