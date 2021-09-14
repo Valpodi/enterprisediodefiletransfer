@@ -51,9 +51,7 @@ public:
 
   void write(const BytesBuffer& inputData) override
   {
-    //spdlog::info("wrote: " + std::to_string(inputData.data()[0]));
     outputStream.write(reinterpret_cast<const char*>(inputData.data()), static_cast<long>(inputData.size()));
-    //outputStream.flush();
   }
 
 private:
