@@ -91,11 +91,11 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
   {
     while (unloadQueueThreadState == unloadQueueThreadStatus::running)
     {
-      std::pair<TestQueue::sequencedPacketStatus, std::optional<Packet>> queueResponse = queue.nextInSequencedPacket(nextFrameCount, lastFrameWritten);
+      auto queueResponse = queue.nextInSequencedPacket(nextFrameCount, lastFrameWritten);
       TestQueue::sequencedPacketStatus packetStatus = queueResponse.first;
       if (packetStatus == TestQueue::sequencedPacketStatus::found)
       {
-        Packet packet = reinterpret_cast<Packet&&>(queueResponse.second);
+        Packet packet(std::move(queueResponse.second.value()));
         if (packet.headerParams.eOFFlag)
         {
           streamWrapper->setStoredFilename(
@@ -115,11 +115,11 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
       }
       else if (packetStatus == TestQueue::sequencedPacketStatus::waiting)
       {
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
+        std::this_thread::sleep_for(std::chrono::microseconds(50));
       }
       else if (packetStatus == TestQueue::sequencedPacketStatus::q_empty)
       {
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
+        std::this_thread::sleep_for(std::chrono::microseconds(50));
       }
       else if (packetStatus == TestQueue::sequencedPacketStatus::error)
       {

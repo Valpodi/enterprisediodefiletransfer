@@ -67,6 +67,5 @@ std::pair<TestQueue::sequencedPacketStatus, std::optional<Packet>> TestQueue::ne
     spdlog::info("#queue size:" + std::to_string(queue.size()));
     return std::make_pair<TestQueue::sequencedPacketStatus, std::optional<Packet>>(sequencedPacketStatus::discarded, {});
   }
-//  spdlog::info("waiting for frame...");
   return std::make_pair<TestQueue::sequencedPacketStatus, std::optional<Packet>>(sequencedPacketStatus::waiting, {});
 }
