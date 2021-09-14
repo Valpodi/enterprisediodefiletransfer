@@ -27,13 +27,13 @@ public:
     std::uint32_t maxQueueLength,
     DiodeType diodeType,
     std::uint32_t maxFilenameLength = 65);
-  bool write(Packet&& packet, StreamInterface* streamWrapper);
+  void write(Packet&& packet, StreamInterface* streamWrapper);
 
   enum unloadQueueThreadStatus { error, empty, idle, running, done, interrupted };
   unloadQueueThreadStatus unloadQueueThreadState = unloadQueueThreadStatus::idle;
 
 private:
-  bool checkQueueAndWrite(StreamInterface* streamWrapper);
+  void startUnloadQueueThread(StreamInterface* streamWrapper);
   void addFrameToQueue(Packet&& packet);
   void writeFrame(StreamInterface *streamWrapper, Packet&&);
   void logOutOfOrderPackets(uint32_t frameCount);

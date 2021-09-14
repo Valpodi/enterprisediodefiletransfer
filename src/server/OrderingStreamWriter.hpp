@@ -22,7 +22,7 @@ public:
     std::function<std::time_t()> getTime,
     DiodeType diodeType);
 
-  bool write(Packet&& data);
+  void write(Packet&& data);
   void deleteFile();
   void renameFile();
 

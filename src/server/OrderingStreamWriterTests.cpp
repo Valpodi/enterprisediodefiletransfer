@@ -44,8 +44,8 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
     const std::string filename = "{name: !str \"testFilename\"}";
     auto packet2 = parsePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()});
 
-    REQUIRE_FALSE(streamWriter.write(std::move(packet)));
-    REQUIRE(streamWriter.write(std::move(packet2)));
+    streamWriter.write(std::move(packet));
+    streamWriter.write(std::move(packet2));
     REQUIRE(outputStream.str() == "AB");
   }
 
@@ -55,17 +55,17 @@ TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been receiv
     std::vector<char> vcFilename(filename.begin(), filename.end());
     auto packetC = parsePacket(createTestPacketStream(1, 3, true), {filename.begin(), filename.end()});
 
-    REQUIRE_FALSE(streamWriter.write(std::move(packetC)));
+    streamWriter.write(std::move(packetC));
     REQUIRE(outputStream.str().empty());
 
     auto packetA = parsePacket(createTestPacketStream(1, 2, false), {'C', 'D'});
 
-    REQUIRE_FALSE(streamWriter.write(std::move(packetA)));
+    streamWriter.write(std::move(packetA));
     REQUIRE(outputStream.str().empty());
 
     auto packetB = parsePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
 
-    REQUIRE(streamWriter.write(std::move(packetB)));
+    streamWriter.write(std::move(packetB));
     REQUIRE(outputStream.str() == "ABCD");
   }
 }
