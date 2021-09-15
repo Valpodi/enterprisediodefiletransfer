@@ -206,19 +206,6 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
   }
 }
 
-void queueManagerWriteHelper(ReorderPackets&& queueManager, std::string inputStream, StreamSpy stream)
-{
-  try
-  {
-    queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
-  }
-  catch (const std::runtime_error& ex)
-  {
-    throw (std::runtime_error(ex.what()));
-  }
-}
-
 TEST_CASE("ReorderPackets. Import diode.")
 {
   std::stringstream outputStream;
@@ -229,11 +216,12 @@ TEST_CASE("ReorderPackets. Import diode.")
 
   SECTION("Data which is not wrapped, sisl or bitmap throws an error")
   {
-    auto inputStream = std::string("AC");
-    queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    REQUIRE_THROWS_AS(queueManagerWriteHelper(std::move(queueManager), inputStream, stream), std::runtime_error);
-    //REQUIRE_THROWS_AS(queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream),
-    //                                     std::runtime_error);
+    auto inputStream1 = std::string("AC");    // bad SISL
+    auto inputStream2 = std::string("BC");    // good SISL
+    queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream1.begin(), inputStream1.end()}}, &stream);
+    queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream2.begin(), inputStream2.end()}}, &stream);
+    WAIT_FOR_ASYNC_THREAD;
+    REQUIRE("BC" == outputStream.str());
   }
 
   SECTION("Data with blank CDHeader starting with sisl or bmp starting char remains unchanged.")

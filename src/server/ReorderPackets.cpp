@@ -75,9 +75,9 @@ void ReorderPackets::startUnloadQueueThread(StreamInterface* streamWrapper)
 void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
 {
   std::this_thread::sleep_for(std::chrono::microseconds(30));
-  try
+  while (unloadQueueThreadState == unloadQueueThreadStatus::running)
   {
-    while (unloadQueueThreadState == unloadQueueThreadStatus::running)
+    try
     {
       auto queueResponse = queue.nextInSequencedPacket(nextFrameCount, lastFrameWritten);
       TestQueue::sequencedPacketStatus packetStatus = queueResponse.first;
@@ -89,7 +89,8 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
           streamWrapper->setStoredFilename(
             sislFilename.extractFilename(packet.getFrame()).value_or("rejected."));
           unloadQueueThreadState = unloadQueueThreadStatus::done;
-          throw std::string("done.");
+          streamWrapper->renameFile();
+          spdlog::info("#File completed. TODO handle thread cleanup.");
         } 
         else 
         {
@@ -115,18 +116,18 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
         throw std::string("Queue Error");
       }
     }
-    unloadQueueThreadState = unloadQueueThreadStatus::interrupted;
-    spdlog::info("#exiting thread while expecting frame: " + std::to_string(nextFrameCount));
-    spdlog::info("#queue size:" + std::to_string(queue.size()));
-    spdlog::info("#frame on top of queue: " + std::to_string(queue.top().headerParams.frameCount));
-    throw std::string("#unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
-  }
-  catch (std::string ex)
-  {
-    spdlog::info(ex);
-    if (unloadQueueThreadState == unloadQueueThreadStatus::done)
+    catch (std::string ex)
     {
-      streamWrapper->renameFile();
+      spdlog::info(ex);
+      unloadQueueThreadState = unloadQueueThreadStatus::interrupted;
+      spdlog::info("#exiting thread while expecting frame: " + std::to_string(nextFrameCount));
+      spdlog::info("#queue size:" + std::to_string(queue.size()));
+      spdlog::info("#frame on top of queue: " + std::to_string(queue.top().headerParams.frameCount));
+      throw std::string("#unloadThreadQueue:") + std::to_string(unloadQueueThreadState);
+    }
+    catch (const std::exception& ex)
+    {
+      spdlog::info("Caught exception: " + std::string(ex.what()));
     }
   }
 }
