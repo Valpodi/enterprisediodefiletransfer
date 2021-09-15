@@ -7,6 +7,8 @@
 #include "SessionManager.hpp"
 #include "StreamSpy.hpp"
 
+#define WAIT_FOR_ASYNC_THREAD usleep(10000)
+
 TEST_CASE("SessionManager.")
 {
   std::vector<std::stringstream> outputStreams;
@@ -28,6 +30,7 @@ TEST_CASE("SessionManager.")
 
     REQUIRE(outputStreams.empty());
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
+    WAIT_FOR_ASYNC_THREAD;
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
     REQUIRE_FALSE(fileDeletedWasCalled);
@@ -37,6 +40,7 @@ TEST_CASE("SessionManager.")
     {
       const std::string filename = "{name: !str \"testFilename\"}";
       sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, true), {filename.begin(), filename.end()}));
+      WAIT_FOR_ASYNC_THREAD;
 
       REQUIRE(outputStreams.at(0).str() == std::string("BC"));
       REQUIRE(fileRenameWasCalled);
@@ -44,6 +48,7 @@ TEST_CASE("SessionManager.")
       SECTION("After a session is closed, new packets with the same sessionID are written to a new stream")
       {
         sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'F', 'G'}));
+        WAIT_FOR_ASYNC_THREAD;
         REQUIRE(outputStreams.at(1).str() == std::string("FG"));
       }
     }
@@ -56,6 +61,7 @@ TEST_CASE("SessionManager.")
 
     REQUIRE(outputStreams.empty());
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false, true), {'B', 'C'}));
+    WAIT_FOR_ASYNC_THREAD;
     REQUIRE(outputStreams.at(0).str() == CDWrappedHeaderString + "BC");
     REQUIRE(capturedSessionId == 1);
     REQUIRE_FALSE(fileDeletedWasCalled);
@@ -65,6 +71,7 @@ TEST_CASE("SessionManager.")
     {
       const std::string filename = "{name: !str \"testFilename\"}";
       sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, true, true), {filename.begin(), filename.end()}));
+      WAIT_FOR_ASYNC_THREAD;
 
       REQUIRE(outputStreams.at(0).str() == CDWrappedHeaderString + "BC");
       REQUIRE(fileRenameWasCalled);
@@ -72,6 +79,7 @@ TEST_CASE("SessionManager.")
       SECTION("After a session is closed, new packets with the same sessionID are written to a new stream")
       {
         sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false, true), {'F', 'G'}));
+        WAIT_FOR_ASYNC_THREAD;
         REQUIRE(outputStreams.at(1).str() == CDWrappedHeaderString + "FG");
       }
     }
@@ -83,11 +91,13 @@ TEST_CASE("SessionManager.")
     auto sessionManager = SessionManager(10, 10, streamSpyCreator, fakeGetTime, 5, DiodeType::basic);
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
+    WAIT_FOR_ASYNC_THREAD;
 
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(2, 1, false), {'D', 'E'}));
+    WAIT_FOR_ASYNC_THREAD;
 
     REQUIRE(outputStreams.at(1).str() == std::string("DE"));
     REQUIRE(capturedSessionId == 2);
@@ -100,6 +110,7 @@ TEST_CASE("SessionManager.")
       10, 10, streamSpyCreator, [&initialTime]() mutable { return initialTime; }, 15, DiodeType::basic);
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
+    WAIT_FOR_ASYNC_THREAD;
 
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
@@ -109,6 +120,7 @@ TEST_CASE("SessionManager.")
     initialTime += secondsSinceFirstPacketSent;
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, false), {'D', 'F'}));
+    WAIT_FOR_ASYNC_THREAD;
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(fileDeletedWasCalled);
     REQUIRE_FALSE(fileRenameWasCalled);
@@ -120,14 +132,19 @@ TEST_CASE("SessionManager.")
     auto sessionManager = SessionManager(10, 2, streamSpyCreator, fakeGetTime, 15, DiodeType::basic);
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'B', 'C'}));
+    WAIT_FOR_ASYNC_THREAD;
 
     REQUIRE(outputStreams.at(0).str() == std::string("BC"));
     REQUIRE(capturedSessionId == 1);
 
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 3, false), {'F', 'G'}));
+    WAIT_FOR_ASYNC_THREAD;
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 4, false), {'H', 'I'}));
+    WAIT_FOR_ASYNC_THREAD;
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 5, false), {'J', 'K'}));
+    WAIT_FOR_ASYNC_THREAD;
     sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 2, false), {'D', 'E'}));
+    WAIT_FOR_ASYNC_THREAD;
 
     REQUIRE_FALSE(fileRenameWasCalled);
   }
