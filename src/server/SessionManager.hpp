@@ -6,6 +6,7 @@
 
 #include <map>
 #include <set>
+#include <future>
 #include "OrderingStreamWriter.hpp"
 #include "StreamInterface.hpp"
 
@@ -25,10 +26,12 @@ public:
 private:
   void closeSession(std::uint32_t sessionId);
   void createNewSession(uint32_t sessionId);
+  void checkStreamFutures();
 
   std::uint32_t maxBufferSize;
   std::uint32_t maxQueueLength;
   std::map<std::uint32_t, OrderingStreamWriter> streams;
+  std::map<std::uint32_t, std::future<int>> streamFutures;
   std::function<std::unique_ptr<StreamInterface>(std::uint32_t)> streamCreator;
   std::function<time_t()> getTime;
   std::uint32_t timeoutPeriod;

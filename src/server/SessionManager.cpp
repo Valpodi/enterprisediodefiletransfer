@@ -1,11 +1,12 @@
 // Copyright PA Knowledge Ltd 2021
 // MIT License. For licence terms see LICENCE.md file.
 
-#include <filesystem>
-#include <iostream>
-#include "diodeheader/EnterpriseDiodeHeader.hpp"
-#include "FileStream.hpp"
 #include "SessionManager.hpp"
+#include "FileStream.hpp"
+#include "diodeheader/EnterpriseDiodeHeader.hpp"
+#include <filesystem>
+#include <future>
+#include <iostream>
 
 SessionManager::SessionManager(
   std::uint32_t maxBufferSize,
@@ -36,6 +37,7 @@ void SessionManager::writeToStream(Packet&& packet)
   }
 
   writeFileAndSaveIfComplete(std::move(packet));
+  checkStreamFutures();
 }
 
 void SessionManager::createSessionIfNewId(const std::uint32_t sessionId)
@@ -48,9 +50,12 @@ void SessionManager::createSessionIfNewId(const std::uint32_t sessionId)
 
 void SessionManager::createNewSession(std::uint32_t sessionId)
 {
+  std::promise<int> isStreamClosedPromise;
+  std::future<int> isStreamClosedFuture = isStreamClosedPromise.get_future();
   streams.emplace(std::make_pair(
     sessionId,
-    OrderingStreamWriter(maxBufferSize, maxQueueLength, streamCreator(sessionId), getTime, diodeType)));
+    OrderingStreamWriter(maxBufferSize, maxQueueLength, streamCreator(sessionId), getTime, diodeType, std::move(isStreamClosedPromise))));
+  streamFutures.emplace(sessionId, std::move(isStreamClosedFuture));
 }
 
 bool SessionManager::isStreamExpired(std::uint32_t sessionId)
@@ -73,4 +78,18 @@ void SessionManager::writeFileAndSaveIfComplete(Packet&& packet)
 void SessionManager::closeSession(std::uint32_t sessionId)
 {
   streams.erase(sessionId);
+}
+
+void SessionManager::checkStreamFutures()
+{
+  for (auto& sessionFuturePair : streamFutures)
+  {
+    if (sessionFuturePair.second.wait_for(std::chrono::microseconds(1)) == std::future_status::ready)
+    {
+      if (sessionFuturePair.second.get() == 1)
+      {
+        closeSession(sessionFuturePair.first);
+      }
+    }
+  }
 }

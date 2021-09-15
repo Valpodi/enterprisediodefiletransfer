@@ -8,6 +8,7 @@
 #include <fstream>
 #include <functional>
 #include <ctime>
+#include <future>
 #include "ReorderPackets.hpp"
 #include "diodeheader/EnterpriseDiodeHeader.hpp"
 #include "StreamInterface.hpp"
@@ -20,7 +21,8 @@ public:
     std::uint32_t maxQueueLength,
     std::unique_ptr<StreamInterface> stream,
     std::function<std::time_t()> getTime,
-    DiodeType diodeType);
+    DiodeType diodeType,
+    std::promise<int>&& isStreamClosedPromise);
 
   void write(Packet&& data);
   void deleteFile();
@@ -30,6 +32,7 @@ private:
   ReorderPackets packetQueue;
   std::unique_ptr<StreamInterface> streamWrapper;
   std::function<std::time_t()> getTime;
+  std::promise<int> streamClosedPromise;
 
 public:
   std::time_t timeLastUpdated;

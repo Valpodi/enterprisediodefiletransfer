@@ -7,11 +7,13 @@
 #include <test/EnterpriseDiodeTestHelpers.hpp>
 #include "StreamSpy.hpp"
 
+std::promise<int> dummyPromise;
+
 TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; },
-                                           DiodeType::basic);
+  auto streamWriter = OrderingStreamWriter(
+    1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic, std::move(dummyPromise));
 
   auto packet = parsePacket(createTestPacketStream(1, 1, false), {'A', 'B'});
 
@@ -22,8 +24,8 @@ TEST_CASE("OrderingStreamWriter. Packet streams are written to the packet queue"
 TEST_CASE("OrderingStreamWriter. Import diode - packet stream and cloakedDaggerHeader are written to the stream")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; },
-                                           DiodeType::import);
+  auto streamWriter = OrderingStreamWriter(
+    1, 1, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::import, std::move(dummyPromise));
 
   auto packet = parsePacket(createTestPacketStream(1, 1, false, true), {'A', 'B'});
 
@@ -34,8 +36,8 @@ TEST_CASE("OrderingStreamWriter. Import diode - packet stream and cloakedDaggerH
 TEST_CASE("OrderingStreamWriter. Write returns true when the eof has been received")
 {
   std::stringstream outputStream;
-  auto streamWriter = OrderingStreamWriter(1, 5, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; },
-                                           DiodeType::basic);
+  auto streamWriter = OrderingStreamWriter(
+    1, 5, std::make_unique<StreamSpy>(outputStream, 1), []() { return 10000; }, DiodeType::basic, std::move(dummyPromise));
 
   SECTION("When the EOF packet is not queued")
   {
@@ -75,10 +77,9 @@ TEST_CASE(
 {
   std::stringstream outputStream;
   std::uint32_t initialTime = 500;
-  OrderingStreamWriter orderingStreamWriter(1,
-                                            1,
-                                            std::make_unique<StreamSpy>(outputStream, 1),
-                                            [&initialTime]() mutable { return initialTime; }, DiodeType::basic);
+  OrderingStreamWriter orderingStreamWriter(
+    1, 1, std::make_unique<StreamSpy>(outputStream, 1), [&initialTime]() mutable { return initialTime; },
+    DiodeType::basic, std::move(dummyPromise));
 
   REQUIRE(orderingStreamWriter.timeLastUpdated == 500);
 
