@@ -37,7 +37,6 @@ void SessionManager::writeToStream(Packet&& packet)
   }
 
   writeFileAndSaveIfComplete(std::move(packet));
-  checkStreamFutures();
 }
 
 void SessionManager::createSessionIfNewId(const std::uint32_t sessionId)
@@ -82,14 +81,23 @@ void SessionManager::closeSession(std::uint32_t sessionId)
 
 void SessionManager::checkStreamFutures()
 {
+  usleep(1000);
   for (auto& sessionFuturePair : streamFutures)
   {
-    if (sessionFuturePair.second.wait_for(std::chrono::microseconds(1)) == std::future_status::ready)
+    std::cerr << "sessionID:" << sessionFuturePair.first;
+    if (sessionFuturePair.second.valid() && (sessionFuturePair.second.wait_for(std::chrono::microseconds(100)) == std::future_status::ready))
     {
-      if (sessionFuturePair.second.get() == 1)
+      int state = sessionFuturePair.second.get();
+      std::cerr << " state:" << state << std::endl;
+      if (state == 1)
       {
         closeSession(sessionFuturePair.first);
+        streamFutures.erase(sessionFuturePair.first);
       }
+    }
+    else
+    {
+      std::cerr << " state: not valid yet" << std::endl;
     }
   }
 }

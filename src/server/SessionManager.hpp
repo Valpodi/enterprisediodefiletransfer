@@ -22,11 +22,11 @@ public:
     DiodeType diodeType);
 
   void writeToStream(Packet&& packet);
+  void checkStreamFutures();
 
 private:
   void closeSession(std::uint32_t sessionId);
   void createNewSession(uint32_t sessionId);
-  void checkStreamFutures();
 
   std::uint32_t maxBufferSize;
   std::uint32_t maxQueueLength;

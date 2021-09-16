@@ -68,7 +68,7 @@ void ReorderPackets::startUnloadQueueThread(StreamInterface* streamWrapper)
 {
   unloadQueueThreadState = unloadQueueThreadStatus::running;
   queueProcessorThread = new std::thread(&ReorderPackets::unloadQueueThread, this, streamWrapper);
-  // queueProcessorThread.detach();
+  queueProcessorThread->detach();
   spdlog::info("started thread");
 }
 
@@ -90,7 +90,7 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
             sislFilename.extractFilename(packet.getFrame()).value_or("rejected."));
           unloadQueueThreadState = unloadQueueThreadStatus::done;
           streamWrapper->renameFile();
-          spdlog::info("#File completed. TODO handle thread cleanup.");
+          spdlog::info("#File completed.");
         } 
         else 
         {
@@ -130,6 +130,7 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
       spdlog::info("Caught exception: " + std::string(ex.what()));
     }
   }
+  spdlog::info("#Exiting thread. TODO handle thread cleanup.");
 }
 
 void ReorderPackets::writeFrame(StreamInterface* streamWrapper, Packet&& packet)
