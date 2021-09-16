@@ -12,13 +12,11 @@ OrderingStreamWriter::OrderingStreamWriter(
   std::function<std::time_t()> getTime,
   DiodeType diodeType,
   std::promise<int>&& isStreamClosedPromise):
-    packetQueue(maxBufferSize, maxQueueLength, diodeType),
+    packetQueue(maxBufferSize, maxQueueLength, diodeType, std::move(isStreamClosedPromise)),
     streamWrapper(std::move(streamWrapper)),
     getTime(std::move(getTime)),
     timeLastUpdated(this->getTime())
 {
-  streamClosedPromise = std::move(isStreamClosedPromise);
-  streamClosedPromise.set_value(99);
 }
 
 void OrderingStreamWriter::write(Packet&& data)
@@ -36,5 +34,4 @@ void OrderingStreamWriter::renameFile()
 {
   std::cerr << "calling rename from inside OrderingStreamWriter::renameFile()" << std::endl;
   streamWrapper->renameFile();
-  streamClosedPromise.set_value(1);
 }

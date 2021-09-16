@@ -9,6 +9,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <future>
 #include <optional>
 #include "spdlog/spdlog.h"
 
@@ -16,12 +17,27 @@ ReorderPackets::ReorderPackets(
   std::uint32_t maxBufferSize,
   std::uint32_t maxQueueLength,
   DiodeType diodeType,
+  std::uint32_t maxFilenameLength) :
+    sislFilename(maxFilenameLength),
+    maxBufferSize(maxBufferSize),
+    maxQueueLength(maxQueueLength),
+    diodeType(diodeType)
+{
+}
+
+ReorderPackets::ReorderPackets(
+  std::uint32_t maxBufferSize,
+  std::uint32_t maxQueueLength,
+  DiodeType diodeType,
+  std::promise<int>&& isStreamClosedPromise,
   std::uint32_t maxFilenameLength):
     sislFilename(maxFilenameLength),
     maxBufferSize(maxBufferSize),
     maxQueueLength(maxQueueLength),
     diodeType(diodeType)
 {
+  streamClosedPromise = std::move(isStreamClosedPromise);
+  streamClosedPromise.set_value(99);
 }
 
 void ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)

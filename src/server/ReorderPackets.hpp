@@ -6,6 +6,7 @@
 #include <BytesBuffer.hpp>
 #include <algorithm>
 #include <optional>
+#include <future>
 #include <queue>
 #include <rewrapper/StreamingRewrapper.hpp>
 #include <thread>
@@ -27,6 +28,14 @@ public:
     std::uint32_t maxQueueLength,
     DiodeType diodeType,
     std::uint32_t maxFilenameLength = 65);
+
+  explicit ReorderPackets(
+    std::uint32_t maxBufferSize,
+    std::uint32_t maxQueueLength,
+    DiodeType diodeType,
+    std::promise<int>&& isStreamClosedPromise,
+    std::uint32_t maxFilenameLength = 65);
+
   void write(Packet&& packet, StreamInterface* streamWrapper);
 
   enum unloadQueueThreadStatus { error, empty, idle, running, done, interrupted };
@@ -55,4 +64,6 @@ private:
   std::uint32_t lastFrameWritten = 0;
 
   long unsigned int queueSize;
+
+  std::promise<int> streamClosedPromise;
 };

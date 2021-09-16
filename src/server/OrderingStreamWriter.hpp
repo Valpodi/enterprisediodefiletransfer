@@ -32,7 +32,6 @@ private:
   ReorderPackets packetQueue;
   std::unique_ptr<StreamInterface> streamWrapper;
   std::function<std::time_t()> getTime;
-  std::promise<int> streamClosedPromise;
 
 public:
   std::time_t timeLastUpdated;
