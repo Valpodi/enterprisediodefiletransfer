@@ -9,8 +9,7 @@
 #include <boost/thread.hpp>
 #include <future>
 
-#define WAIT_FOR_FUTURE (isStreamClosedFuture.wait_for(std::chrono::microseconds(1000)) == std::future_status::ready)
-#define WAIT_FOR_ASYNC_THREAD usleep(1000)
+#define WAIT_FOR_FUTURE (isStreamClosedFuture.wait_for(std::chrono::microseconds(10000)) == std::future_status::ready)
 
 void queueManagerWriteHelper(ReorderPackets&& queueManager, std::string inputStream, StreamSpy stream);
 
