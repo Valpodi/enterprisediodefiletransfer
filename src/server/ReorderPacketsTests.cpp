@@ -10,6 +10,7 @@
 #include <future>
 
 #define WAIT_FOR_FUTURE (isStreamClosedFuture.wait_for(std::chrono::microseconds(10000)) == std::future_status::ready)
+#define WAIT_FOR_ASYNC usleep(10000)
 
 void queueManagerWriteHelper(ReorderPackets&& queueManager, std::string inputStream, StreamSpy stream);
 
