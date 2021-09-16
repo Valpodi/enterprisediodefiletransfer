@@ -8,17 +8,19 @@
 #include <rewrapper/UnwrapperTestHelpers.hpp>
 #include <boost/thread.hpp>
 
-#define WAIT_FOR_ASYNC_THREAD usleep(1000)
+#define WAIT_FOR_ASYNC_THREAD usleep(10000)
 
 void queueManagerWriteHelper(ReorderPackets&& queueManager, std::string inputStream, StreamSpy stream);
 
 TEST_CASE("ReorderPackets. Packets received in order are written to the output")
 {
+  std::promise<int> isStreamClosedPromise;
+  std::future<int> isStreamClosedFuture = isStreamClosedPromise.get_future();
   std::stringstream outputStream;
   bool notused1;
   bool notused2;
   StreamSpy stream(outputStream, 1, notused1, notused2);
-  auto queueManager = ReorderPackets(4, 1024, DiodeType::basic);
+  auto queueManager = ReorderPackets(4, 1024, DiodeType::basic, std::move(isStreamClosedPromise));
   queueManager.write({HeaderParams{0, 1, false, {}}, {'B', 'C'}}, &stream);
   WAIT_FOR_ASYNC_THREAD;
   REQUIRE(outputStream.str() == "BC");
@@ -30,11 +32,13 @@ TEST_CASE("ReorderPackets. Packets received in order are written to the output")
 
 TEST_CASE("ReorderPackets. Handling filename")
 {
+  std::promise<int> isStreamClosedPromise;
+  std::future<int> isStreamClosedFuture = isStreamClosedPromise.get_future();
   bool notused1;
   bool notused2;
   std::stringstream outputStream;
   StreamSpy stream(outputStream, 1, notused1, notused2);
-  auto queueManager = ReorderPackets(4, 1024, DiodeType::basic);
+  auto queueManager = ReorderPackets(4, 1024, DiodeType::basic, std::move(isStreamClosedPromise));
 
   SECTION("good filename")
   {
@@ -57,11 +61,14 @@ TEST_CASE("ReorderPackets. Handling filename")
 
 TEST_CASE("ReorderPackets. Out-of-order packets")
 {
+  std::promise<int> isStreamClosedPromise;
+  std::future<int> isStreamClosedFuture = isStreamClosedPromise.get_future();
   std::stringstream outputStream;
   bool notused1;
   bool notused2;
   StreamSpy stream(outputStream, 1, notused1, notused2);
-  auto queueManager = ReorderPackets(16, 1024, DiodeType::basic);
+//  auto queueManager = ReorderPackets(16, 1024, DiodeType::basic);
+  auto queueManager = ReorderPackets(4, 1024, DiodeType::basic, std::move(isStreamClosedPromise));
 
   SECTION("Frame 2 and 3 are not written to the output if frame 1 missing")
   {
