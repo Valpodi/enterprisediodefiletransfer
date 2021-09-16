@@ -7,8 +7,10 @@
 #include "test/catch.hpp"
 #include <rewrapper/UnwrapperTestHelpers.hpp>
 #include <boost/thread.hpp>
+#include <future>
 
-#define WAIT_FOR_ASYNC_THREAD usleep(10000)
+#define WAIT_FOR_FUTURE (isStreamClosedFuture.wait_for(std::chrono::microseconds(1000)) == std::future_status::ready)
+#define WAIT_FOR_ASYNC_THREAD usleep(1000)
 
 void queueManagerWriteHelper(ReorderPackets&& queueManager, std::string inputStream, StreamSpy stream);
 
@@ -22,11 +24,11 @@ TEST_CASE("ReorderPackets. Packets received in order are written to the output")
   StreamSpy stream(outputStream, 1, notused1, notused2);
   auto queueManager = ReorderPackets(4, 1024, DiodeType::basic, std::move(isStreamClosedPromise));
   queueManager.write({HeaderParams{0, 1, false, {}}, {'B', 'C'}}, &stream);
-  WAIT_FOR_ASYNC_THREAD;
+  WAIT_FOR_FUTURE;
   REQUIRE(outputStream.str() == "BC");
 
   queueManager.write({HeaderParams{0, 2, false, {}}, {'D', 'E'}}, &stream);
-  WAIT_FOR_ASYNC_THREAD;
+  WAIT_FOR_FUTURE;
   REQUIRE(outputStream.str() == "BCDE");
 }
 
@@ -44,7 +46,7 @@ TEST_CASE("ReorderPackets. Handling filename")
   {
     auto inputStream = std::string("{name: !str \"testFilename\"}");
     queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "testFilename");
   }
@@ -53,7 +55,7 @@ TEST_CASE("ReorderPackets. Handling filename")
   {
     auto inputStream = std::string("{name: !str \"testFilenametestFilenametestFilenametestFilenametestFilenametestFilename\"}");
     queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str().empty());
     REQUIRE(stream.storedFilename == "rejected.12345");
   }
@@ -74,26 +76,26 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
   {
     auto inputStream = std::string("BC");
     queueManager.write({HeaderParams{0, 2, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str().empty());
 
     inputStream = std::string("DE");
     queueManager.write({HeaderParams{0, 3, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str().empty());
 
     SECTION("After frame 1 arrives, frame 2 and 3 are written to the output")
     {
       inputStream = std::string("ZA");
       queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-      WAIT_FOR_ASYNC_THREAD;
+      WAIT_FOR_FUTURE;
       REQUIRE(outputStream.str() == "ZABCDE");
 
       SECTION("Frame 4 is EOF and is written to to the output and write returns true")
       {
         inputStream = std::string("{name: !str \"testFilename\"}");
         queueManager.write({HeaderParams{0, 4, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-        WAIT_FOR_ASYNC_THREAD;
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDE");
       }
 
@@ -101,11 +103,12 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
       {
         inputStream = std::string("{name: !str \"testFilename\"}");
         queueManager.write({HeaderParams{0, 5, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDE");
         REQUIRE_FALSE(stream.storedFilename == "testFilename");
         inputStream = std::string("FG");
         queueManager.write({HeaderParams{0, 4, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-        WAIT_FOR_ASYNC_THREAD;
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDEFG");
         REQUIRE(stream.storedFilename == "testFilename");
       }
@@ -114,11 +117,12 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
       {
         inputStream = std::string("YZ");
         queueManager.write({HeaderParams{0, 99, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDE");
+
         inputStream = std::string("{name: !str \"testFilename\"}");
         queueManager.write({HeaderParams{0, 4, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-        WAIT_FOR_ASYNC_THREAD;
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDE");
       }
 
@@ -126,11 +130,12 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
       {
         inputStream = std::string("");
         queueManager.write({HeaderParams{0, 99, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDE");
+
         inputStream = std::string("{name: !str \"testFilename\"}");
         queueManager.write({HeaderParams{0, 4, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-        WAIT_FOR_ASYNC_THREAD;
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDE");
       }
 
@@ -139,15 +144,15 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
       {
         inputStream = std::string("{name: !str \"testFilename\"}");
         queueManager.write({HeaderParams{0, 5, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-        WAIT_FOR_ASYNC_THREAD;
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDE");
         inputStream = std::string("{name: !str \"wrongFilename\"}");
         queueManager.write({HeaderParams{0, 99, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-        WAIT_FOR_ASYNC_THREAD;
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDE");
         inputStream = std::string("FG");
         queueManager.write({HeaderParams{0, 4, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-        WAIT_FOR_ASYNC_THREAD;
+        WAIT_FOR_FUTURE;
         REQUIRE(outputStream.str() == "ZABCDEFG");
 
         REQUIRE(stream.storedFilename == "testFilename");
