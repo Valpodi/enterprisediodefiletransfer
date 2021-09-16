@@ -164,22 +164,22 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
   {
     auto inputStream = std::string("BC");
     queueManager.write({HeaderParams{0, 3, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str().empty());
 
     inputStream = std::string("{name: !str \"testFilename\"}");
     queueManager.write({HeaderParams{0, 4, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str().empty());
 
     inputStream = std::string("ZA");
     queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str() == "ZA");
 
     inputStream = std::string("12");
     queueManager.write({HeaderParams{0, 2, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str() == "ZA12BC");
   }
 
@@ -189,7 +189,7 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
     {
       auto inputStream = std::string("{name: !str \"testFilename\"}");
       queueManager.write({HeaderParams{0, 1, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-      WAIT_FOR_ASYNC_THREAD;
+      WAIT_FOR_FUTURE;
       REQUIRE(outputStream.str() == "");
     }
 
@@ -197,22 +197,22 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
     {
       auto inputStream = std::string("BC");
       queueManager.write({HeaderParams{0, 2, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-      WAIT_FOR_ASYNC_THREAD;
+      WAIT_FOR_FUTURE;
       REQUIRE(outputStream.str().empty());
 
       inputStream = std::string("{name: !str \"testFilename\"}");
       queueManager.write({HeaderParams{0, 4, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-      WAIT_FOR_ASYNC_THREAD;
+      WAIT_FOR_FUTURE;
       REQUIRE(outputStream.str().empty());
 
       inputStream = std::string("ZA");
       queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-      WAIT_FOR_ASYNC_THREAD;
+      WAIT_FOR_FUTURE;
       REQUIRE(outputStream.str() == "ZABC");
 
       inputStream = std::string("DE");
       queueManager.write({HeaderParams{0, 3, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-      WAIT_FOR_ASYNC_THREAD;
+      WAIT_FOR_FUTURE;
       REQUIRE(outputStream.str() == "ZABCDE");
     }
   }
@@ -220,11 +220,14 @@ TEST_CASE("ReorderPackets. Out-of-order packets")
 
 TEST_CASE("ReorderPackets. Import diode.")
 {
+  std::promise<int> isStreamClosedPromise;
+  std::future<int> isStreamClosedFuture = isStreamClosedPromise.get_future();
+
   std::stringstream outputStream;
   bool notused1;
   bool notused2;
   StreamSpy stream(outputStream, 1, notused1, notused2);
-  auto queueManager = ReorderPackets(4, 1024, DiodeType::import, 65);
+  auto queueManager = ReorderPackets(4, 1024, DiodeType::import, std::move(isStreamClosedPromise), 65);
 
   SECTION("Data which is not wrapped, sisl or bitmap throws an error")
   {
@@ -232,7 +235,7 @@ TEST_CASE("ReorderPackets. Import diode.")
     auto inputStream2 = std::string("BC");    // good SISL
     queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream1.begin(), inputStream1.end()}}, &stream);
     queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream2.begin(), inputStream2.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE("BC" == outputStream.str());
   }
 
@@ -240,12 +243,12 @@ TEST_CASE("ReorderPackets. Import diode.")
   {
     auto inputStream = std::string("{A");
     queueManager.write({HeaderParams{0, 1, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     REQUIRE(outputStream.str() == "{A");
 
     inputStream = std::string("BC");
     queueManager.write({HeaderParams{0, 2, false, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
 
     REQUIRE(outputStream.str() == "{ABC");
   }
@@ -254,7 +257,7 @@ TEST_CASE("ReorderPackets. Import diode.")
   {
     auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), static_cast<char>(0xf0)});
     queueManager.write({HeaderParams{0, 1, false, wrappedInputStream.header}, {wrappedInputStream.message.begin(), wrappedInputStream.message.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
 
     std::string firstFrame{wrappedInputStream.header.begin(), wrappedInputStream.header.end()};
     firstFrame.insert(firstFrame.end(), wrappedInputStream.message.begin(), wrappedInputStream.message.end());
@@ -268,13 +271,13 @@ TEST_CASE("ReorderPackets. Import diode.")
                                                               static_cast<char>(0xf0)});
     queueManager.write({HeaderParams{0, 1, false, wrappedInputStream.header},
                         {wrappedInputStream.message.begin(), wrappedInputStream.message.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     auto wrappedInputStream2 = createTestWrappedString("def", {static_cast<char>(0xf0), 0x34, 0x56, 0x78,
                                                                static_cast<char>(0x9a), static_cast<char>(0xbc),
                                                                static_cast<char>(0xde), 0x12});
     queueManager.write({HeaderParams{0, 2, false, wrappedInputStream2.header},
                         {wrappedInputStream2.message.begin(), wrappedInputStream2.message.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     std::stringstream unwrappedStream;
     unwrapFromStream(outputStream, unwrappedStream);
     REQUIRE(unwrappedStream.str() == "abcdef");
@@ -284,10 +287,10 @@ TEST_CASE("ReorderPackets. Import diode.")
   {
     auto wrappedInputStream = createTestWrappedString("def", {0x12, 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), static_cast<char>(0xf0)});
     queueManager.write({HeaderParams{0, 2, false, wrappedInputStream.header}, {wrappedInputStream.message.begin(), wrappedInputStream.message.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     auto wrappedInputStream2 = createTestWrappedString("abc", {static_cast<char>(0xf0), 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), 0x12});
     queueManager.write({HeaderParams{0, 1, false, wrappedInputStream2.header}, {wrappedInputStream2.message.begin(), wrappedInputStream2.message.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
 
     std::stringstream unwrappedStream;
     unwrapFromStream(outputStream, unwrappedStream);
@@ -298,16 +301,16 @@ TEST_CASE("ReorderPackets. Import diode.")
   {
     auto wrappedInputStream = createTestWrappedString("abc", {0x12, 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), static_cast<char>(0xf0)});
     queueManager.write({HeaderParams{0, 1, false, wrappedInputStream.header}, {wrappedInputStream.message.begin(), wrappedInputStream.message.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     auto wrappedInputStream2 = createTestWrappedString("def", {static_cast<char>(0xf0), 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), 0x12});
     queueManager.write({HeaderParams{0, 2, false, wrappedInputStream2.header}, {wrappedInputStream2.message.begin(), wrappedInputStream2.message.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     auto wrappedInputStream3 = createTestWrappedString("ghi", {static_cast<char>(0xf5), 0x34, 0x56, 0x78, static_cast<char>(0x9a), static_cast<char>(0xbc), static_cast<char>(0xde), 0x34});
     queueManager.write({HeaderParams{0, 3, false, wrappedInputStream3.header}, {wrappedInputStream3.message.begin(), wrappedInputStream3.message.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
     std::string inputStream = std::string("{name: !str \"testFilename\"}");
     queueManager.write({HeaderParams{0, 4, true, {}}, {inputStream.begin(), inputStream.end()}}, &stream);
-    WAIT_FOR_ASYNC_THREAD;
+    WAIT_FOR_FUTURE;
 
     std::stringstream unwrappedStream;
     unwrapFromStream(outputStream, unwrappedStream);
