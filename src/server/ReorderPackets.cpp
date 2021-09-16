@@ -37,7 +37,6 @@ ReorderPackets::ReorderPackets(
     diodeType(diodeType)
 {
   streamClosedPromise = std::move(isStreamClosedPromise);
-  streamClosedPromise.set_value(99);
 }
 
 void ReorderPackets::write(Packet&& packet, StreamInterface* streamWrapper)
@@ -106,6 +105,7 @@ void ReorderPackets::unloadQueueThread(StreamInterface* streamWrapper)
             sislFilename.extractFilename(packet.getFrame()).value_or("rejected."));
           unloadQueueThreadState = unloadQueueThreadStatus::done;
           streamWrapper->renameFile();
+          streamClosedPromise.set_value(1);
           spdlog::info("#File completed.");
         } 
         else 

@@ -47,7 +47,7 @@ TEST_CASE("SessionManager.")
 
       SECTION("After a session is closed, new packets with the same sessionID are written to a new stream")
       {
-        sessionManager.writeToStream(parsePacket(createTestPacketStream(2, 1, false), {'F', 'G'}));
+        sessionManager.writeToStream(parsePacket(createTestPacketStream(1, 1, false), {'F', 'G'}));
         WAIT_FOR_ASYNC_THREAD;
         REQUIRE(outputStreams.at(1).str() == std::string("FG"));
       }
