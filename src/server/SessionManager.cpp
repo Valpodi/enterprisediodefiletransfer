@@ -77,6 +77,7 @@ void SessionManager::writeFileAndSaveIfComplete(Packet&& packet)
 void SessionManager::closeSession(std::uint32_t sessionId)
 {
   streams.erase(sessionId);
+  streamFutures.erase(sessionId);
 }
 
 void SessionManager::checkStreamFutures()
@@ -92,7 +93,6 @@ void SessionManager::checkStreamFutures()
       if (state == 1)
       {
         closeSession(sessionFuturePair.first);
-        streamFutures.erase(sessionFuturePair.first);
       }
     }
     else
